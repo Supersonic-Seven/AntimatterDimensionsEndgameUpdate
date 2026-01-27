@@ -307,6 +307,7 @@ export const Endgame = {
     player.reality.glyphs.sac.dilation = DC.D0;
     player.reality.glyphs.sac.effarig = DC.D0;
     player.reality.glyphs.sac.reality = DC.D0;
+    if (ImaginaryUpgrade(22).isBought) ImaginaryUpgrade(22).onPurchased();
     player.blackHole = Array.range(0, 2).map(id => ({
       id,
       intervalUpgrades: EndgameUpgrade(6).isBought ? 40 : 0,
