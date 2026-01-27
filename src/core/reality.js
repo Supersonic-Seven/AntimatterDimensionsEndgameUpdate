@@ -672,9 +672,9 @@ export function finishProcessReality(realityProps) {
   player.records.thisReality.time = DC.D0;
   player.records.thisReality.realTime = 0;
   player.records.thisReality.maxReplicanti = DC.D0;
-  if (!PelleUpgrade.timeStudiesNoReset.canBeApplied) Currency.timeTheorems.reset();
-  player.celestials.v.STSpent = 0;
   if (!PelleUpgrade.timeStudiesNoReset.canBeApplied) {
+    Currency.timeTheorems.reset();
+    player.celestials.v.STSpent = 0;
     player.dilation.studies = [];
     player.dilation.active = false;
   }
