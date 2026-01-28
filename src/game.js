@@ -590,6 +590,8 @@ export function gameLoop(passedDiff, options = {}) {
       // This is only called from simulateTime() and is calculated externally in order to avoid weirdness when game
       // speed is directly nerfed
       speedFactor = new Decimal(options.blackHoleSpeedup);
+      if (speedFactor.lt(0)) throw Error("The Speed Factor of BH is" + speedFactor.toString() + " which will cause game to crash.")
+      if (speedFactor.eq(0)) console.log("The Speed Factor of BH is 0! Will it cause crash?")
     }
 
     if (Enslaved.isStoringGameTime && !fixedSpeedActive) {
@@ -1198,7 +1200,7 @@ export function simulateTime(seconds, real, fast) {
   // - Calling with fast === true will only simulate it with a max of 50 ticks
   // - Otherwise, tick count will be limited to the offline tick count (which may be set externally during save import)
   // Tick count is never *increased*, and only ever decreased if needed.
-  if (seconds < 0) return;
+  if (seconds <= 0) return;
   let ticks = Math.floor(seconds * 20);
   GameUI.notify.showBlackHoles = false;
 
@@ -1238,6 +1240,7 @@ export function simulateTime(seconds, real, fast) {
   EventHub.dispatch(GAME_EVENT.OFFLINE_CURRENCY_GAINED);
 
   let remainingRealSeconds = seconds;
+  if (remainingRealSeconds <= 0) return;
   // During async code the number of ticks remaining can go down suddenly
   // from "Speed up" which means tick length needs to go up, and thus
   // you can't just divide total time by total ticks to get tick length.
@@ -1263,7 +1266,8 @@ export function simulateTime(seconds, real, fast) {
       const [realTickTime, blackHoleSpeedup] = BlackHoles.calculateOfflineTick(remainingRealSeconds,
         i, 0.0001);
       remainingRealSeconds -= realTickTime;
-      gameLoop(1000 * realTickTime, { blackHoleSpeedup });
+      if (realTickTime <= 0) throw Error("The game tries to simulate " + realTickTime + " seconds and this will cause game to randomly crash.");
+      else gameLoop(1000 * realTickTime, { blackHoleSpeedup });
     };
   }
 

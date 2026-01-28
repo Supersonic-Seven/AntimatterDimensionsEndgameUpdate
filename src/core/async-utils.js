@@ -55,9 +55,9 @@ window.Async = {
       return config.then ? runResult.then(() => {
         config.then();
         this.enabled = true;
-      }) : runResult;
+      }) : runResult.then(() => this.enabled = true);
     }
-    for (let i = 0; i < maxIter; ++i) {
+    for (let i = maxIter; i > 0; i--) {
       fun(i);
     }
     if (config.then) config.then();
