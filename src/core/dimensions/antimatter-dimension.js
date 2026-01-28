@@ -342,9 +342,11 @@ export function buyMaxDimension(tier, bulk = Infinity) {
   }
   let buying = maxBought.quantity;
   if (buying > bulkLeft) buying = bulkLeft;
-  dimension.amount = dimension.amount.plus(10 * buying).round();
-  dimension.bought += 10 * buying;
-  dimension.currencyAmount = dimension.currencyAmount.minus(Decimal.pow10(maxBought.logPrice));
+  if (dimension.currencyAmount.gte(Decimal.pow10(maxBought.logPrice))) {
+    dimension.amount = dimension.amount.plus(10 * buying).round();
+    dimension.bought += 10 * buying;
+    dimension.currencyAmount = dimension.currencyAmount.minus(Decimal.pow10(maxBought.logPrice));
+  }
 }
 
 class AntimatterDimensionState extends DimensionState {

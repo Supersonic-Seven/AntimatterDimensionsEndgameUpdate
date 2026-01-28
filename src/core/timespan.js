@@ -251,7 +251,8 @@ window.TimeSpan = class TimeSpan {
       // If the number is smaller than 1e1.8e-308, it will displayed as something like "1e-NaN".
       // If this really happened we need to fix it.
       const ms = totalSeconds.times(1000);
-      return `${format(ms.mantissa, 0, 1)}e${format(ms.exponent)} ms`;
+      if (isFinite(ms.exponent)) return `${format(ms.mantissa, 0, 1)}e${format(ms.exponent)} ms`;
+      return ms.toString() + "ms";
     }
     if (totalSeconds.gt(1e-7) && totalSeconds.lt(1e-3)) {
       // This conditional happens when when the time is less than 1 millisecond
