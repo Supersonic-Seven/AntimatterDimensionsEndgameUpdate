@@ -231,7 +231,7 @@ export default {
           <div class="c-enslaved-run-button">
             <div
               class="c-enslaved-run-button__title"
-              :class="BHDescClass"
+              :class="doomedDisabledClass"
             >
               {{ realityTitle }}
             </div>
@@ -283,7 +283,7 @@ export default {
             >
               <div
                 class="o-enslaved-stored-time"
-                :class="doomedDisabledClass"
+                :class="BHDescClass"
               >
                 {{ storedBHDesc }}
               </div>

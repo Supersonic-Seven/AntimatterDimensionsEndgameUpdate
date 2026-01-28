@@ -271,8 +271,7 @@ export const Glyphs = {
     return this.active[activeIndex];
   },
   equip(glyph, targetSlot) {
-    const forbiddenByPelle = Pelle.isDisabled("glyphs") || Pelle.isGlyphTypeDisabled(glyph.type);
-    if (Pelle.isDoomed && !PelleDestructionUpgrade.specialGlyphEffects.isBought && forbiddenByPelle) return;
+    if ((Pelle.isDisabled("glyphs") && !PelleDestructionUpgrade.specialGlyphEffects.isBought) || Pelle.isGlyphTypeDisabled(glyph.type)) return;
     if (GameEnd.creditsEverClosed) return;
 
     if (glyph.type !== "companion") {

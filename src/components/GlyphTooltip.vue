@@ -201,7 +201,8 @@ export default {
   },
   methods: {
     update() {
-      this.showChaosText = Pelle.specialGlyphEffect.isUnlocked;
+      // Chaos Text is "You cannot equip this Glyph while Doomed!" if you can't equip this glyph
+      this.showChaosText = Pelle.specialGlyphEffect.isUnlocked || Pelle.isGlyphTypeDisabled(this.type);
       if (this.showChaosText) {
         this.chaosDescription = Pelle.getSpecialGlyphEffectDescription(this.type);
       }
