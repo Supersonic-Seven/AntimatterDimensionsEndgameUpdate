@@ -248,8 +248,10 @@ window.TimeSpan = class TimeSpan {
     if (totalSeconds.lt(1e-7) && !totalSeconds.eq(0)) {
       // Well I give up on fixing notation. I choose to make a new one.
       // TODO: make it a new notation
-      // Break eternity port: Nothing changed
-      return `${format(totalSeconds.times(1000).mantissa, 0, 1)}e${format(totalSeconds.times(1000).exponent)} ms`;
+      // If the number is smaller than 1e1.8e-308, it will displayed as something like "1e-NaN".
+      // If this really happened we need to fix it.
+      const ms = totalSeconds.times(1000);
+      return `${format(ms.mantissa, 0, 1)}e${format(ms.exponent)} ms`;
     }
     if (totalSeconds.gt(1e-7) && totalSeconds.lt(1e-3)) {
       // This conditional happens when when the time is less than 1 millisecond
