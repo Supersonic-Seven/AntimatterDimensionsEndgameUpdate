@@ -157,7 +157,7 @@ export default {
           </template>
         </ExpandingControlBox>
       </div>
-      <div class="l-options-grid__row">
+      <div class="l-options-grid__row l-low-z-index">
         <ExpandingControlBox
           class="l-options-grid__button c-options-grid__notations"
           button-class="o-primary-btn o-primary-btn--option l-options-grid__notations-header"
@@ -172,3 +172,8 @@ export default {
     </div>
   </div>
 </template>
+<style scoped>
+.l-low-z-index .l-expanding-control-box{
+  z-index: 2;
+}
+</style>
