@@ -106,8 +106,8 @@ export function buyMaxTimeDimension(tier, portionToSpend = 1, isMaxAll = false) 
   }
   if (Enslaved.isRunning) return buySingleTimeDimension(tier);
   const pur = Math.clampMin(calcHighestPurchaseableTD(tier, canSpend) - dim.bought, 0);
+  if (pur <= 0 || !isFinite(pur)) return false;
   const cost = dim.nextCost(pur + dim.bought).sub(1);
-  if (pur <= 0) return false;
   Currency.eternityPoints.subtract(cost);
   dim.amount = dim.amount.plus(pur);
   dim.bought += pur;
@@ -212,7 +212,7 @@ class TimeDimensionState extends DimensionState {
 
     let base = this.costMultiplier;
     if (this._tier <= 4) base *= 2.2;
-    const exponent = this.e6000ScalingAmount + (bought - this.e6000ScalingAmount) * TimeDimensions.scalingPast1e6000;
+    const exponent = new Decimal(bought - this.e6000ScalingAmount).mul(TimeDimensions.scalingPast1e6000).add(this.e6000ScalingAmount)
     const cost = Decimal.pow(base, exponent).times(this.baseCost);
 
     if (PelleRifts.paradox.milestones[0].canBeApplied && this._tier > 4) {

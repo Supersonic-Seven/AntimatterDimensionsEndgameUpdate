@@ -361,7 +361,7 @@ class EPMultiplierState extends GameMechanicState {
     if (bulk < 1) return false;
     const price = this.costAfterCount(bulk - 1);
     bulk = Math.max(bulk - this.boughtAmount, 0);
-    if (bulk === 0) return false;
+    if (bulk === 0 || !isFinite(bulk)) return false;
     Currency.eternityPoints.subtract(price);
     this.boughtAmount = this.boughtAmount + bulk;
     let i = 0;

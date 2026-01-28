@@ -13,6 +13,7 @@ export class TimeTheoremPurchaseType {
   set amount(value) { throw new NotImplementedError(); }
 
   add(amount) { this.amount += amount; }
+  willInfinity(amount) {return !isFinite(this.amount + amount);}
 
   /**
   * @abstract
@@ -48,6 +49,7 @@ export class TimeTheoremPurchaseType {
     if (!this.canAfford) return false;
     let purchased = false;
     const amount = this.bulkPossible;
+    if (this.willInfinity(amount)) return false;
     const buyFn = cost => (Perk.ttFree.canBeApplied ? this.currency.gte(cost) : this.currency.purchase(cost));
     // This will sometimes buy one too few for EP, so we just have to buy 1 after.
     if (bulk && buyFn(this.bulkCost(amount))) {
