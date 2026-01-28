@@ -57,6 +57,7 @@ window.Async = {
         this.enabled = true;
       }) : runResult.then(() => this.enabled = true);
     }
+    console.log("Warning! The async is not enabled because another async is running!");
     for (let i = maxIter; i > 0; i--) {
       fun(i);
     }
