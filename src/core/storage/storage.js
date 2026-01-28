@@ -483,6 +483,7 @@ export const GameStorage = {
     Glyphs.unseen = [];
     Glyphs.unequipped = [];
     Notations.find(player.options.notation).setAsCurrent(true);
+    LNotations.find(player.options.lnotation).setAsCurrent(true);
     ADNotations.Settings.exponentCommas.min = 10 ** player.options.notationDigits.comma;
     ADNotations.Settings.exponentCommas.max = 10 ** player.options.notationDigits.notation;
 
