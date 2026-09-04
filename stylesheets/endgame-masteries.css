@@ -1,0 +1,489 @@
+.l-endgame-masteries-tab {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  align-items: center;
+}
+
+.l-endgame-masteries-tab__tree {
+  margin-top: 1.5rem;
+  margin-bottom: 12.5rem;
+}
+
+.l-endgame-mastery-options {
+  display: flex;
+  flex-direction: row;
+}
+
+.l-endgame-mastery-options > * {
+  margin: 0.2rem;
+}
+
+.l-endgame-mastery-tree {
+  position: relative;
+}
+
+.l-endgame-mastery {
+  position: absolute;
+  z-index: 1;
+}
+
+.l-endgame-mastery-connection {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+}
+
+/* #region o-endgame-mastery */
+
+.o-endgame-mastery {
+  width: 18rem;
+  height: 10rem;
+  font-family: Typewriter, serif;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: black;
+  border: 0.1rem solid;
+  border-radius: var(--var-border-radius, 0.4rem);
+  transition-duration: 0.2s;
+}
+
+.o-endgame-mastery--available {
+  animation: a-endgame-mastery 7s infinite;
+  cursor: pointer;
+}
+
+.o-endgame-mastery--available:hover {
+  background-color: #00bcd4;
+  animation: none;
+}
+
+.o-endgame-mastery--unavailable {
+  color: black;
+}
+
+.o-endgame-mastery--unavailable:hover {
+  background-color: var(--color-bad);
+}
+
+.t-metro .o-endgame-mastery--unavailable,
+.t-inverted-metro .o-endgame-mastery--unavailable,
+.t-s1 .o-endgame-mastery--unavailable,
+.t-s8 .o-endgame-mastery--unavailable {
+  box-shadow: 0.1rem 0.1rem 0.1rem 0 black;
+}
+
+.s-base--metro .o-endgame-mastery--unavailable,
+.t-s1 .o-endgame-mastery--unavailable {
+  color: black;
+  border: none;
+}
+
+@keyframes a-endgame-mastery {
+  0% { box-shadow: inset 0 0 0.3rem 0; }
+  50% { box-shadow: inset 0 0 2rem 0; }
+  100% { box-shadow: inset 0 0 0.3rem 0; }
+}
+
+.o-endgame-mastery--small {
+  width: 12rem;
+  font-size: 0.85rem;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+}
+
+.o-endgame-mastery-normal--available {
+  color: var(--color-endgame);
+  border-color: var(--color-endgame);
+}
+
+.o-endgame-mastery-normal--available:hover {
+  color: white;
+  background-color: var(--color-endgame);
+  border-color: black;
+}
+
+.o-endgame-mastery-antimatter-dim-compression--available {
+  color: #22aa48;
+  border-color: #198036;
+}
+
+.o-endgame-mastery-antimatter-dim-compression--available:hover {
+  color: #eeeeee;
+  background-color: #22aa48;
+}
+
+.o-endgame-mastery-infinity-dim-compression--available {
+  color: #b67f33;
+  border-color: #8b6227;
+}
+
+.o-endgame-mastery-infinity-dim-compression--available:hover {
+  color: #eeeeee;
+  background-color: #b67f33;
+}
+
+.o-endgame-mastery-time-dim-compression--available {
+  color: #b241e3;
+  border-color: #951ec8;
+}
+
+.o-endgame-mastery-time-dim-compression--available:hover {
+  color: #eeeeee;
+  background-color: #b241e3;
+}
+
+.o-endgame-mastery-celestial-dim-compression--available {
+  color: #5151ec;
+  border-color: #4242b0;
+}
+
+.o-endgame-mastery-celestial-dim-compression--available:hover {
+  color: #eeeeee;
+  background-color: #5151ec;
+}
+
+.o-endgame-mastery-infinity-points--available {
+  color: #b67f33;
+  border-color: #8b6227;
+}
+
+.o-endgame-mastery-infinity-points--available:hover {
+  color: #eeeeee;
+  background-color: #b67f33;
+}
+
+.o-endgame-mastery-eternity-points--available {
+  color: #b241e3;
+  border-color: #951ec8;
+}
+
+.o-endgame-mastery-eternity-points--available:hover {
+  color: #eeeeee;
+  background-color: #b241e3;
+}
+
+.o-endgame-mastery-reality-machines--available {
+  color: #22aa48;
+  border-color: #198036;
+}
+
+.o-endgame-mastery-reality-machines--available:hover {
+  color: #eeeeee;
+  background-color: #22aa48;
+}
+
+.o-endgame-mastery-imaginary-machines--available {
+  color: #198036;
+  border-color: #175f2a;
+}
+
+.o-endgame-mastery-imaginary-machines--available:hover {
+  color: #eeeeee;
+  background-color: #198036;
+}
+
+.o-endgame-mastery-permanent--available {
+  color: black;
+  background-color: var(--color-endgame);
+  border-color: var(--color-endgame);
+  animation: a-endgame-mastery-permanent 10s infinite;
+}
+
+.o-endgame-mastery-permanent--available:hover {
+  color: white;
+  background-color: var(--color-endgame);
+  animation: a-endgame-mastery-permanent 10s infinite;
+}
+
+@keyframes a-endgame-mastery-permanent {
+  0% { box-shadow: inset 0.5rem  0       2rem; }
+  25% { box-shadow: inset 0       0.5rem  2rem; }
+  50% { box-shadow: inset -0.5rem 0       2rem; }
+  75% { box-shadow: inset 0       -0.5rem 2rem; }
+  100% { box-shadow: inset 0.5rem  0       2rem; }
+}
+
+.o-endgame-mastery-time-compression--available {
+  color: black;
+  background-color: #64ddad;
+  border-color: #64ddad;
+  animation: a-endgame-mastery-permanent 10s infinite;
+}
+
+.o-endgame-mastery-time-compression--available:hover {
+  color: white;
+  background-color: #64ddad;
+  animation: a-endgame-mastery-time-compression 10s infinite;
+}
+
+@keyframes a-endgame-mastery-time-compression {
+  0% { box-shadow: inset 0.5rem  0       2rem; }
+  25% { box-shadow: inset 0       0.5rem  2rem; }
+  50% { box-shadow: inset -0.5rem 0       2rem; }
+  75% { box-shadow: inset 0       -0.5rem 2rem; }
+  100% { box-shadow: inset 0.5rem  0       2rem; }
+}
+
+.o-endgame-mastery-normal--unavailable {
+  background-color: #9e9e9e;
+}
+
+.t-dark .o-endgame-mastery--unavailable:hover,
+.t-s6 .o-endgame-mastery--unavailable:hover,
+.t-s10 .o-endgame-mastery--unavailable:hover {
+  background-color: var(--color-bad);
+  border-color: var(--color-bad);
+}
+
+.o-endgame-mastery-antimatter-dim-compression--unavailable {
+  background-color: #94a89a;
+}
+
+.o-endgame-mastery-infinity-dim-compression--unavailable {
+  background-color: #a8a094;
+}
+
+.o-endgame-mastery-time-dim-compression--unavailable {
+  background-color: #a294a8;
+}
+
+.o-endgame-mastery-celestial-dim-compression--unavailable {
+  background-color: #9494a8;
+}
+
+.o-endgame-mastery-infinity-points--unavailable {
+  background-color: #a8a094;
+}
+
+.o-endgame-mastery-eternity-points--unavailable {
+  background-color: #a294a8;
+}
+
+.o-endgame-mastery-reality-machines--unavailable {
+  background-color: #94a89a;
+}
+
+.o-endgame-mastery-imaginary-machines--unavailable {
+  background-color: #94a894;
+}
+
+.o-endgame-mastery-permanent--unavailable {
+  background-color: #a8a894;
+}
+
+.o-endgame-mastery-time-compression--unavailable {
+  background-color: #94a8a0;
+}
+
+.o-endgame-mastery-normal--bought {
+  color: black;
+  background-color: var(--color-endgame);
+  border-color: black;
+}
+
+.o-endgame-mastery-antimatter-dim-compression--bought {
+  color: black;
+  background-color: #22aa48;
+  border-color: black;
+}
+
+.o-endgame-mastery-infinity-dim-compression--bought {
+  color: black;
+  background-color: #b67f33;
+  border-color: black;
+}
+
+.o-endgame-mastery-time-dim-compression--bought {
+  color: black;
+  background-color: #b241e3;
+  border-color: black;
+}
+
+.o-endgame-mastery-celestial-dim-compression--bought {
+  color: black;
+  background-color: #5151ec;
+  border-color: black;
+}
+
+.o-endgame-mastery-infinity-points--bought {
+  color: black;
+  background-color: #b67f33;
+  border-color: black;
+}
+
+.o-endgame-mastery-eternity-points--bought {
+  color: black;
+  background-color: #b241e3;
+  border-color: black;
+}
+
+.o-endgame-mastery-reality-machines--bought {
+  color: black;
+  background-color: #22aa48;
+  border-color: black;
+}
+
+.o-endgame-mastery-imaginary-machines--bought {
+  color: black;
+  background-color: #198036;
+  border-color: black;
+}
+
+.o-endgame-mastery-permanent--bought {
+  color: black;
+  background: linear-gradient(var(--color-endgame), var(--color-pelle--base));
+  border-color: black;
+}
+
+.o-endgame-mastery-time-compression--bought {
+  color: black;
+  background: linear-gradient(#64ddad, #0000ff);
+  border-color: black;
+}
+
+.t-dark .o-endgame-mastery-antimatter-dim-compression--bought,
+.t-s6 .o-endgame-mastery-antimatter-dim-compression--bought,
+.t-s10 .o-endgame-mastery-antimatter-dim-compression--bought {
+  border-color: #198036;
+}
+
+.t-dark .o-endgame-mastery-infinity-dim-compression--bought,
+.t-s6 .o-endgame-mastery-infinity-dim-compression--bought,
+.t-s10 .o-endgame-mastery-infinity-dim-compression--bought {
+  border-color: #8b6227;
+}
+
+.t-dark .o-endgame-mastery-time-dim-compression--bought,
+.t-s6 .o-endgame-mastery-time-dim-compression--bought,
+.t-s10 .o-endgame-mastery-time-dim-compression--bought {
+  border-color: #951ec8;
+}
+
+.t-dark .o-endgame-mastery-celestial-dim-compression--bought,
+.t-s6 .o-endgame-mastery-celestial-dim-compression--bought,
+.t-s10 .o-endgame-mastery-celestial-dim-compression--bought {
+  border-color: #4242b0;
+}
+
+.t-dark .o-endgame-mastery-infinity-points--bought,
+.t-s6 .o-endgame-mastery-infinity-points--bought,
+.t-s10 .o-endgame-mastery-infinity-points--bought {
+  border-color: #8b6227;
+}
+
+.t-dark .o-endgame-mastery-eternity-points--bought,
+.t-s6 .o-endgame-mastery-eternity-points--bought,
+.t-s10 .o-endgame-mastery-eternity-points--bought {
+  border-color: #951ec8;
+}
+
+.t-dark .o-endgame-mastery-reality-machines--bought,
+.t-s6 .o-endgame-mastery-reality-machines--bought,
+.t-s10 .o-endgame-mastery-reality-machines--bought {
+  border-color: #198036;
+}
+
+.t-dark .o-endgame-mastery-imaginary-machines--bought,
+.t-s6 .o-endgame-mastery-imaginary-machines--bought,
+.t-s10 .o-endgame-mastery-imaginary-machines--bought {
+  border-color: #175f2a;
+}
+
+/* #endregion o-endgame-mastery */
+
+.o-endgame-mastery-connection {
+  stroke: #444444;
+  /* This one should be px, because it rem svg behaves weirdly under scale */
+  stroke-width: 16px;
+  transition: stroke 0.3s;
+}
+
+.o-endgame-mastery-connection--antimatter-dim-compression {
+  stroke: #37533f;
+}
+
+.o-endgame-mastery-connection--infinity-dim-compression {
+  stroke: #534737;
+}
+
+.o-endgame-mastery-connection--time-dim-compression {
+  stroke: #4a3753;
+}
+
+.o-endgame-mastery-connection--celestial-dim-compression {
+  stroke: #373753;
+}
+
+.o-endgame-mastery-connection--infinity-points {
+  stroke: #534737;
+}
+
+.o-endgame-mastery-connection--eternity-points {
+  stroke: #4a3753;
+}
+
+.o-endgame-mastery-connection--reality-machines {
+  stroke: #37533f;
+}
+
+.o-endgame-mastery-connection--imaginary-machines {
+  stroke: #375337;
+}
+
+.o-endgame-mastery-connection--permanent {
+  stroke: #a0a037;
+}
+
+.o-endgame-mastery-connection--time-compression {
+  stroke: #37a080;
+}
+
+.o-endgame-mastery-connection--bought {
+  stroke: black;
+}
+
+.s-base--dark .o-endgame-mastery-connection--bought {
+  stroke: #bbbbbb;
+}
+
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--antimatter-dim-compression {
+  stroke: #22aa48;
+}
+
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--infinity-dim-compression {
+  stroke: #b67f33;
+}
+
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--time-dim-compression {
+  stroke: #b241e3;
+}
+
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--celestial-dim-compression {
+  stroke: #5151ec;
+}
+
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--infinity-points {
+  stroke: #b67f33;
+}
+
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--eternity-points {
+  stroke: #b241e3;
+}
+
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--reality-machines {
+  stroke: #22aa48;
+}
+
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--imaginary-machines {
+  stroke: #198036;
+}
+
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--permanent {
+  stroke: var(--color-endgame);
+}
+
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--time-compression {
+  stroke: #64ddad;
+}
