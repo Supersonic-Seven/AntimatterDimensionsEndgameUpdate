@@ -7,6 +7,10 @@ export default {
       lightHadrons: 0,
       darkHadrons: 0,
       exoticHadrons: 0,
+      totalLightHadrons: 0,
+      totalDarkHadrons: 0,
+      totalExoticHadrons: 0,
+      basePercentageCap: 0,
       percentageCap: 0,
       hadronTimer: new Decimal(0),
       effect1: new Decimal(1),
@@ -20,7 +24,8 @@ export default {
       hasEffect4: false,
       hasDark: false,
       hasExotic: false,
-      showWarning: false
+      showWarning: false,
+      isFlipped: false
     };
   },
   computed: {
@@ -42,27 +47,27 @@ export default {
     effect1Percent() {
       let fac = this.hadronTimer.times(100).times(4).times(Hadrons.speedFactor);
       let per = fac.gte(100) ? fac.sub(100).sqrt().add(100) : fac;
-      return per.div(100).min((100 + (Accelerators.emptiness.effectValue2 - 1) * 100 + EndgameMastery(251).effectOrDefault(0)) / 100);
+      return per.div(100).min(this.basePercentageCap / 100);
     },
     effect2Percent() {
       let fac = this.hadronTimer.times(100).times(2).times(Hadrons.speedFactor);
       let per = fac.gte(100) ? fac.sub(100).sqrt().add(100) : fac;
-      return per.div(100).min((100 + (Accelerators.emptiness.effectValue2 - 1) * 100 + EndgameMastery(251).effectOrDefault(0)) / 100);
+      return per.div(100).min(this.basePercentageCap / 100);
     },
     effect3Percent() {
       let fac = this.hadronTimer.times(100).times(Hadrons.speedFactor);
       let per = fac.gte(100) ? fac.sub(100).sqrt().add(100) : fac;
-      return per.div(100).min((100 + (Accelerators.emptiness.effectValue2 - 1) * 100 + EndgameMastery(251).effectOrDefault(0)) / 100);
+      return per.div(100).min(this.basePercentageCap / 100);
     },
     effect4Percent() {
       let fac = this.hadronTimer.times(100).div(2).times(Hadrons.speedFactor);
       let per = fac.gte(100) ? fac.sub(100).sqrt().add(100) : fac;
-      return per.div(100).min((100 + (Accelerators.emptiness.effectValue2 - 1) * 100 + EndgameMastery(251).effectOrDefault(0)) / 100);
+      return per.div(100).min(this.basePercentageCap / 100);
     },
     effect5Percent() {
       let fac = this.hadronTimer.times(100).div(5).times(Hadrons.speedFactor);
       let per = fac.gte(100) ? fac.sub(100).sqrt().add(100) : fac;
-      return per.div(100).min((100 + (Accelerators.emptiness.effectValue2 - 1) * 100 + EndgameMastery(251).effectOrDefault(0)) / 100);
+      return per.div(100).min(this.basePercentageCap / 100);
     },
     effect1Text() {
       if (this.effect1Time.lte(0)) return `Effect is capped`;
@@ -113,12 +118,16 @@ export default {
   methods: {
     update() {
       const hadrons = player.celestials.laitela.hadrons;
-      this.totalHadrons = hadrons.total;
+      this.totalHadrons = hadrons.trueTotal;
       this.lightHadrons = hadrons.light;
       this.darkHadrons = hadrons.dark;
       this.exoticHadrons = hadrons.exotic;
-      this.percentageCap = (100 + Math.pow((Accelerators.emptiness.effectValue2 - 1) * 100 +
-        EndgameMastery(251).effectOrDefault(0), 2)) / 100;
+      this.totalLightHadrons = hadrons.totalLight;
+      this.totalDarkHadrons = hadrons.totalDark;
+      this.totalExoticHadrons = hadrons.totalExotic;
+      this.basePercentageCap = (100 * Accelerators.emptiness.effectValue2 + EndgameMastery(251).effectOrDefault(0)) *
+        (DivinityMilestone.serpentPower.isReached ? 2 : 1);
+      this.percentageCap = (Math.pow(this.basePercentageCap - 100, 2) + 100) / 100;
       this.hadronTimer.copyFrom(Hadrons.timeFactor.div(100));
       this.effect1.copyFrom(Hadrons.singularityMultiplier);
       this.effect2.copyFrom(Hadrons.darkMatterCapMultiplier);
@@ -132,9 +141,11 @@ export default {
       this.hasDark = DualityUpgrade(19).isBought;
       this.hasExotic = DivinityMilestone.hadronEmpowerment.isReached;
       this.showWarning = Accelerators.emptiness.effectValue2 > 1;
+      this.isFlipped = player.universes.current === 2;
     },
     assignOne() {
       if (this.hasExotic) {
+        if (Slabdrill.isCursed) return;
         if (this.lightHadrons <= 0) return;
         Laitela.reset();
         Endgame.resetNoReward();
@@ -151,6 +162,7 @@ export default {
     },
     unassignOne() {
       if (this.hasExotic) {
+        if (Slabdrill.isCursed) return;
         if (this.exoticHadrons <= 0) return;
         Laitela.reset();
         Endgame.resetNoReward();
@@ -167,6 +179,7 @@ export default {
     },
     assignAll() {
       if (this.hasExotic) {
+        if (Slabdrill.isCursed) return;
         if (this.lightHadrons <= 0) return;
         Laitela.reset();
         Endgame.resetNoReward();
@@ -183,6 +196,7 @@ export default {
     },
     unassignAll() {
       if (this.hasExotic) {
+        if (Slabdrill.isCursed) return;
         if (this.exoticHadrons <= 0) return;
         Laitela.reset();
         Endgame.resetNoReward();
@@ -205,13 +219,19 @@ export default {
   <div class="c-laitela-hadrons-container">
     <div class="c-laitela-hadrons-row">
       <h2>
-        You have {{ quantify("Hadron", lightHadrons, 2) }}
+        You have
+        {{ formatHybridSmall(lightHadrons, 3) }}<span v-if="totalLightHadrons > lightHadrons">(+{{ formatHybridSmall(totalLightHadrons - lightHadrons, 3) }})</span>
+        {{ pluralize("Light Hadron", totalLightHadrons) }}
       </h2>
       <h2 v-if="hasDark">
-        You have {{ quantify("Dark Hadron", darkHadrons, 2) }}
+        You have
+        {{ formatHybridSmall(darkHadrons, 3) }}<span v-if="totalDarkHadrons > darkHadrons">(+{{ formatHybridSmall(totalDarkHadrons - darkHadrons, 3) }})</span>
+        {{ pluralize("Dark Hadron", totalDarkHadrons) }}
       </h2>
       <h2 v-if="hasExotic">
-        You have {{ quantify("Exotic Hadron", exoticHadrons, 2) }}
+        You have
+        {{ formatHybridSmall(exoticHadrons, 3) }}<span v-if="totalExoticHadrons > exoticHadrons">(+{{ formatHybridSmall(totalExoticHadrons - exoticHadrons, 3) }})</span>
+        {{ pluralize("Exotic Hadron", totalExoticHadrons) }}
       </h2>
       <br>
       <h2>
@@ -277,7 +297,7 @@ export default {
         Hadron Effect 4:
       </div>
       <div>
-        Antimatter generates {{ formatX(effect4, 2, 2) }} more Entropy
+        {{ isFlipped ? "Matter" : "Antimatter" }} generates {{ formatX(effect4, 2, 2) }} more Entropy
       </div>
       <div>
         {{ effect4Text }}

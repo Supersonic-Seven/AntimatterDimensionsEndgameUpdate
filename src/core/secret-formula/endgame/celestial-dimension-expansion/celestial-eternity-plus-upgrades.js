@@ -22,7 +22,7 @@ export const celestialEternityPlusUpgrades = {
   oldStoneSlabAndSteelDrill: {
     id: "oldStoneSlabAndSteelDrill",
     cost: DC.E4000,
-    description: () => (false ? "Unlock the Cursed Reality" : "Unlock Pelle's Domain"),
+    description: () => (player.celestials.slabdrill.isWarping ? "Unlock the Cursed Reality" : "Unlock Pelle's Domain"),
     onPurchased: () => Pelle.quotes.reachGoal.show()
   }
 };

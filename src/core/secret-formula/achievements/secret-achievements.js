@@ -55,7 +55,7 @@ export const secretAchievements = [
   {
     id: 22,
     name: "Deep fried",
-    get description() { return `Buy ${formatInt(1e5)} Antimatter Galaxies in total while using emoji notation.`; },
+    get description() { return `Buy ${formatInt(1e5)} ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxies in total while using emoji notation.`; },
     checkRequirement: () => player.requirementChecks.permanent.emojiGalaxies >= 1e5,
     checkEvent: GAME_EVENT.GALAXY_RESET_AFTER
   },

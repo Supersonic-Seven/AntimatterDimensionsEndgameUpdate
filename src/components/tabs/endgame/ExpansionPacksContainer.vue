@@ -37,6 +37,7 @@ export default {
         "o-expansion-pack--laitela": this.pack.config.id === "laitelaPack" && !this.isBought,
         "o-expansion-pack--pelle": this.pack.config.id === "pellePack" && !this.isBought,
         "o-expansion-pack--alpha": this.pack.config.id === "alphaPack" && !this.isBought,
+        "o-expansion-pack--slabdrill": this.pack.config.id === "slabPack" && !this.isBought,
         "o-expansion-pack--teresa--bought": this.pack.config.id === "teresaPack" && this.isBought,
         "o-expansion-pack--effarig--bought": this.pack.config.id === "effarigPack" && this.isBought,
         "o-expansion-pack--enslaved--bought": this.pack.config.id === "enslavedPack" && this.isBought,
@@ -44,7 +45,8 @@ export default {
         "o-expansion-pack--ra--bought": this.pack.config.id === "raPack" && this.isBought,
         "o-expansion-pack--laitela--bought": this.pack.config.id === "laitelaPack" && this.isBought,
         "o-expansion-pack--pelle--bought": this.pack.config.id === "pellePack" && this.isBought,
-        "o-expansion-pack--alpha--bought": this.pack.config.id === "alphaPack" && this.isBought
+        "o-expansion-pack--alpha--bought": this.pack.config.id === "alphaPack" && this.isBought,
+        "o-expansion-pack--slabdrill--bought": this.pack.config.id === "slabPack" && this.isBought
       };
     },
     textClassObject() {

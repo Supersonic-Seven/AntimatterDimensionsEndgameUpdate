@@ -27,6 +27,9 @@ export default {
         cp: new Decimal(0),
         dp: new Decimal(0)
       },
+      hasESGen: false,
+      showESGen: false,
+      invertESgenDisplay: false,
     };
   },
   computed: {
@@ -38,6 +41,16 @@ export default {
         return format;
       }
       return formatInt;
+    },
+    ESgenRateText() {
+      if (this.skillGeneration.lt(1 / 3600)) {
+        return `one ES every ${TimeSpan.fromSeconds(
+          this.skillGeneration.reciprocal()).toStringShort(false)}`;
+      }
+      if (this.skillGeneration.lt(0.1)) {
+        return `${format(this.skillGeneration.times(3600), 2, 2)} ES/hour`;
+      }
+      return `${format(this.skillGeneration, 2, 2)} ES/sec`;
     },
     totalEndgameSkillText() {
       return `${quantify("total Endgame Skill", this.totalEndgameSkills, 2, 2, this.formatEndgameSkillType)}`;
@@ -56,6 +69,11 @@ export default {
         height: this.hasTTAutobuyer ? "6.7rem" : "4.4rem",
       };
     }
+  },
+  watch: {
+    invertESgenDisplay(newValue) {
+      player.options.invertESgenDisplay = newValue;
+    },
   },
   methods: {
     minimize() {
@@ -84,6 +102,7 @@ export default {
     },
     update() {
       this.skillAmount.copyFrom(Currency.endgameSkills);
+      this.skillGeneration.copyFrom(getESPerSecond());
       this.totalEndgameSkills.copyFrom(Currency.endgameSkills.max);
       this.shopMinimized = player.endgameMasteries.shopMinimized;
       this.minimizeAvailable = Currency.doomedParticles.gte(1e100);
@@ -95,7 +114,13 @@ export default {
       costs.gg.copyFrom(EndgameSkillPurchaseType.gg.cost);
       costs.cp.copyFrom(EndgameSkillPurchaseType.cp.cost);
       costs.dp.copyFrom(EndgameSkillPurchaseType.dp.cost);
+      this.hasESGen = this.skillGeneration.gt(0);
+      this.showESGen = this.hasESGen && (ui.view.shiftDown === this.invertESgenDisplay);
+      this.invertESgenDisplay = player.options.invertESgenDisplay;
     },
+    toggleESgen() {
+      this.invertESgenDisplay = !this.invertESgenDisplay;
+    }
   },
 };
 </script>
@@ -128,7 +153,24 @@ export default {
             />
           </div>
           <div class="es-gen-container">
-            <span>
+            <span
+              v-if="hasESGen"
+              class="checkbox-margin"
+              ach-tooltip="This shows ES generation by default and total ES if you hold shift.
+                Check this box to swap this behavior."
+            >
+              <input
+                v-model="invertESgenDisplay"
+                type="checkbox"
+                :value="invertESgenDisplay"
+                class="o-clickable"
+                @input="toggleESgen()"
+              >
+            </span>
+            <span v-if="showESGen">
+              You are gaining {{ ESgenRateText }}.
+            </span>
+            <span v-else>
               You have {{ totalEndgameSkillText }}.
             </span>
           </div>

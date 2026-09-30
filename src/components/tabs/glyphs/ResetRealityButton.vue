@@ -7,10 +7,12 @@ export default {
       resetCelestial: false,
       isInCelestialReality: false,
       isDoomed: false,
+      isCursed: false
     };
   },
   computed: {
     resetText() {
+      if (this.isCursed) return "Perform a Core Jump";
       if (this.isDoomed) return "Start this Armageddon over";
       if (this.isInCelestialReality && !this.resetCelestial) return "Exit this Celestial early";
       if (this.isInCelestialReality && this.resetCelestial) return "Restart this Celestial";
@@ -23,10 +25,16 @@ export default {
       this.resetCelestial = player.options.retryCelestial;
       this.isInCelestialReality = isInCelestialReality();
       this.isDoomed = Pelle.isDoomed;
+      this.isCursed = Slabdrill.isCursed;
     },
     resetReality() {
       const confirms = player.options.confirmations;
       if (GameEnd.creditsClosed) return;
+      if (this.isCursed) {
+        Slabdrill.enterCore();
+        Slabdrill.exitCore();
+        return;
+      }
       if (this.isInCelestialReality) {
         if (confirms.exitChallenge) Modal.exitChallenge.show({
           challengeName: "a Celestial Reality",

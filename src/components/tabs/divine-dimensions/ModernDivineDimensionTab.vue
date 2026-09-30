@@ -23,7 +23,8 @@ export default {
       creditsClosed: false,
       canProduceEnergy: false,
       isProducingEnergy: false,
-      isAnyAutobuyerUnlocked: false
+      isAnyAutobuyerUnlocked: false,
+      isFlipped: false
     };
   },
   computed: {
@@ -54,6 +55,7 @@ export default {
       this.canProduceEnergy = DivinityUpgrade.divineL1U5.isBought;
       this.isProducingEnergy = player.celestials.pelle.divinity.isProducingEnergy;
       this.isAnyAutobuyerUnlocked = Autobuyer.divineDimension(1).isUnlocked;
+      this.isFlipped = player.universes.current === 2;
     },
     maxAll() {
       DivineDimensions.buyMax();
@@ -99,7 +101,7 @@ export default {
           <span class="c-divine-dim-description__accent">{{ formatX(conversionFormula1, 2, 2) }}</span>
           multiplier to Endgame and Ethereal Power gain, a
           <span class="c-divine-dim-description__accent">{{ formatPow(conversionFormula2, 2, 3) }}</span>
-          to Antimatter Exponent while Doomed and all Machines, and a
+          to {{ isFlipped ? "Matter" : "Antimatter" }} Exponent while Doomed and all Machines, and a
           <span class="c-divine-dim-description__accent">{{ formatPercents(conversionFormula3, 2, 2) }}</span>
           reduction to Hadron and Remnants of Alpha Decay cap times.
         </p>

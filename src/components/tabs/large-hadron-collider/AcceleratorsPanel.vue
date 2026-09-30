@@ -26,7 +26,7 @@ export default {
       this.decayRate = LHC.acceleratorSpeed;
       this.time = Date.now();
       this.nextAcceleratorReq.copyFrom(LHC.nextAccelerator ? LHC.nextAccelerator.config.unlockReq() : Decimal.pow10("1e1000"));
-      this.nextAcceleratorCurrency = LHC.nextAccelerator ? LHC.nextAccelerator.config.drainResource : "Antimatter";
+      this.nextAcceleratorCurrency = LHC.nextAccelerator ? LHC.nextAccelerator.config.drainResource : (player.universes.current === 2 ? "Matter" : "Antimatter");
     }
   }
 };

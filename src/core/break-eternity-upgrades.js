@@ -24,7 +24,7 @@ export class BreakEternityUpgradeState extends SetPurchasableMechanicState {
 
 class RebuyableBreakEternityUpgradeState extends RebuyableMechanicState {
   get name() {
-    return this.config.name;
+    return typeof this.config.name === "function" ? this.config.name() : this.config.name;
   }
   
   get currency() {

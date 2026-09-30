@@ -98,7 +98,7 @@ export default {
     runDescription() {
       return GameDatabase.celestials.descriptions[3].effects().replace(/^\w/u, c => c.toUpperCase());
     },
-    isDoomed: () => Pelle.isDoomed,
+    isDoomed: () => Pelle.isDoomed || Slabdrill.isCursed,
   },
   methods: {
     update() {

@@ -56,7 +56,7 @@ export const divinityUpgrades = {
     id: "divineL1U4",
     layer: 1,
     cost: new Decimal(1e50),
-    description: () => `Only in Pelle, raise the Antimatter Exponent’s Exponent to the power
+    description: () => `Only in Pelle, raise the ${player.universes.current === 2 ? "Matter" : "Antimatter"} Exponent’s Exponent to the power
       of ${format(DivinityUpgrade.divineL5U2.isBought ? 1.02 : 1.01, 2, 2)}`,
     effect: () => DivinityUpgrade.divineL5U2.isBought ? 1.02 : 1.01
   },

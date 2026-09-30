@@ -158,6 +158,10 @@ export default {
   animation: a-universes--transient-glow-hover 10s infinite;
 }
 
+.o-tab-btn--universes__tangible::before {
+  animation: a-universes--tangible-glow-hover 10s infinite;
+}
+
 .o-subtab-btn--active {
   border-bottom-width: 0.5rem;
 }

@@ -25,6 +25,8 @@ export * from "./hypercubes";
 export * from "./large-hadron-collider";
 export * from "./ascension";
 
+export * from "./universes";
+
 export * from "./elemental";
 export * from "./destroyer";
 
@@ -46,6 +48,7 @@ export * from "./celestials/pelle/galaxy-generator";
 export * from "./celestials/pelle/game-end";
 export * from "./celestials/pelle/pelle-destruction-upgrades";
 export * from "./celestials/alpha";
+export * from "./celestials/slabdrill";
 export * from "./celestials/celestials";
 
 export * from "./automator";
@@ -100,6 +103,7 @@ export * from "./divinity-upgrades";
 export * from "./resurgence-upgrades";
 export * from "./perks";
 export * from "./dilation";
+export * from "./compression";
 export * from "./black-hole";
 export * from "./machines";
 export * from "./break-eternity-upgrades";

@@ -19,7 +19,13 @@ class ExpansionPackState extends SetPurchasableMechanicState {
 
   get isUnlocked() {
     return this.isBought || (Currency.antimatter.gte(this.unlockAM) && (this.config.id !== "alphaPack" || !Pelle.isDoomed) &&
-      (this.config.id !== "alphaPack" || DivinityMilestone.hadronEmpowerment.isReached));
+      (this.config.id !== "alphaPack" || DivinityMilestone.hadronEmpowerment.isReached) &&
+      (this.config.id !== "slabPack" || !Pelle.isDoomed || !Slabdrill.isCursed) &&
+      (this.config.id !== "slabPack" || DivinityMilestone.serpentPower.isReached));
+  }
+
+  onPurchased() {
+    if (this.config.id === "slabPack") Modal.message.show(`This feature is not yet implemented. Please wait for updates.`, {}, 3);
   }
 }
 

@@ -5,6 +5,7 @@ export default {
     return {
       canEndgame: false,
       isDoomed: false,
+      isCursed: false
     };
   },
   computed: {
@@ -16,20 +17,27 @@ export default {
     update() {
       this.canEndgame = player.celestials.pelle.records.totalEndgameAntimatter.add(1).log10().gte(9e15);
       this.isDoomed = Pelle.isDoomed;
+      this.isCursed = Slabdrill.isCursed;
     },
     resetEndgame() {
       const confirms = player.options.confirmations;
       if (GameEnd.creditsClosed) return;
-      if (this.isDoomed) {
+      if (this.isCursed) {
         if (confirms.resetEndgame) Modal.resetEndgame.show({
-          endgameState: "in a Doomed Reality",
-          suggestion: "just wait it out"
+          endgameState: "in a Cursed Reality",
+          suggestion: "don't even try, it won't work"
         });
         else Endgame.resetNoReward();
       } else if (this.canEndgame) {
         if (confirms.resetEndgame) Modal.resetEndgame.show({
           endgameState: "able to Endgame",
           suggestion: "just Endgame with rewards rather than with nothing"
+        });
+        else Endgame.resetNoReward();
+      } else if (this.isDoomed) {
+        if (confirms.resetEndgame) Modal.resetEndgame.show({
+          endgameState: "in a Doomed Reality",
+          suggestion: "just wait it out"
         });
         else Endgame.resetNoReward();
       } else if (confirms.resetEndgame) Modal.resetEndgame.show({

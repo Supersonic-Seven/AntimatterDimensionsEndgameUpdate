@@ -11,7 +11,7 @@
   "dependencies": {
     "@antimatter-dimensions/notations": "^3.1.0",
     "@fortawesome/fontawesome-free": "^6.1.1",
-    "adnot-beport-large": "^1.3.3",
+    "adnot-beport-large": "^1.3.4",
     "adnot-beport-small": "^1.2.1",
     "break_eternity.js": "^2.1.1",
     "chevrotain": "^4.8.1",

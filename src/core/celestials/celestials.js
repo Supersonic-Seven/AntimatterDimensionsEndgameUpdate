@@ -4,6 +4,7 @@ import { Enslaved } from "./enslaved";
 import { Laitela } from "./laitela/laitela";
 import { Pelle } from "./pelle/pelle";
 import { Ra } from "./ra/ra";
+import { Slabdrill } from "./slabdrill";
 import { Teresa } from "./teresa";
 import { V } from "./V";
 
@@ -15,7 +16,8 @@ export const Celestials = {
   ra: Ra,
   laitela: Laitela,
   pelle: Pelle,
-  alpha: Alpha
+  alpha: Alpha,
+  slabdrill: Slabdrill
 };
 
 GameDatabase.celestials.descriptions = [
@@ -41,8 +43,8 @@ GameDatabase.celestials.descriptions = [
     name: "The Nameless Ones",
     effects() {
       return `Glyph levels are boosted to a minimum of ${formatInt(5000)}.
-      Infinity, Time, and 8th Antimatter Dimension purchases are limited to ${formatInt(1)} each.
-      Antimatter Dimension multipliers are always Dilated (the Glyph effect still only applies in actual Dilation).
+      Infinity, Time, and 8th ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimension purchases are limited to ${formatInt(1)} each.
+      ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimension multipliers are always Dilated (the Glyph effect still only applies in actual Dilation).
       Time Study 192 (uncapped Replicanti) is locked.
       The Black Hole is disabled.
       Tachyon Particle production and Dilated Time production are severely reduced.
@@ -104,7 +106,7 @@ GameDatabase.celestials.descriptions = [
       ${disabledText}`;
     },
     description() {
-      return `Antimatter generates entropy inside of this Reality.\
+      return `${player.universes.current === 2 ? "Matter" : "Antimatter"} generates entropy inside of this Reality.\
       At ${formatPercents(1)} entropy, the Reality becomes destabilized\
       and you gain a reward based on how quickly you reached ${formatPercents(1)}.
       Destabilizing the Reality in less than ${formatInt(30)} seconds makes it become significantly more difficult,\
@@ -136,12 +138,18 @@ GameDatabase.celestials.descriptions = [
       through progression in Alpha.
       Most game-time based features are now real-time based.
       The Achievement Multiplier and many Achievements have been destroyed.
-      Gain a small nerf to Antimatter Dimensions based on Antimatter.`;
+      Gain a small nerf to ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions based on ${player.universes.current === 2 ? "Matter" : "Antimatter"}.`;
     },
     description() {
       return `You will exit Alpha's Reality when you complete a Layer of it for the first time.
       For every layer of Alpha's Reality completed, you will gain a buff which applies outside Alpha,\
       and a nerf which applies inside Alpha.`;
+    }
+  },
+  {
+    name: "Slabdrill",
+    effects() {
+      return `Your Reality will become Cursed. This will have various effects on gameplay.`;
     }
   }
 ];

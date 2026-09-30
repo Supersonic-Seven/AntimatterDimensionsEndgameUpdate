@@ -87,6 +87,10 @@ class DualityUpgradeState extends BitPurchasableMechanicState {
     if (this.id === 15) {
       player.celestials.laitela.hadrons.total = Laitela.hadronizes;
       player.celestials.laitela.hadrons.light = Laitela.hadronizes;
+      TabNotification.hadrons.tryTrigger();
+    }
+    if (this.id === 25) {
+      TabNotification.hypercubes.tryTrigger();
     }
   }
 }

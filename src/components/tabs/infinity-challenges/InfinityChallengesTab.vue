@@ -13,7 +13,8 @@ export default {
   data() {
     return {
       nextIC: 0,
-      showAllChallenges: false
+      showAllChallenges: false,
+      isFlipped: false
     };
   },
   computed: {
@@ -24,16 +25,17 @@ export default {
       const first = this.nextIC?.id === 1;
       const next = InfinityChallenges.nextICUnlockAM;
 
-      if (first) return `The first Infinity Challenge unlocks at ${format(next)} antimatter.`;
+      if (first) return `The first Infinity Challenge unlocks at ${format(next)} ${this.isFlipped ? "matter" : "antimatter"}.`;
       return next === undefined
         ? "All Infinity Challenges unlocked"
-        : `Next Infinity Challenge unlocks at ${format(next)} antimatter.`;
+        : `Next Infinity Challenge unlocks at ${format(next)} ${this.isFlipped ? "matter" : "antimatter"}.`;
     }
   },
   methods: {
     update() {
       this.nextIC = InfinityChallenges.nextIC;
       this.showAllChallenges = player.options.showAllChallenges;
+      this.isFlipped = player.universes.current === 2;
     },
     isChallengeVisible(challenge) {
       return challenge.isUnlocked || (this.showAllChallenges && PlayerProgress.eternityUnlocked());
@@ -47,7 +49,7 @@ export default {
     <ChallengeTabHeader />
     <div>
       An active Big Crunch Autobuyer will Crunch immediately when
-      reaching an Infinity Challenge's antimatter goal, regardless of settings.
+      reaching an Infinity Challenge's {{ isFlipped ? "matter" : "antimatter" }} goal, regardless of settings.
     </div>
     <div>{{ nextAtDisplay }}</div>
     <ChallengeGrid

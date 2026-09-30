@@ -28,7 +28,7 @@ export default {
       bestAMSet: [],
       lastMachines: new Decimal(0),
       runReward: new Decimal(0),
-      perkPoints: 0,
+      perkPoints: new Decimal(0),
       hasReality: false,
       hasEPGen: false,
       hasPerkShop: false,
@@ -41,6 +41,7 @@ export default {
       disCharge: false,
       chargeView: false,
       autoPour: false,
+      isFlipped: false
     };
   },
   computed: {
@@ -107,7 +108,7 @@ export default {
         borderRight: "0.5rem solid var(--color-teresa--base)"
       };
     },
-    isDoomed: () => Pelle.isDoomed,
+    isDoomed: () => Pelle.isDoomed || Slabdrill.isCursed,
     isEPGenDoomed: () => Pelle.isDoomed && !PelleCelestialUpgrade.passiveEPGen.canBeApplied,
     disChargeClassObject() {
       return {
@@ -147,7 +148,7 @@ export default {
       this.isPouredAmountCapped = this.pouredAmount.eq(new Decimal(this.pouredAmountCap));
       this.percentage = `${(Teresa.fill * 100).toFixed(2)}%`;
       this.possibleFillPercentage = `${(Teresa.possibleFill * 100).toFixed(2)}%`;
-      this.rmMult = Teresa.rmMultiplier;
+      this.rmMult.copyFrom(Teresa.rmMultiplier);
       this.hasReality = TeresaUnlocks.run.isUnlocked;
       this.hasEPGen = TeresaUnlocks.epGen.isUnlocked;
       this.hasPerkShop = TeresaUnlocks.shop.isUnlocked;
@@ -156,7 +157,7 @@ export default {
       this.bestAMSet = cloneDeep(Glyphs.copyForRecords(player.celestials.teresa.bestAMSet));
       this.lastMachines.copyFrom(player.celestials.teresa.lastRepeatedMachines);
       this.runReward.copyFrom(Teresa.runRewardMultiplier);
-      this.perkPoints = Currency.perkPoints.value;
+      this.perkPoints.copyFrom(Currency.perkPoints.value);
       this.rm.copyFrom(Currency.realityMachines);
       this.isRunning = Teresa.isRunning;
       this.canUnlockNextPour = TeresaUnlocks.all
@@ -167,6 +168,7 @@ export default {
       this.disCharge = player.celestials.teresa.disCharge;
       this.chargeView = Teresa.chargeModeOn;
       this.autoPour = player.celestials.teresa.autoPour;
+      this.isFlipped = player.universes.current === 2;
     },
     startRun() {
       if (this.isDoomed) return;
@@ -234,10 +236,11 @@ export default {
           {{ runDescription }}
           <br><br>
           <div>
-            This Reality can be repeated for a stronger reward based on the antimatter gained within it.
+            This Reality can be repeated for a stronger reward based on the {{ isFlipped ? "matter" : "antimatter" }} gained
+            within it.
             <br><br>
             <span v-if="showRunReward">
-              Your record antimatter in Teresa's Reality is {{ format(bestAM, 2) }},
+              Your record {{ isFlipped ? "matter" : "antimatter" }} in Teresa's Reality is {{ format(bestAM, 2) }},
               achieved with {{ lastMachinesString }}.
               <br><br>
               Glyph Set used:

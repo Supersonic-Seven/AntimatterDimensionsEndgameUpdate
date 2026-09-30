@@ -88,6 +88,16 @@ export default {
       if (ui.$viewModel.quotes.current === Quotes.elemental.intro3) {
         player.introFrozen = false;
       }
+      if (ui.$viewModel.quotes.current === Quotes.slabdrill.curse) {
+        Slabdrill.realityWarp();
+        player.celestials.slabdrill.warpTick = 3000;
+      }
+      if (ui.$viewModel.quotes.current === Quotes.slabdrill.reality) {
+        player.celestials.slabdrill.goodbyeTick = 3000;
+      }
+      if (ui.$viewModel.quotes.current === Quotes.slabdrill.glitch) {
+        player.celestials.slabdrill.goodbyeTick = 10000;
+      }
       if (!this.isFocused) return;
       this.index = 0;
       Quote.advanceQueue();

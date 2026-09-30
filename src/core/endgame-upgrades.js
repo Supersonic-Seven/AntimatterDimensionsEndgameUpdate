@@ -7,7 +7,7 @@ class EndgameUpgradeState extends BitPurchasableMechanicState {
   }
 
   get name() {
-    return this.config.name;
+    return typeof this.config.name === "function" ? this.config.name() : this.config.name;
   }
 
   get requirement() {
@@ -87,6 +87,10 @@ class EndgameUpgradeState extends BitPurchasableMechanicState {
 }
 
 class RebuyableEndgameUpgradeState extends RebuyableMechanicState {
+  get name() {
+    return typeof this.config.name === "function" ? this.config.name() : this.config.name;
+  }
+
   get currency() {
     return Currency.celestialPoints;
   }

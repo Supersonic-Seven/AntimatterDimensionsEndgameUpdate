@@ -71,7 +71,7 @@ export default {
     showShardsRate() {
       return this.currentShardsRate;
     },
-    isDoomed: () => Pelle.isDoomed,
+    isDoomed: () => Pelle.isDoomed || Slabdrill.isCursed,
   },
   watch: {
     isRunning() {
@@ -82,7 +82,8 @@ export default {
     update() {
       this.relicShards.copyFrom(Currency.relicShards.value);
       this.shardRarityBoost = Effarig.maxRarityBoost / 100;
-      this.shardPower = player.disablePostReality ? 1 : Ra.unlocks.maxGlyphRarityAndShardSacrificeBoost.effectOrDefault(1);
+      this.shardPower = player.disablePostReality && !SlabdrillUnlocks.timeStudy181.isUnlocked
+        ? 1 : Ra.unlocks.maxGlyphRarityAndShardSacrificeBoost.effectOrDefault(1);
       this.shardMaxRarityIncrease = Effarig.rarityCapIncrease / 100;
       this.shardsGained.copyFrom(Effarig.shardsGained);
       this.currentShardsRate.copyFrom(this.shardsGained.div(Time.thisRealityRealTime.totalMinutes));

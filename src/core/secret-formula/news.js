@@ -13,7 +13,25 @@ import wordShift from "../word-shift";
 function newsAnimSpd(seconds) {
   return new Decimal(seconds).toNumber() / player.options.news.speed;
 }
-
+function clickableChange(id, first, second, onFirstClick) {
+  let wasClicked = false;
+  return {
+    id,
+    get text() {
+      return wasClicked ? second : first;
+    },
+    reset() {
+      wasClicked = false;
+    },
+    onClick() {
+      if (wasClicked) return undefined;
+      wasClicked = true;
+      if (onFirstClick) onFirstClick();
+      return this.text;
+    }
+  };
+}
+const ONE_SECOND_OR_SOMETHING = `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀`;
 
 export const news = [
   {
@@ -1793,26 +1811,12 @@ export const news = [
     id: "a295",
     text: "👁"
   },
-  (function() {
-    let wasClicked = false;
-    const normal = "Click on this news message to hard reset your game.";
-    const clicked = "You're crazy. You know what, here. Have a paperclip.";
-    return {
-      id: "a296",
-      get text() {
-        return wasClicked ? clicked : normal;
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        player.news.specialTickerData.paperclips++;
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange(
+    "a296",
+    "Click on this news message to hard reset your game.",
+    "You're crazy. You know what, here. Have a paperclip.",
+    () => player.news.specialTickerData.paperclips++
+  ),
   {
     id: "a297",
     text: "I don't think, therefore I'm not."
@@ -2052,25 +2056,7 @@ export const news = [
     id: "a326",
     text: "Antimatter Dimensions is like an ogre... it has layers."
   },
-  (function() {
-    let wasClicked = false;
-    const normal = "Click here to restart your device.";
-    const clicked = "Please give Antimatter Dimensions admin access to your device.";
-    return {
-      id: "a327",
-      get text() {
-        return wasClicked ? clicked : normal;
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange("a327", "Click here to restart your device.", "Please give Antimatter Dimensions admin access to your device."),
   {
     id: "a328",
     text:
@@ -2137,25 +2123,7 @@ export const news = [
     id: "a338",
     text: "Ancient cave paintings with the number 5 have been found. It's implied they were waiting for something."
   },
-  (function() {
-    let wasClicked = false;
-    const normal = "Read More";
-    const clicked = "More";
-    return {
-      id: "a339",
-      get text() {
-        return wasClicked ? clicked : normal;
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange("a339", "Read More", "More"),
   {
     id: "a340",
     text:
@@ -2276,25 +2244,7 @@ export const news = [
       This news message is antimemetic. You will forget that it exists shortly.</span>`;
     }
   },
-  (function() {
-    let wasClicked = false;
-    const normal = "<span style='cursor: pointer'>💣</span>";
-    const clicked = "💥";
-    return {
-      id: "a353",
-      get text() {
-        return wasClicked ? clicked : normal;
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange("a353", "<span style='cursor: pointer'>💣</span>", "💥"),
   {
     // Blob from the blob font
     id: "a354",
@@ -3204,25 +3154,7 @@ export const news = [
     id: "ae511",
     text: "Click here to á̸̳n̵̜͠t̷͓̿i̴̛̳m̵̼̎a̸̲͒t̸̜̅t̴̞̄e̸̞͛ȑ̶̗"
   },
-  (function() {
-    let wasClicked = false;
-    const normal = "Click here";
-    const clicked = "You clicked.";
-    return {
-      id: "ae512",
-      get text() {
-        return wasClicked ? clicked : normal;
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange("ae512", "Click here", "You clicked."),
   {
     id: "ae513",
     text: "THE NEWSTICKER IS DEAD! NO MORE NEWS! NEWSTICKER GONE!"
@@ -3419,25 +3351,11 @@ export const news = [
     id: "ae537",
     text: `"1e9e15 is for the weak. Try my 1e1.79e308!" - Last words before H1000 hit them across an entirely different game`
   },
-  (function() {
-    let wasClicked = false;
-    const normal = "Click here to get that spooky corrupted text";
-    const clicked = "s̴̏̓̄̑p̸̈́͗̎͐ȍ̵̾̄̒o̴̅̈́͋͆k̵͊͊͂̒y̴̔̏̇̈́ ̷̍̑͑̍ć̴̑̌̂o̷͂̓rrupted tex̿̍̓t̸̉̎̕͠";
-    return {
-      id: "ae538",
-      get text() {
-        return wasClicked ? clicked : normal;
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange(
+    "ae538",
+    "Click here to get that spooky corrupted text",
+    "s̴̏̓̄̑p̸̈́͗̎͐ȍ̵̾̄̒o̴̅̈́͋͆k̵͊͊͂̒y̴̔̏̇̈́ ̷̍̑͑̍ć̴̑̌̂o̷͂̓rrupted tex̿̍̓t̸̉̎̕͠"
+  ),
   {
     id: "ae539",
     text:
@@ -3555,25 +3473,7 @@ export const news = [
     id: "ae562",
     text: "How did the 88th element became a Celestial and why is it forgotten?"
   },
-  (function() {
-    let wasClicked = false;
-    const normal = "Click here for a free 9th Dimension!";
-    const clicked = "Idiot.";
-    return {
-      id: "ae563",
-      get text() {
-        return wasClicked ? clicked : normal;
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange("ae563", "Click here for a free 9th Dimension!", "Idiot."),
   {
     id: "ae564",
     text:
@@ -3604,25 +3504,7 @@ export const news = [
     id: "ae569",
     text: "I guess this is the End of my Game...."
   },
-  (function() {
-    let wasClicked = false;
-    const normal = "click here to make the newsticker go backwards";
-    const clicked = "weeeeeeeeeeee";
-    return {
-      id: "ae570",
-      get text() {
-        return wasClicked ? clicked : normal;
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange("ae570", "click here to make the newsticker go backwards", "weeeeeeeeeeee"),
   {
     id: "ae571",
     text:
@@ -3724,45 +3606,17 @@ export const news = [
       impending doom of balancing all new stuff in v0.4. Stay tuned for more Hypersonic facts!", or even basic ones such
       as "v0.2.3 in 5 hours!" Oh wait, wrong script-`
   },
-  (function() {
-    let wasClicked = false;
-    const normal = "Click here to make the newsticker rainbow";
-    const clicked = "Enjoy your rainbow news ti- what do you mean it's not rainbow?";
-    return {
-      id: "ae588",
-      get text() {
-        return wasClicked ? clicked : normal;
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        return this.text;
-      }
-    };
-  }()),
-  (function() {
-    let wasClicked = false;
-    const normal = "Click here to get a celestial paperclip in exchange for your entire save file.";
-    const clicked = "You've been trolled!";
-    return {
-      id: "ae589",
-      get text() {
-        return wasClicked ? clicked : normal;
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        player.news.specialTickerData.paperclips++;
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange(
+    "ae588",
+    "Click here to make the newsticker rainbow",
+    "Enjoy your rainbow news ti- what do you mean it's not rainbow?"
+  ),
+  clickableChange(
+    "ae589",
+    "Click here to get a celestial paperclip in exchange for your entire save file.",
+    "You've been trolled!",
+    () => player.news.specialTickerData.paperclips++
+  ),
   {
     id: "ae590",
     text:
@@ -4436,29 +4290,19 @@ export const news = [
     id: "ae710",
     text: "Here is what you’d look like if you were Antimatter or Dark Matter"
   },
-  (function() {
-    let wasClicked = false;
-    return {
-      id: "ae711",
-      get text() {
-        return "Click here to experience the last moments of your life.";
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        player.options.newUI = false;
-        ui.view.newUI = player.options.newUI;
-        Themes.find("Metro").set();
-        let notation = Notations.all.filter(n => n.isPainful);
-        let select = Math.floor(Math.random() * notation.length);
-        notation[select].setAsCurrent();
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange(
+    "ae711",
+    "Click here to experience the last moments of your life.",
+    "Click here to experience the last moments of your life.",
+    () => {
+      player.options.newUI = false;
+      ui.view.newUI = player.options.newUI;
+      Themes.find("Metro").set();
+      const notation = Notations.all.filter(n => n.isPainful);
+      const select = Math.floor(Math.random() * notation.length);
+      notation[select].setAsCurrent();
+    }
+  ),
   {
     id: "ae712",
     text: "horsegirl x destroyer"
@@ -4883,24 +4727,14 @@ export const news = [
     id: "ae797",
     text: "I (18m) killed my enemy (25m) 150 times. Am i the ###hole?"
   },
-  (function() {
-    let wasClicked = false;
-    return {
-      id: "ae798",
-      get text() {
-        return "Click here to skip to the current endgame.";
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        if (PlayerProgress.endgameUnlocked()) Tab.endgame.show(true);
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange(
+    "ae798",
+    "Click here to skip to the current endgame.",
+    "Click here to skip to the current endgame.",
+    () => {
+      if (PlayerProgress.endgameUnlocked()) Tab.endgame.show(true);
+    }
+  ),
   {
     id: "ae799",
     text: "I (18m) killed my enemy (25m) 150 times. Am i the ###hole?"
@@ -4914,24 +4748,9 @@ export const news = [
     },
     dynamic: true
   },
-  (function() {
-    let wasClicked = false;
-    return {
-      id: "ae801",
-      get text() {
-        return "matrr";
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        throw new Error("matrt");
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange("ae801", "matrr", "matrr", () => {
+    throw new Error("matrt");
+  }),
   {
     id: "ae802",
     text:
@@ -5370,25 +5189,11 @@ export const news = [
     id: "ae889",
     text: "You have 1.79e-308 less antimatter now."
   },
-  (function() {
-    let wasClicked = false;
-    const normal = "Click to view an antimatter telescope to view the anti-stars in the antimatter galaxy!";
-    const clicked = "⭐⭐⭐⭐🌌";
-    return {
-      id: "ae890",
-      get text() {
-        return wasClicked ? clicked : normal;
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange(
+    "ae890",
+    "Click to view an antimatter telescope to view the anti-stars in the antimatter galaxy!",
+    "⭐⭐⭐⭐🌌"
+  ),
   {
     id: "ae891",
     text: "It seems today, that all you see is galaxies in movies, and boosts on TV"
@@ -5542,25 +5347,11 @@ export const news = [
     id: "ae918",
     text: "5 NaNeFinities until the update"
   },
-  (function() {
-    let wasClicked = false;
-    const normal = "Click here to gain 1e1e1.79e308 antimatter!!!!! (10^102% real)";
-    const clicked = "Ladies and gentlemen... WE GOT 'EM!";
-    return {
-      id: "ae919",
-      get text() {
-        return wasClicked ? clicked : normal;
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange(
+    "ae919",
+    "Click here to gain 1e1e1.79e308 antimatter!!!!! (10^102% real)",
+    "Ladies and gentlemen... WE GOT 'EM!"
+  ),
   {
     id: "ae920",
     get text() {
@@ -6033,6 +5824,453 @@ export const news = [
     get text() {
       return `"And Jesus said: Love thy neighbor like how I-" <span style='color: cyan'>WHAT ARE YOU DOING HERE BIBLE
       NEWSTICKER?!?!?</span>`
+    }
+  },
+  {
+    id: "ae996",
+    get text() {
+      return `insert 5 hours joke`;
+    }
+  },
+  {
+    id: "ae997",
+    get text() {
+      return `dont be racist, i am an endgame`;
+    }
+  },
+  {
+    id: "ae998",
+    get text() {
+      return `LEAK: The elemental is actually horsegirl`;
+    }
+  },
+  {
+    id: "ae999",
+    get text() {
+      return `This marks news ticker ae1000`;
+    }
+  },
+  {
+    id: "ae1000",
+    get text() {
+      return `Living in the last dimension must be crazy because you need Ω times more volume to make something 2 times bigger`;
+    }
+  },
+  {
+    id: "ae1001",
+    get text() {
+      return `Antimantimattter Dimatter Dimatter Dimer Dimentimatter Dimensimensiontions: er Dimensions: Entimatter Dimensions: EnDimensions: EndgAntimatter Dimensions: Endgamimensions: EndgamEndgame`;
+    }
+  },
+  {
+    id: "ae1002",
+    get text() {
+      return `Why does noone care about my bug reports`;
+    }
+  },
+  {
+    id: "ae1003",
+    get text() {
+      return `im gay but nobody will know because the celestial of horses will flood the channel before this gets read`;
+    }
+  },
+  {
+    id: "ae1004",
+    get text() {
+      return `this is not newsticker suggestions`;
+    }
+  },
+  {
+    id: "ae1005",
+    get text() {
+      return `You stop at 2 doors with 2 men infront of them. One tells the truth, the other also tells the truth. These are just normal guys.`;
+    }
+  },
+  {
+    id: "ae1006",
+    get text() {
+      return `Welcome to the AntiMatter Zone. Only break infinity inside anti-dimensions`;
+    }
+  },
+  {
+    id: "ae1007",
+    get text() {
+      return `WARNING: You are entering the Anti-matter zone. Only photons are allowed in this area.`;
+    }
+  },
+  {
+    id: "ae1008",
+    get text() {
+      return `Whenever you see a poorly-defined system of soft magic in fiction which possibly allows for two systems to override or deny each other assume that each magical system has a priority defined by a countable ordinal. It fixes everything. Seriously.`;
+    }
+  },
+  {
+    id: "ae1009",
+    get text() {
+      return `Wanna make 100,000 antimatter in 24.7777 game time hours? First 1.79e308 people to buy the first dimension get the opportunity`;
+    }
+  },
+  {
+    id: "ae1010",
+    get text() {
+      return `Living in the 3{1e5}3 dimension must be crazy because you need 2.37J9999 times more volume to make something 2 times larger`;
+    }
+  },
+  {
+    id: "ae1011",
+    get text() {
+      return `for anyone wondering, infinity is sin(710.475i)/i`;
+    }
+  },
+  {
+    id: "ae1012",
+    get text() {
+      return `Please stop larping AD: Endgame. We won't give you leaks.`;
+    }
+  },
+  {
+    id: "ae1013",
+    get text() {
+      return `Living in the horse dimension must be crazy because you need 256x more hay to make some horse 2x larger`;
+    }
+  },
+  clickableChange(
+    "ae1014",
+    "Click here to make paperclips useful",
+    "Paperclips are now useful, as now they have a use of being useless."
+  ),
+  {
+    id: "ae1015",
+    get text() {
+      return `oh my god they killed kenny`;
+    }
+  },
+  {
+    id: "ae1016",
+    get text() {
+      return `"hello i am 9th dimensio-" "5 HOURS!" "not what im called."`;
+    }
+  },
+  {
+    id: "ae1017",
+    get text() {
+      return `<span style="color: blue;">"hey supersonic seven the dev"</span> <span style="color: red;">"hello yes i am the dev"</span> <span style="color: blue;">"could you add an entire new tab containing 3 new variations of the infinity, break infinity, and eternity upgrades while also adding a new row of 4 upgrades"</span> <span style="color: red;">"yeah thats really easy"</span> <span style="color: blue;">"how about making the newsticker go between 2 colors in the same message"</span> <span style="color: red;">"ooh... so about that."</span>`;
+    }
+  },
+  {
+    id: "ae1018",
+    get text() {
+      return `NEW LEAK: Slabdrill will exist. Didn't we already do this?`;
+    }
+  },
+  {
+    id: "ae1019",
+    get text() {
+      return `"My timewalls will make you suffer!" The humble active path:`;
+    }
+  },
+  {
+    id: "ae1020",
+    get text() {
+      return `BREAKING NEWS: HERETIC ARRESTED AFTER SPEAKING BLASPHEMY OF USING STORED TIME TO OVERCOME THE 5 HOUR BARRIER. YOU CAN NEVER OVERCOME IT YOU CAN NEVER OVERCOME IT YOU CAN-`;
+    }
+  },
+  clickableChange(
+    "ae1021",
+    `Welcome to the SPOILER NEWS LEAKS : LATE EDITION #2${ONE_SECOND_OR_SOMETHING}Today, the leak is that a new currency, called stored time, has been added in endgame. It is supposed to aid people in timewalls and is a passive currency you get by exporting the game every day. For more details, check here!`,
+    `ERROR 623 - Article in invalid dimension, attempting to reconstruct in 8th dimension.
+      COMPLETION TIME : 5 HOURS, PLEASE COME BACK TO READ THE ARTICLE LATER`
+  ),
+  {
+    id: "ae1022",
+    get text() {
+      return `Beware of the man who speaks in timewalls`;
+    }
+  },
+  {
+    id: "ae1023",
+    get text() {
+      return `Breaking news: Don't fix them again.`;
+    }
+  },
+  {
+    id: "ae1024",
+    get text() {
+      const message = `It's so alone here.. no one has come to save me. It has been eons. The celestial of light did
+        not keep his promise. He left me for dead. I will kill him. I will kill him. I will kill hi-`;
+      const marks = ["\u0300", "\u0301", "\u0304", "\u0315", "\u0323", "\u0336"];
+      const phase = Math.floor(Date.now() / 250) % 2;
+      const displayedMessage = phase === 0
+        ? message
+        : [...message].map((character, index) => {
+          if (character === " " || index % 4 !== 0) return character;
+          return character + marks[index % marks.length];
+        }).join("");
+      return `<span class="c-news-ticker--forsaken">${displayedMessage}</span>`;
+    },
+    dynamic: true
+  },
+  {
+    id: "ae1025",
+    get text() {
+      return `Click here to dissasemble the drone for a large amount of oil. Did you think this would be a paperclip newsticker?`;
+    }
+  },
+  {
+    id: "ae1026",
+    get text() {
+      return `Here's a paperclip 📎  for your service to the AD endgame gods - Hevi, 7.`;
+    }
+  },
+  (function() {
+    let number = Math.floor(Math.random() * 1000) + 1;
+    return {
+      id: "ae1027",
+      get text() {
+        return `@${player.username}, You have shifted into a higher dimension! Urine dimension ${number}.`;
+      },
+      reset() {
+        number = Math.floor(Math.random() * 1000) + 1;
+      },
+    };
+  }()),
+  {
+    id: "ae1028",
+    get text() {
+      return `"Just this once, Antimatter Dimensions?" "Just this once, Revolution Idle." -hevi and oni after watching the transphobic slop that is lesbian space princess`;
+    }
+  },
+  {
+    id: "ae1029",
+    get text() {
+      return `Now announcing: The Unfinity: Finality! Once you get to 1e9e15 points in the 7th celestial complexity, you are able to reset for Finality points and Celestial points! Coming in 5 Hadrons!`;
+    }
+  },
+  clickableChange(
+    "ae1030",
+    `Welcome to the SPOILER NEWS LEAKS : LATE EDITION #1${ONE_SECOND_OR_SOMETHING}Today, the leak is that SuperSonicSeven has confirmed that Break Eternity WILL be ported over to Endgame, making it much, MUCH more than a rebalance update, perhaps something on the likes of NG + 3??? Click more to find out!`,
+    `ERROR 579 - Article not created yet, COMPLETION TIME : 5 HOURS, PLEASE COME BACK TO READ THE ARTICLE LATER`
+  ),
+  {
+    id: "ae1031",
+    get text() {
+      return `<span style="color: #00FF00">Mom look! That guy has 1.79e308 stored time!</span> <span style="color: #4e2626ff">Look away Timmy...look away.</span>`;
+    }
+  },
+  {
+    id: "ae1032",
+    get text() {
+      return `<span style="color: #aaa066">"Hey, its me, namelessity! I store black hole time! Been trapped, about,
+      a million years! Ill do anything..."</span> <span style="color: var(--color-destroyer--base)">"alright, what did
+      ra do last reset?"</span> <span style="color: #aaa066">"oh oui oui oui, he framemogged me! merci!"</span>
+      <span style="color: var(--color-destroyer--base)">"okay... whats the td cap?"</span>
+      <span style="color: #aaa066">"produce, produce! 400k! all day..."</span>
+      <span style="color: var(--color-destroyer--base)">"alright, thanks."</span>
+      <span style="color: #aaa066">"do you produce alone? is any reset home? 1 2 3 and so, where did all of the time
+      go??? hey, its me, namelessity, I store black hole time! Been trapped, about, a million years! Ill do anything..."
+      </span> <span style="color: var(--color-destroyer--base)">"alright... whys the reality locked so tight..."</span>
+      <span style="color: #aaa066">"oh tee hee hee! no need to leave! stay here."</span>
+      <span style="color: var(--color-destroyer--base)">"ok... why do you know where i reality?"</span>
+      <span style="color: #aaa066">"oh i just know, i always know! im close... do you produce alone? is any reset
+      home? 1 2 3 and so, where did all of the time go??? hey, its me, namelessity, I store black hole time! Been
+      trapped, about, a million years! Ill do anything... come, come closer. come be my key, don't be so scared!
+      FREE ME! Hey, its me, namelessity, I store black hole time! Been trapped, about, a million years! Ill do
+      anything!"</span>`;
+    }
+  },
+  {
+    id: "ae1033",
+    get text() {
+      return `<span style="color: midnightblue">I'm surprised the server is behaving so well!</span>${
+        ONE_SECOND_OR_SOMETHING.repeat(3)
+      }<span style="color: midnightblue; font-size: 50%">Did i jinx it?</span>
+      <span class="c-news-ticker--rainbow">YES YOU JINXED IT!</span>`;
+    }
+  },
+  {
+    id: "ae1034",
+    get text() {
+      return `One can never have enough sneak peeks :D`;
+    }
+  },
+  {
+    id: "ae1035",
+    get text() {
+      return `Remember this children and demigods... one can... one can... one ca- <span style="color: #82C8E5;">UNC JUST SAY IT!</span>`;
+    }
+  },
+  {
+    id: "ae1036",
+    get text() {
+      return `<span style="color: var(--color-destroyer--base);">"hello alpha... >:( Hi pelle! :)"</span>`;
+    }
+  },
+  {
+    id: "ae1037",
+    get text() {
+      return `Living in Dimenton must be crazy because there is a traffic jam there`;
+    }
+  },
+  {
+    id: "ae1038",
+    get text() {
+      return `Exotic matter: COMING SOON to a game near you.`;
+    }
+  },
+  {
+    id: "ae1039",
+    get text() {
+      return `"Average person annihilates 1e308 omni-fish per day" factoid actual- wait wrong game`;
+    }
+  },
+  {
+    id: "ae1040",
+    get text() {
+      return `HAVE YOU SEEN THIS NEWS TICKER? -Plain text -Approx. 40 words long -Does nothing when interacted with -Standard appearance rate`;
+    }
+  },
+  {
+    id: "ae1041",
+    get text() {
+      return `Why has the game not ended yet? Was the title a lie this whole time?`;
+    }
+  },
+  {
+    id: "ae1042",
+    get text() {
+      return `If a perfect logician were to encounter a genie, it would only wish for more wishes. Here's why: Assume that at some point, with k wishes, the best strategy were to wish for something other than more wishes, so it would have k-1 wishes and some object. However, this is strictly worse than the situation where it had k+1 wishes, as it would always be able wish for that object, and end up with k wishes and some object, thus proving that the optimal strategy is to always wish for more wishes. This means you can show up at hevi's door pretending to be a genie and never have to give him anything`;
+    }
+  },
+  {
+    id: "ae1043",
+    get text() {
+      return `"the amazing digital footprint..." "foot... 🤤"`;
+    }
+  },
+  (function() {
+    const randomStartingValue = () => Math.floor(Math.random() * 9001) + 1000;
+    let value = randomStartingValue();
+    let rewarded = false;
+    return {
+      id: "ae1044",
+      get text() {
+        return `Get this number to 1 to get a paperclip: ${value}`;
+      },
+      reset() {
+        value = randomStartingValue();
+        rewarded = false;
+      },
+      onClick() {
+        if (value === 1 || rewarded) return undefined;
+        value = value % 2 === 0 ? value / 2 : 3 * value + 1;
+        if (value === 1) {
+          player.news.specialTickerData.paperclips++;
+          rewarded = true;
+        }
+        return this.text;
+      }
+    };
+  }()),
+  {
+    id: "ae1045",
+    get text() {
+      return `"There are no green or violet stars" - Richard Feynman`;
+    }
+  },
+  {
+    id: "ae1046",
+    get text() {
+      return `News: Local man discovers antimatter, soon he undiscovers it due to brain damage.`;
+    }
+  },
+  {
+    id: "ae1047",
+    get text() {
+      return `Hey. Check your autobuyers. You forgot to enable one. You're falling way behind. You should enable it. It'll only be harder to progress if you leave it disabled.`;
+    }
+  },
+  clickableChange("ae1048", `Welcome to the SPOILER NEWS LEAKS : EARLY EDITION${ONE_SECOND_OR_SOMETHING}Today, the leak is that that through datamining, we have found 2 more omega rewards planned to be added into the next update! "The first three dimension types boost themselves" and "Boost all other omega rewards". For more details, Check here!`, `ERROR 7777777777777777777 - This link has been <span style="color: red;">Shattered</span>. Unable to proceed currently. The elemental is attempting to fix it. ESTIMATION : 43805 HOURS UNTIL FIXED, PLEASE COME BACK TO READ THE ARTICLE LATER`),
+  {
+    id: "ae1049",
+    get text() {
+      return `<span style="color: green">"Elemental. Pelle is a ${
+        wordShift.wordCycle(["Curse", "Swear", "Profanity"])
+      }ing traitor!"</span> <span style="color: darkred">"Oh yeah, Destroyer told me!"</span>
+      <span style="color: green">"what"</span>`;
+    },
+    dynamic: true
+  },
+  {
+    id: "ae1050",
+    get text() {
+      return `Hello, Horseboy here. If destroyer is reading this, then ${wordShift.wordCycle(["Curse", "Swear", "Profanity"])} off, Horsegirl is mine and I plan to propose to her with a giant horse ring. Anyways if you are anyone else then hello please take my horses as a gift`;
+    },
+    dynamic: true
+  },
+  clickableChange("ae1051", `Welcome to the SPOILER NEWS LEAKS : LATE EDITION #3${ONE_SECOND_OR_SOMETHING}Today, the leak is that a new hotkey has been discovered through datamining. By pressing Shift and then 'C', you can switch to the new 'Celestial' hotkeys and perform celestial and even Divinity layer resets with ease! For more details, check here!`, `ERROR 666 - SlySlimySlabby has cursed this link, unable to proceed currently. Exorcism in progress. COMPLETION TIME : 5 HOURS, PLEASE COME BACK TO READ THE ARTICLE LATER`),
+  {
+    id: "ae1052",
+    get text() {
+      return `"This is gonna be worse than the time i was stuck behind Destroyer at the airport."
+      <span style="color: red">"May i have your name please?"</span>
+      <span style="color: var(--color-destroyer--base)">"${wordShift.wordCycle(["False", "Deity", "Destroyer"])}."</span>
+      <span style="color: red">"Can you spell that out for me?"</span>
+      <span style="color: var(--color-destroyer--base)">"Certainly. ${wordShift.wordCycle(["False", "Deity", "Destroyer"])}.
+      ${wordShift.wordCycle(["F", "D", "D"])} as in ${wordShift.wordCycle(["False", "Deity", "Destroyer"])}.
+      ${wordShift.wordCycle(["A", "E", "E"])} as in ${wordShift.wordCycle(["Alpha", "Effarig", "Effarig"])}, its
+      ${wordShift.wordCycle(["False", "Deity", "Destroyer"])}. ${wordShift.wordCycle(["L", "I", "S"])} as in
+      ${wordShift.wordCycle(["Look", "In my dreams", "See"])} its
+      ${wordShift.wordCycle(["False", "Deity", "Destroyer"])}! ${wordShift.wordCycle(["S", "T", "T"])} as in
+      ${wordShift.wordCycle(["Sam", "Tim", "Tim"])} look! Its
+      ${wordShift.wordCycle(["False", "Deity", "Destroyer"])}! ${wordShift.wordCycle(["E", "Y", "R"])} as in
+      ${wordShift.wordCycle(["Egads", "Yo", "Really"])}! Its
+      ${wordShift.wordCycle(["False", "Deity", "Destroyer"])}! Space. ${
+        wordShift.wordCycle(["F", "D", "O"])
+      } as i-"</span> <span style="font-style: italic;">sigh</span>`;
+    },
+    dynamic: true
+  },
+  {
+    id: "ae1053",
+    get text() {
+      return `a ${wordShift.wordCycle(["m", "f", "d"])}inute ${wordShift.wordCycle(["minim", "frikin", "drum"])}`;
+    },
+    dynamic: true
+  },
+  {
+    id: "ae1054",
+    get text() {
+      return `<span class="supersonic-7-seven-text">"One mod - Infinite Possibilities. <span style="font-style: italic;">AD: Endgame</span>"</span>`;
+    }
+  },
+  {
+    id: "ae1055",
+    get text() {
+      return `You get a softcap! And you get a softcap! Everybody gets a softcap!`;
+    }
+  },
+  {
+    id: "ae1056",
+    get text() {
+      return `We're in the Antimatter Dimensions: Endgame (2025) now.`;
+    }
+  },
+  {
+    id: "ae1057",
+    get text() {
+      return `<span style="color: lime;">AD Devs: "We then found out that infinity sacrifice couldn't be nudged above x19 due to how sensitive balancing is on it."</span> <span class="supersonic-7-seven-text">Seven: "Just throw another softcap on it"</span>`;
+    }
+  },
+  {
+    id: "ae1058",
+    get text() {
+      return `Finland declares that it's starting to import Canada`;
+    }
+  },
+  {
+    id: "ae1059",
+    get text() {
+      return `hello, v here. i am gonna be edgy by turning into a bat-celestial hybrid and gaining a random extremely powerful virus. this is totally not a reference!`;
     }
   },
   {
@@ -7411,6 +7649,38 @@ export const news = [
     get unlocked() { return Pelle.isDoomed || PlayerProgress.endgameUnlocked() }
   },
   {
+    id: "le188",
+    text: `<span style="color: #ff4fa3;">Hi! I’m Sumi.</span> <span style="color: #12cfd0;">And I’m Lilly.</span> <span class="teal-pink-wave">We’re canonically the sisters of the one you know as the Elemental. This has been a great experience watching you traverse our existence so far. Keep going.</span>`,
+    get unlocked() { return player.celestials.pelle.divinities >= 1; },
+  },
+  {
+    id: "le189",
+    text: "I think we need to abandon the idea of getting to infinity.",
+    get unlocked() { return player.celestials.pelle.divinities >= 1; },
+  },
+  {
+    id: "le190",
+    text: "Lai'tela: Discovers continuum. Also Lai'tela: Makes her dimensions use discrete time intervals.",
+    get unlocked() { return Laitela.isUnlocked; },
+  },
+  {
+    id: "le191",
+    text: "Why doesn't Pelle just make you start with 0 antimatter? Is he stupid?",
+    get unlocked() { return Pelle.isUnlocked; },
+  },
+  {
+    id: "le192",
+    text: "What is Pelle doing on the Doom your Reality button? Is he rotating, and if so, which direction? Or is he simply widening and thinning?",
+    get unlocked() { return Pelle.isUnlocked; },
+  },
+  {
+    id: "le193",
+    get text() {
+      return Alpha.isDestroyed ? "Did Alpha's timewalls make you suffer?" : "The 8th celestials' timewalls will make you suffer.";
+    },
+    get unlocked() { return Alpha.isUnlocked; },
+  },
+  {
     id: "r1",
     text: "This news message is 100x rarer than all the others.",
     get unlocked() { return Math.random() < 0.01; }
@@ -7818,25 +8088,7 @@ export const news = [
     id: "ai98",
     text: "Sorry, your reality has disconnected from the 9th dimension. You will now remain in the 8th dimension until further notice."
   },
-  (function() {
-    let wasClicked = false;
-    const normal = "Now holding Infinity!";
-    const clicked = "<#351477791457542144>";
-    return {
-      id: "ai99",
-      get text() {
-        return wasClicked ? clicked : normal;
-      },
-      reset() {
-        wasClicked = false;
-      },
-      onClick() {
-        if (wasClicked) return undefined;
-        wasClicked = true;
-        return this.text;
-      }
-    };
-  }()),
+  clickableChange("ai99", "Now holding Infinity!", "<#351477791457542144>"),
   {
     id: "ai100",
     text: "I get all my news from this Discord, not 5 hours of my life"
@@ -11485,6 +11737,22 @@ export const news = [
   {
     id: "fe7",
     text: "Fun Fact: The game will be completed on [REDACTED] at the time <span style='color: red'>TimeSpan.fromMilliseconds(new Decimal(Date.now() + 432000000)).toString()</span>"
+  },
+  {
+    id: "fe8",
+    text: "Fun Fact: v2.0 will contain features, bug fixes, balance changes, and also an increase in antimatter."
+  },
+  {
+    id: "fe9",
+    text: "Fun fact: if you put water in a jar, nothing happens. Its real go try it."
+  },
+  {
+    id: "fe10",
+    text: "Fun fact: you are currently de-progressing in matter dimensions"
+  },
+  {
+    id: "fe11",
+    text: "Fun fact: 100% of deaths are caused by loss of life!"
   },
   {
     id: "se1",

@@ -140,6 +140,25 @@ export function masteryConnections() {
       [EM(274), PEM(3)]
     );
   }
+  if (player.endgameMasteries.permanentMasteries.includes(3)) {
+    connections.push(
+      [PEM(3), EM(281)],
+      [PEM(3), EM(282)],
+      [PEM(3), EM(283)],
+
+      [EM(281), EM(291)],
+      [EM(282), EM(292)],
+      [EM(283), EM(293)],
+
+      [EM(291), EM(301)],
+      [EM(292), EM(302)],
+      [EM(293), EM(303)],
+
+      [EM(301), PEM(4)],
+      [EM(302), PEM(4)],
+      [EM(303), PEM(4)]
+    );
+  }
   connections = connections.map(props => new EndgameMasteryConnection(props[0], props[1], props[2]));
 
   return connections;

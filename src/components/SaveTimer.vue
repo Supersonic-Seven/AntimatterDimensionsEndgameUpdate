@@ -27,7 +27,7 @@ export default {
       this.lastLocalSave = GameStorage.lastSaveTime;
       this.lastCloudSave = GameStorage.lastCloudSave;
       this.showTimeSinceSave = player.options.showTimeSinceSave;
-      this.saveDisabled = GameEnd.endState >= END_STATE_MARKERS.INTERACTIVITY_DISABLED;
+      this.saveDisabled = GameEnd.endState >= END_STATE_MARKERS.INTERACTIVITY_DISABLED || player.endgame.credits;
     },
     save() {
       GameStorage.save(false, true);

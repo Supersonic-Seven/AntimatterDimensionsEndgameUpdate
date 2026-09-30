@@ -79,7 +79,8 @@ export const GameCache = {
     .map(run => run[1])
     .reduce(Number.sumReducer) / (1000 * player.records.recentEternities.length)),
 
-  tickSpeedMultDecrease: new Lazy(() => (Alpha.isRunning ? AlphaUnlocks.breakInfinity.effects.nerfB.effectOrDefault(10) : 10) - Effects.sum(
+  tickSpeedMultDecrease: new Lazy(() => (SlabdrillUnlocks.breakInfinity.isUnlocked ? 25 :
+    (Alpha.isRunning ? AlphaUnlocks.breakInfinity.effects.nerfB.effectOrDefault(10) : 10)) - Effects.sum(
     BreakInfinityUpgrade.tickspeedCostMult,
     EternityChallenge(11).reward) - (player.disablePostReality ? 0 : Effects.sum(
     AlphaUnlocks.breakInfinity.effects.buffA,
@@ -88,7 +89,8 @@ export const GameCache = {
     AlphaUnlocks.ec11Bulk.effects.buff
   ))),
 
-  dimensionMultDecrease: new Lazy(() => (Alpha.isRunning ? AlphaUnlocks.breakInfinity.effects.nerfB.effectOrDefault(10) : 10) - Effects.sum(
+  dimensionMultDecrease: new Lazy(() => (SlabdrillUnlocks.breakInfinity.isUnlocked ? 25 :
+    (Alpha.isRunning ? AlphaUnlocks.breakInfinity.effects.nerfB.effectOrDefault(10) : 10)) - Effects.sum(
     BreakInfinityUpgrade.dimCostMult,
     EternityChallenge(6).reward) - (player.disablePostReality ? 0 : Effects.sum(
     AlphaUnlocks.breakInfinity.effects.buffB,
@@ -141,7 +143,7 @@ export const GameCache = {
   antimatterDimensionCommonMultiplier: new Lazy(() => antimatterDimensionCommonMultiplier()),
 
   // 0 will cause a crash if invoked; this way the tier can be used as an index
-  antimatterDimensionFinalMultipliers: Array.range(0, 9)
+  antimatterDimensionFinalMultipliers: Array.range(0, 10)
     .map(tier => new Lazy(() => getDimensionFinalMultiplierUncached(tier))),
 
   infinityDimensionCommonMultiplier: new Lazy(() => infinityDimensionCommonMultiplier()),

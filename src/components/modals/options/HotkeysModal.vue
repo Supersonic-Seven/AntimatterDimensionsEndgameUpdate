@@ -12,7 +12,8 @@ export default {
       visible: [],
       timeStudyUnlocked: false,
       glyphSacUnlocked: false,
-      isElectron: false
+      isElectron: false,
+      isFlipped: false
     };
   },
   computed: {
@@ -58,6 +59,7 @@ export default {
       const progress = PlayerProgress.current;
       this.timeStudyUnlocked = progress.isEternityUnlocked;
       this.glyphSacUnlocked = RealityUpgrade(19).isBought;
+      this.isFlipped = player.universes.current === 2;
 
       // ElectronRuntime is a global which only exists on Steam (throws a ReferenceError on web)
       try {
@@ -131,8 +133,8 @@ export default {
           Alt is a modifier key that, when pressed in conjunction with any key that has a corresponding autobuyer,
           will toggle said autobuyer.
           <br>
-          When pressing both Alt and Shift, you can toggle buying singles or buying max for the Antimatter Dimension
-          and Tickspeed Autobuyers instead.
+          When pressing both Alt and Shift, you can toggle buying singles or buying max for the
+          {{ isFlipped ? "Matter" : "Antimatter" }} Dimension and Tickspeed Autobuyers instead.
         </span>
         <br>
         <div class="l-modal-hotkeys-row">

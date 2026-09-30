@@ -40,6 +40,9 @@ export const Ascension = {
   },
   get nextAscension() {
     return Ascensions.all.find(x => !x.isUnlocked);
+  },
+  get overchargePenalty() {
+    return [1, 0.72, 0.525, 0.375, 0.125][player.endgame.overcharge.level];
   }
 };
 
@@ -49,10 +52,12 @@ export function tryAscend() {
   Ascension.nextAscension.config.onUnlock?.();
   player.endgame.ascension++;
   player.endgame.ascensionTimer = 0;
+  TabNotification.ascension.clearTrigger();
+  TabNotification.ascension.tryTrigger();
 };
 
 export function tryEnterOvercharge() {
-  if (LHC.voidRunning || LHC.nullifiedVoidRunning) return;
+  if (LHC.voidRunning || LHC.nullifiedVoidRunning || player.compression.active || player.universes.current !== 0) return;
   if (player.options.confirmations.overcharge) {
     Modal.enterOvercharge.show();
   } else {
@@ -66,6 +71,9 @@ export function enterOvercharge() {
   player.endgame.overcharge.isRunning = true;
   recalculateAllGlyphs();
   Tab.dimensions.antimatter.show(false);
+  if (player.endgame.overcharge.level >= 4) {
+    Modal.message.show(`The rewards for this feature are not yet implemented. Please wait for updates.`, {}, 3);
+  }
 };
 
 export function exitOvercharge() {

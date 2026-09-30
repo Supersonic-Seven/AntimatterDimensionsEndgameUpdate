@@ -184,6 +184,36 @@
   background-color: #198036;
 }
 
+.o-endgame-mastery-endgame-entanglement--available {
+  color: var(--color-endgame);
+  border-color: var(--color-endgame);
+}
+
+.o-endgame-mastery-endgame-entanglement--available:hover {
+  color: #eeeeee;
+  background-color: var(--color-endgame);
+}
+
+.o-endgame-mastery-celestial-entanglement--available {
+  color: var(--color-celestials);
+  border-color: var(--color-celestials);
+}
+
+.o-endgame-mastery-celestial-entanglement--available:hover {
+  color: #eeeeee;
+  background-color: var(--color-celestials);
+}
+
+.o-endgame-mastery-divine-entanglement--available {
+  color: var(--color-pelle--base);
+  border-color: var(--color-pelle--base);
+}
+
+.o-endgame-mastery-divine-entanglement--available:hover {
+  color: #eeeeee;
+  background-color: var(--color-pelle--base);
+}
+
 .o-endgame-mastery-permanent--available {
   color: black;
   background-color: var(--color-endgame);
@@ -215,15 +245,20 @@
 .o-endgame-mastery-time-compression--available:hover {
   color: white;
   background-color: #64ddad;
-  animation: a-endgame-mastery-time-compression 10s infinite;
+  animation: a-endgame-mastery-permanent 10s infinite;
 }
 
-@keyframes a-endgame-mastery-time-compression {
-  0% { box-shadow: inset 0.5rem  0       2rem; }
-  25% { box-shadow: inset 0       0.5rem  2rem; }
-  50% { box-shadow: inset -0.5rem 0       2rem; }
-  75% { box-shadow: inset 0       -0.5rem 2rem; }
-  100% { box-shadow: inset 0.5rem  0       2rem; }
+.o-endgame-mastery-celestial-reality--available {
+  color: black;
+  background-color: var(--color-reality);
+  border-color: var(--color-reality);
+  animation: a-endgame-mastery-permanent 10s infinite;
+}
+
+.o-endgame-mastery-celestial-reality--available:hover {
+  color: white;
+  background-color: var(--color-reality);
+  animation: a-endgame-mastery-permanent 10s infinite;
 }
 
 .o-endgame-mastery-normal--unavailable {
@@ -269,12 +304,28 @@
   background-color: #94a894;
 }
 
+.o-endgame-mastery-endgame-entanglement--unavailable {
+  background-color: #aeae90;
+}
+
+.o-endgame-mastery-celestial-entanglement--unavailable {
+  background-color: #9090ae;
+}
+
+.o-endgame-mastery-divine-entanglement--unavailable {
+  background-color: #ae9090;
+}
+
 .o-endgame-mastery-permanent--unavailable {
   background-color: #a8a894;
 }
 
 .o-endgame-mastery-time-compression--unavailable {
   background-color: #94a8a0;
+}
+
+.o-endgame-mastery-celestial-reality--unavailable {
+  background-color: #90ae90;
 }
 
 .o-endgame-mastery-normal--bought {
@@ -331,6 +382,24 @@
   border-color: black;
 }
 
+.o-endgame-mastery-endgame-entanglement--bought {
+  color: black;
+  background-color: var(--color-endgame);
+  border-color: black;
+}
+
+.o-endgame-mastery-celestial-entanglement--bought {
+  color: black;
+  background-color: var(--color-celestials);
+  border-color: black;
+}
+
+.o-endgame-mastery-divine-entanglement--bought {
+  color: black;
+  background-color: var(--color-pelle--base);
+  border-color: black;
+}
+
 .o-endgame-mastery-permanent--bought {
   color: black;
   background: linear-gradient(var(--color-endgame), var(--color-pelle--base));
@@ -340,6 +409,12 @@
 .o-endgame-mastery-time-compression--bought {
   color: black;
   background: linear-gradient(#64ddad, #0000ff);
+  border-color: black;
+}
+
+.o-endgame-mastery-celestial-reality--bought {
+  color: black;
+  background: linear-gradient(var(--color-reality), var(--color-celestials));
   border-color: black;
 }
 
@@ -391,6 +466,24 @@
   border-color: #175f2a;
 }
 
+.t-dark .o-endgame-mastery-endgame-entanglement--bought,
+.t-s6 .o-endgame-mastery-endgame-entanglement--bought,
+.t-s10 .o-endgame-mastery-endgame-entanglement--bought {
+  border-color: #eaea00;
+}
+
+.t-dark .o-endgame-mastery-celestial-entanglement--bought,
+.t-s6 .o-endgame-mastery-celestial-entanglement--bought,
+.t-s10 .o-endgame-mastery-celestial-entanglement--bought {
+  border-color: #4040c8;
+}
+
+.t-dark .o-endgame-mastery-divine-entanglement--bought,
+.t-s6 .o-endgame-mastery-divine-entanglement--bought,
+.t-s10 .o-endgame-mastery-divine-entanglement--bought {
+  border-color: #c01030;
+}
+
 /* #endregion o-endgame-mastery */
 
 .o-endgame-mastery-connection {
@@ -432,12 +525,28 @@
   stroke: #375337;
 }
 
+.o-endgame-mastery-connection--endgame-entanglement {
+  stroke: #a08037;
+}
+
+.o-endgame-mastery-connection--celestial-entanglement {
+  stroke: #3737a0;
+}
+
+.o-endgame-mastery-connection--divine-entanglement {
+  stroke: #a03737;
+}
+
 .o-endgame-mastery-connection--permanent {
   stroke: #a0a037;
 }
 
 .o-endgame-mastery-connection--time-compression {
   stroke: #37a080;
+}
+
+.o-endgame-mastery-connection--celestial-reality {
+  stroke: #37a037;
 }
 
 .o-endgame-mastery-connection--bought {
@@ -480,10 +589,26 @@
   stroke: #198036;
 }
 
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--endgame-entanglement {
+  stroke: var(--color-endgame);
+}
+
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--celestial-entanglement {
+  stroke: var(--color-celestials);
+}
+
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--divine-entanglement {
+  stroke: var(--color-pelle--base);
+}
+
 .o-endgame-mastery-connection--bought.o-endgame-mastery-connection--permanent {
   stroke: var(--color-endgame);
 }
 
 .o-endgame-mastery-connection--bought.o-endgame-mastery-connection--time-compression {
   stroke: #64ddad;
+}
+
+.o-endgame-mastery-connection--bought.o-endgame-mastery-connection--celestial-reality {
+  stroke: var(--color-reality);
 }

@@ -22,11 +22,17 @@ export const permanentEndgameMasteries = [
   {
     id: 3,
     description: "Unlock Time Compression",
-    cost: 7000000,
+    cost: 12000000,
     requirement: () => {
       const esRequirement = Currency.endgameSkills.max.gte(EndgameMastery.timeCompression.totalEndgameSkillRequirement);
       const emRequirement = [271, 272, 273, 274].every(id => EndgameMastery(id).isBought);
       return emRequirement && esRequirement;
     }
+  },
+  {
+    id: 4,
+    description: "Unlock Celestial Reality",
+    cost: 1e15,
+    requirement: () => EndgameMasteryState.all.every(u => u.isBought)
   }
 ];

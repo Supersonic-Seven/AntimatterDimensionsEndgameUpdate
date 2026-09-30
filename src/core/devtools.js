@@ -190,7 +190,7 @@ dev.realize = function() {
 };
 
 dev.respecPerks = function() {
-  player.reality.perkPoints += player.reality.perks.size;
+  player.reality.perkPoints = player.reality.perkPoints.add(player.reality.perks.size);
   player.reality.perks = new Set();
   GameCache.achievementPeriod.invalidate();
   GameCache.buyablePerks.invalidate();
@@ -215,7 +215,7 @@ dev.buyAllPerks = function() {
   const visited = [];
   const toVisit = [Perk.firstPerk];
   while (toVisit.length > 0) {
-    if (player.reality.perkPoints < 1) break;
+    if (player.reality.perkPoints.lt(1)) break;
     const perk = toVisit.shift();
     visited.push(perk);
     toVisit.push(...perk.connectedPerks.filter(p => !visited.includes(p)));

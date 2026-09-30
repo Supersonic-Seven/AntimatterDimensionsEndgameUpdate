@@ -23,9 +23,10 @@ export class PermanentEndgameMasteryState extends EndgameMasteriesState {
   }
 
   get totalEndgameSkillRequirement() {
-    if (this.id === 3) return 15000000;
+    if (this.id === 3) return 20000000;
     if (this.id === 2) return 150000;
-    return 100;
+    if (this.id === 1) return 100;
+    return 0;
   }
 
   purchase(quiet = false) {
@@ -40,6 +41,10 @@ export class PermanentEndgameMasteryState extends EndgameMasteriesState {
 
     if (this.id == 2) {
       respecEndgameMasteries();
+    }
+
+    if (this.id === 4) {
+      Modal.message.show(`This feature is not yet implemented. Please wait for updates.`, {}, 3);
     }
 
     player.endgameMasteries.permanentMasteries.push(this.id);
@@ -65,6 +70,8 @@ EndgameMastery.endgameUpgrades = PermanentEndgameMasteryState.masteries[1];
 EndgameMastery.permaMasteries = PermanentEndgameMasteryState.masteries[2];
 
 EndgameMastery.timeCompression = PermanentEndgameMasteryState.masteries[3];
+
+EndgameMastery.celestialReality = PermanentEndgameMasteryState.masteries[4];
 
 EndgameMastery.boughtEndgameUpgradesEM = function() {
   return player.endgameMasteries.permanentMasteries.map(id => PermanentEndgameMasteryState.masteries[id]);

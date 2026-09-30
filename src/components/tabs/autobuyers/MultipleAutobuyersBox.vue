@@ -26,6 +26,7 @@ export default {
       anyUnlocked: false,
       displayLabelAsGroup: false,
       parentActive: false,
+      isFlipped: false
     };
   },
   computed: {
@@ -72,6 +73,7 @@ export default {
       this.anyUnlocked = type.anyUnlocked;
       this.displayLabelAsGroup = (type.allMaxedInterval ?? true) && (type.allUnlimitedBulk ?? true);
       this.parentActive = type.isActive;
+      this.isFlipped = player.universes.current === 2;
     },
     toggleGroup() {
       this.type.toggle();
@@ -121,7 +123,7 @@ export default {
     v-else-if="isADBox && continuumActive"
     class="c-autobuyer-box-row"
   >
-    Continuum replaces your Antimatter Dimension and Tickspeed Autobuyers, as your production multipliers
+    Continuum replaces your {{ isFlipped ? "Matter" : "Antimatter" }} Dimension and Tickspeed Autobuyers, as your production multipliers
     <br>
     now automatically and continuously scale based on how many purchases you would have had otherwise.
   </span>

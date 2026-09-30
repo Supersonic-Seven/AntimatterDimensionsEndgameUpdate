@@ -226,7 +226,9 @@ export const V = {
       else sum += player.celestials.v.runUnlocks[i] * 2;
     }
     this.spaceTheorems = player.disablePostReality ? 0 : new Decimal(sum).times(ExpansionPack.vPack.isBought ? 2 : 1).times(
-      Ra.unlocks.spaceTheoremBoost.effectOrDefault(1)).times(Effects.product(ResurgenceUpgrade.synergy3)).toNumber();
+      Ra.unlocks.spaceTheoremBoost.effectOrDefault(1)).times(Effects.product(ResurgenceUpgrade.synergy3)).times(
+      ReplicantiMultipliers.stMult).pow(
+      (ResurgenceUpgrade.repSurge.isBought && !player.disablePostReality) ? ReplicantiMultipliers.stPow : 1).toNumber();
   },
   reset() {
     player.celestials.v = {

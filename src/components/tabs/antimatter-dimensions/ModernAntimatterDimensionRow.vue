@@ -32,12 +32,15 @@ export default {
       isCostsAD: false,
       amountDisplay: "",
       hasTutorial: false,
+      canSeeNine: false,
+      isCursedCore: false,
+      isFlipped: false
     };
   },
   computed: {
     isDoomed: () => Pelle.isDoomed,
     name() {
-      return `${AntimatterDimension(this.tier).shortDisplayName} Antimatter Dimension`;
+      return `${AntimatterDimension(this.tier).shortDisplayName} ${this.isFlipped ? "Matter" : "Antimatter"} Dimension`;
     },
     costDisplay() {
       return this.buyUntil10 ? format(this.until10Cost) : format(this.singleCost);
@@ -49,24 +52,29 @@ export default {
       return this.isShown || this.isUnlocked || this.amount.gt(0);
     },
     boughtTooltip() {
-      if (this.isCapped) return `Nameless prevents the purchase of more than ${format(1)} 8th Antimatter Dimension`;
-      if (this.isContinuumActive) return "Continuum produces all your Antimatter Dimensions";
+      if (this.tier === 9 && this.isCapped) return `You cannot hold more than ${format(1)} 9th
+        ${this.isFlipped ? "Matter" : "Antimatter"} Dimension at this time`;
+      if (this.isCapped) return `Nameless prevents the purchase of more than ${format(1)} 8th
+        ${this.isFlipped ? "Matter" : "Antimatter"} Dimension`;
+      if (this.isContinuumActive && this.tier !== 9) return `Continuum produces all your
+        ${this.isFlipped ? "Matter" : "Antimatter"} Dimensions`;
       return `Purchased ${quantifyHybridLarge("time", this.bought)}`;
     },
     costUnit() {
-      return `${AntimatterDimension(this.tier - 2).shortDisplayName} AD`;
+      return `${AntimatterDimension(this.tier - 2).shortDisplayName} ${this.isFlipped ? "MD" : "AD"}`;
     },
     buttonPrefix() {
       if (!this.isUnlocked) return "Locked";
+      if (this.tier === 9 && this.isCapped) return "Universal Limitations Reached";
       if (this.isCapped) return "Shattered by Nameless";
-      if (this.isContinuumActive) return "Continuum: ";
+      if (this.isContinuumActive && this.tier !== 9) return "Continuum: ";
       return `Buy ${formatInt(this.howManyCanBuy)}`;
     },
     buttonValue() {
       if (this.isCapped) return "";
-      if (this.isContinuumActive) return this.continuumString;
+      if (this.isContinuumActive && this.tier !== 9) return this.continuumString;
       const prefix = this.showCostTitle(this.buyUntil10 ? this.until10Cost : this.singleCost) ? "Cost: " : "";
-      const suffix = this.isCostsAD ? this.costUnit : "AM";
+      const suffix = this.isCostsAD ? this.costUnit : (this.isFlipped ? "M" : "AM");
       return `${prefix}${this.costDisplay} ${suffix}`;
     },
     hasLongText() {
@@ -76,34 +84,41 @@ export default {
   methods: {
     update() {
       const tier = this.tier;
-      if (tier > DimBoost.maxDimensionsUnlockable && !this.isDoomed) return;
+      this.canSeeNine = player.celestials.slabdrill.goodbyeTick >= 40000 || Slabdrill.isDestroyed;
+      this.isFlipped = player.universes.current === 2;
+      if (!this.canSeeNine && ((tier > DimBoost.maxDimensionsUnlockable && !this.isDoomed) || tier === 9)) return;
       const dimension = AntimatterDimension(tier);
       this.isUnlocked = dimension.isAvailableForPurchase;
       const buyUntil10 = player.buyUntil10;
-      this.isCapped = tier === 8 && Enslaved.isRunning && dimension.bought.gte(1);
+      this.isCapped = (tier === 8 && Enslaved.isRunning && dimension.bought.gte(1)) ||
+        (tier === 9 && true && Slabdrill.isDestroyed && dimension.bought.gte(1));
       this.multiplier.copyFrom(AntimatterDimension(tier).multiplier);
       this.amount.copyFrom(dimension.totalAmount);
       this.bought.copyFrom(dimension.bought);
       this.boughtBefore10 = dimension.boughtBefore10;
-      this.howManyCanBuy = buyUntil10 ? dimension.howManyCanBuy : Math.min(dimension.howManyCanBuy, 1);
+      this.howManyCanBuy = (this.tier === 9 && true && Slabdrill.isDestroyed) ? Math.min(dimension.howManyCanBuy, 1) :
+        (buyUntil10 ? dimension.howManyCanBuy : Math.min(dimension.howManyCanBuy, 1));
       this.singleCost.copyFrom(dimension.cost);
-      this.until10Cost.copyFrom(dimension.cost.times(Math.max(dimension.howManyCanBuy, 1)));
-      if (tier < 8) {
+      this.until10Cost.copyFrom(this.tier === 9 ? dimension.cost.pow(Math.max(dimension.howManyCanBuy, 1)) :
+        dimension.cost.times(Math.max(dimension.howManyCanBuy, 1)));
+      if (tier < ((player.celestials.slabdrill.goodbyeTick >= 40000 || Slabdrill.isDestroyed) ? 9 : 8)) {
         this.rateOfChange.copyFrom(dimension.rateOfChange);
       }
       this.isAffordable = dimension.isAffordable;
       this.buyUntil10 = buyUntil10;
       this.isContinuumActive = Laitela.continuumActive;
       if (this.isContinuumActive) this.continuumValue.copyFrom(dimension.continuumValue);
-      this.isShown =
-        (DimBoost.totalBoosts.gt(0) && DimBoost.totalBoosts.plus(3).toNumber() >= tier) || PlayerProgress.infinityUnlocked();
-      this.isCostsAD = NormalChallenge(6).isRunning && tier > 2 && !this.isContinuumActive;
-      this.amountDisplay = this.tier < 8 ? format(this.amount, 2) : formatHybridLarge(this.amount, 3);
+      this.isShown = (tier === 9 ? (player.celestials.slabdrill.goodbyeTick >= 40000 || Slabdrill.isDestroyed) :
+        ((DimBoost.totalBoosts.gt(0) && DimBoost.totalBoosts.plus(3).toNumber() >= tier) || PlayerProgress.infinityUnlocked()));
+      this.isCostsAD = NormalChallenge(6).isRunning && tier > 2 && (!this.isContinuumActive || this.tier === 9);
+      this.amountDisplay = (this.tier < ((player.celestials.slabdrill.goodbyeTick >= 40000 || Slabdrill.isDestroyed) ? 9 : 8)) &&
+        !Slabdrill.isCursed ? format(this.amount, 2) : formatHybridLarge(this.amount, 3);
       this.hasTutorial = (tier === 1 && Tutorial.isActive(TUTORIAL_STATE.DIM1)) ||
         (tier === 2 && Tutorial.isActive(TUTORIAL_STATE.DIM2));
+      this.isCursedCore = player.celestials.slabdrill.core.isActive;
     },
     buy() {
-      if (this.isContinuumActive) return;
+      if (this.isContinuumActive && this.tier !== 9) return;
       if (this.howManyCanBuy === 1) {
         buyOneDimension(this.tier);
       } else {
@@ -116,8 +131,9 @@ export default {
     buttonClass() {
       return {
         "o-primary-btn o-primary-btn--new": true,
-        "o-primary-btn--disabled": (!this.isAffordable && !this.isContinuumActive) || !this.isUnlocked || this.isCapped,
-        "o-non-clickable o-continuum": this.isContinuumActive
+        "o-primary-btn--disabled": (!this.isAffordable && (!this.isContinuumActive || this.tier === 9))
+          || !this.isUnlocked || this.isCapped,
+        "o-non-clickable o-continuum": this.isContinuumActive && this.tier !== 9
       };
     },
     buttonTextClass() {
@@ -133,8 +149,8 @@ export default {
 <template>
   <div
     v-show="showRow"
-    class="c-dimension-row l-dimension-row-antimatter-dim c-antimatter-dim-row l-dimension-single-row"
-    :class="{ 'c-dim-row--not-reached': !isUnlocked }"
+    class="c-dimension-row l-dimension-row-antimatter-dim c-antimatter-dim-row"
+    :class="{ 'c-dim-row--not-reached': !isUnlocked, 'l-dimension-single-row': !isCursedCore, 'l-cursed-style': isCursedCore }"
   >
     <GenericDimensionRowText
       :tier="tier"
@@ -143,7 +159,10 @@ export default {
       :amount-text="amountDisplay"
       :rate="rateOfChange"
     />
-    <div class="l-dim-row-multi-button-container c-modern-dim-tooltip-container">
+    <div
+      v-if="!isCursedCore"
+      class="l-dim-row-multi-button-container c-modern-dim-tooltip-container"
+    >
       <div class="c-modern-dim-purchase-count-tooltip">
         {{ boughtTooltip }}
       </div>
@@ -164,7 +183,7 @@ export default {
           />
         </div>
         <div
-          v-if="!isContinuumActive && isUnlocked && !isCapped"
+          v-if="(!isContinuumActive || tier === 9) && isUnlocked && !isCapped"
           class="fill"
         >
           <div
@@ -201,5 +220,10 @@ export default {
   border-color: var(--color-laitela--accent);
   color: var(--color-laitela--base);
   background: var(--color-laitela--accent);
+}
+
+.l-cursed-style {
+  display: flex;
+  height: 5.5rem;
 }
 </style>

@@ -42,6 +42,9 @@ export default {
         ],
         [
           ExpansionPack.alphaPack
+        ],
+        [
+          ExpansionPack.slabPack
         ]
       ];
     },
@@ -50,11 +53,16 @@ export default {
       const next = ExpansionPacks.nextPackUnlockAM;
       const alpha = DivinityMilestone.hadronEmpowerment.isReached && this.nextPack?.id === "alphaPack";
       const alphaLock = !DivinityMilestone.hadronEmpowerment.isReached && this.nextPack?.id === "alphaPack";
+      const slab = DivinityMilestone.serpentPower.isReached && this.nextPack?.id === "slabPack";
+      const slabLock = !DivinityMilestone.serpentPower.isReached && this.nextPack?.id === "slabPack";
 
       if (first) return `The first Expansion Pack unlocks at ${format(next)} Antimatter.`;
+      if (slab && !Pelle.isDoomed && !Slabdrill.isCursed) return `Reach ${format(next)} Antimatter to unlock a new Expansion Pack.`;
+      if (slab && (Pelle.isDoomed || Slabdrill.isCursed)) return `The next Expansion Pack restricts you from buying it
+        while Doomed or Cursed!`;
       if (alpha && !Pelle.isDoomed) return `Reach ${format(next)} Antimatter to unlock a new Expansion Pack.`;
       if (alpha && Pelle.isDoomed) return `The next Expansion Pack restricts you from buying it while Doomed!`;
-      return (next === undefined || alphaLock)
+      return (next === undefined || alphaLock || slabLock)
         ? "All Expansion Packs unlocked"
         : `Next Expansion Pack unlocks at ${format(next)} Antimatter.`;
     },

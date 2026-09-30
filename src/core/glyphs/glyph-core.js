@@ -76,6 +76,11 @@ export const Glyphs = {
     return PelleGlyphs;
   },
   get activeSlotCount() {
+    if (Slabdrill.isCursed && SlabdrillUnlocks.dilation.isUnlocked) return 5;
+    if (Slabdrill.isCursed && SlabdrillUnlocks.eternityChallengeTen.isUnlocked) return 4;
+    if (Slabdrill.isCursed && SlabdrillUnlocks.timeStudy181.isUnlocked) return 3;
+    if (Slabdrill.isCursed && SlabdrillUnlocks.eternity.isUnlocked) return 2;
+    if (Slabdrill.isCursed && SlabdrillUnlocks.breakInfinity.isUnlocked) return 1;
     if (player.disablePostReality && !(Effarig.isRunning && Effarig.currentStage === EFFARIG_STAGES.ENDGAME)) return 0;
     if (Pelle.isDoomed) {
       return this.activeSlotCountInPelle();
@@ -323,6 +328,9 @@ export const Glyphs = {
     let maxSpecialGlyph = 1;
     if (Achievement(196).isUnlocked && !player.disablePostReality) {
       maxSpecialGlyph = 2;
+    }
+    if (Slabdrill.isCursed) {
+      maxSpecialGlyph = 0;
     }
 
     let specialGlyphEquippedAfterChange = 0;
@@ -584,6 +592,9 @@ export const Glyphs = {
     if (Achievement(196).isUnlocked && !player.disablePostReality) {
       maxSpecialGlyph = 2;
     }
+    if (Slabdrill.isCursed) {
+      maxSpecialGlyph = 0;
+    }
     let compareThreshold = glyph.type === "effarig" || glyph.type === "reality" ? maxSpecialGlyph : Math.max(5, threshold);
     compareThreshold = Math.clampMax(compareThreshold, threshold);
     if (toCompare.length < compareThreshold) return false;
@@ -704,6 +715,9 @@ export const Glyphs = {
   get prodigiousInstabilityThreshold() {
     return new Decimal(2500000 * (DivinityMilestone.ascendedSurge.isReached && !player.disablePostReality ? 1.1 : 1));
   },
+  get ultimateInstabilityThreshold() {
+    return new Decimal(10000000);
+  },
   get levelCap() {
     return DC.NUMMAX;
   },
@@ -804,11 +818,16 @@ export const Glyphs = {
   swapIntoActive(glyph, targetSlot) {
     this.removeFromInventory(glyph);
     this.unequip(targetSlot, glyph.idx);
-    finishProcessReality({
-      reset: true,
-      glyphUndo: false,
-      restoreCelestialState: true,
-    });
+    if (Slabdrill.isCursed) {
+      Slabdrill.enterCore();
+      Slabdrill.exitCore();
+    } else {
+      finishProcessReality({
+        reset: true,
+        glyphUndo: false,
+        restoreCelestialState: true,
+      });
+    }
     player.reality.glyphs.active.push(glyph);
     this.active[targetSlot] = glyph;
     glyph.idx = targetSlot;
@@ -893,6 +912,7 @@ export function getRarity(x) {
 export function getAdjustedGlyphLevel(glyph, realityGlyphBoost = Glyphs.levelBoost, ignoreCelestialEffects = false) {
   const level = glyph.level;
   if (!ignoreCelestialEffects) {
+    if (Slabdrill.isCursed) return Decimal.min(level, Decimal.floor(Decimal.pow(Slabdrill.power, 0.2)));
     if (Pelle.isDoomed) return Decimal.min(level, Pelle.glyphMaxLevel);
     if (Enslaved.isRunning) return Decimal.max(level, Enslaved.glyphLevelMin);
     if (Effarig.isRunning) return Decimal.min(level, Effarig.glyphLevelCap);

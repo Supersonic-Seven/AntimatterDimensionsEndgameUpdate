@@ -22,7 +22,7 @@ const rebuyable = props => {
 
 export const endgameUpgrades = [
   rebuyable({
-    name: "Antimatter Ameilorator",
+    name: () => `${player.universes.current === 2 ? "Matter" : "Antimatter"} Ameilorator`,
     id: 1,
     initialCost: 1e40,
     costMult: 60,
@@ -139,7 +139,7 @@ export const endgameUpgrades = [
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
     canLock: true,
     lockEvent: "pour RM into Teresa",
-    description: () => "Record Teresa Antimatter is kept on Endgame"
+    description: () => `Record Teresa ${player.universes.current === 2 ? "Matter" : "Antimatter"} is kept on Endgame`
   },
   {
     name: "Nonary Neutralization",
@@ -187,14 +187,14 @@ export const endgameUpgrades = [
     effect: () => player.disablePostReality ? 1 : 0.9
   },
   {
-    name: "Antimatter Amassment",
+    name: () => `${player.universes.current === 2 ? "Matter Multitudes" : "Antimatter Amassment"}`,
     id: 15,
     cost: new Decimal(1e150),
-    requirement: () => `Reach ${format(Decimal.pow(10, 1e33))} Antimatter outside Pelle`,
+    requirement: () => `Reach ${format(Decimal.pow(10, 1e33))} ${player.universes.current === 2 ? "Matter" : "Antimatter"} outside Pelle`,
     hasFailed: () => Pelle.isDoomed,
     checkRequirement: () => Currency.antimatter.value.add(1).log10().gte(1e33) && !Pelle.isDoomed,
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
-    description: () => `Gain a power to the Antimatter Exponent based on Imaginary Machines`,
+    description: () => `Gain a power to the ${player.universes.current === 2 ? "Matter" : "Antimatter"} Exponent based on Imaginary Machines`,
     effect: () => player.disablePostReality ? 1 : 1 + (Decimal.pow(Decimal.log10(Decimal.log10(
       player.reality.imaginaryMachines.add(1)).add(1)), 2).min(10).add(Decimal.log10(Decimal.log10(
       player.reality.imaginaryMachines.add(1)).add(1)).sub(Math.sqrt(10)).max(0)).div(200)).toNumber(),
@@ -307,7 +307,7 @@ export const endgameUpgrades = [
     hasFailed: () => !BreakEternityUpgrade.glyphSlotImprovement.isBought,
     checkRequirement: () => BreakEternityUpgrade.glyphSlotImprovement.isBought,
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
-    description: "Glyph Level gains a multiplier based on Antimatter which applies after Instability",
+    description: () => `Glyph Level gains a multiplier based on ${player.universes.current === 2 ? "Matter" : "Antimatter"} which applies after Instability`,
     effect: () => player.disablePostReality ? 1 : Decimal.min(Decimal.pow(Decimal.max(Decimal.log10(Decimal.log10(player.antimatter.add(1)).add(1)).div(100), 1), 0.05), 1.2).toNumber(),
     formatEffect: value => formatX(value, 2, 4)
   },

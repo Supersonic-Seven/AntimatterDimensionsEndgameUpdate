@@ -162,8 +162,8 @@ export const dualityUpgrades = [
     name: "Invention of Duplexes",
     id: 15,
     cost: new Decimal(1e12),
-    requirement: () => `Reach ${format("e5e55")} antimatter outside Pelle without ever having Infinity,
-      Time, or ${formatInt(8)}th Antimatter Dimensions this Endgame while Dilated`,
+    requirement: () => `Reach ${format("e5e55")} ${player.universes.current === 2 ? "matter" : "antimatter"} outside Pelle without ever having Infinity,
+      Time, or ${formatInt(8)}th ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions this Endgame while Dilated`,
     hasFailed: () => !player.requirementChecks.endgame.onlyLowDims || Pelle.isDoomed,
     checkRequirement: () => player.requirementChecks.endgame.onlyLowDims && player.dilation.active &&
       player.antimatter.add(1).log10().gte(5e55) && !Pelle.isDoomed,
@@ -196,11 +196,9 @@ export const dualityUpgrades = [
     id: 18,
     cost: new Decimal(1.6e13),
     formatCost: x => format(x, 1),
-    requirement: () => `Have ${format(2.4e9, 1)} total Galaxies outside Pelle`,
+    requirement: () => `Have ${format(2.6e9, 1)} total Galaxies outside Pelle`,
     hasFailed: () => Pelle.isDoomed,
-    checkRequirement: () => GalacticPowers.galacticAscension.isUnlocked ? Replicanti.galaxies.total.max(1).times(player.galaxies.max(1)).times(
-    player.dilation.totalTachyonGalaxies.max(1)).times(GalacticPower.freeGalaxies.max(1)).gte(2.4e9) : Replicanti.galaxies.total.add(player.galaxies).add(
-      player.dilation.totalTachyonGalaxies).add(GalacticPower.freeGalaxies).gte(2.4e9) && !Pelle.isDoomed,
+    checkRequirement: () => actualBaseGalaxiesWithoutGeneration().gte(2.6e9) && !Pelle.isDoomed,
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
     description: "Unlock a 4th Hadron effect",
   },
@@ -234,7 +232,7 @@ export const dualityUpgrades = [
     name: "Empyrean Eradication",
     id: 21,
     cost: new Decimal(3e17),
-    requirement: () => `Reach ${format("e1e88")} antimatter outside Pelle with Continuum disabled for the entire Endgame`,
+    requirement: () => `Reach ${format("e1e88")} ${player.universes.current === 2 ? "matter" : "antimatter"} outside Pelle with Continuum disabled for the entire Endgame`,
     hasFailed: () => !player.requirementChecks.endgame.noContinuum || Pelle.isDoomed,
     checkRequirement: () => player.requirementChecks.endgame.noContinuum &&
       Currency.antimatter.value.add(1).log10().gte(1e88) && !Pelle.isDoomed,
@@ -249,7 +247,7 @@ export const dualityUpgrades = [
     name: "Depiction Devastation",
     id: 22,
     cost: new Decimal(2e18),
-    requirement: () => `Reach ${format("e1e85")} antimatter outside Pelle without ever equipping Glyphs this Endgame`,
+    requirement: () => `Reach ${format("e1e85")} ${player.universes.current === 2 ? "matter" : "antimatter"} outside Pelle without ever equipping Glyphs this Endgame`,
     hasFailed: () => !player.requirementChecks.endgame.noGlyphs || Pelle.isDoomed,
     checkRequirement: () => player.requirementChecks.endgame.noGlyphs &&
       Currency.antimatter.value.add(1).log10().gte(1e85) && !Pelle.isDoomed,
@@ -279,11 +277,11 @@ export const dualityUpgrades = [
     id: 24,
     cost: new Decimal(1.5e19),
     formatCost: x => format(x, 1),
-    requirement: () => `Have ${format(106e6, 2, 2)} Antimatter Galaxies in Ra's Reality
+    requirement: () => `Have ${format(105.5e6, 2, 2)} ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxies in Ra's Reality
       with Celestial Matter toggled off`,
     hasFailed: () => !Ra.isRunning || !player.requirementChecks.reality.noCelMatter,
     checkRequirement: () => Ra.isRunning && player.requirementChecks.reality.noCelMatter &&
-      player.galaxies.gte(106e6),
+      player.galaxies.gte(105.5e6),
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
     canLock: true,
     lockEvent: "turn on Celestial Matter",
@@ -300,5 +298,63 @@ export const dualityUpgrades = [
     checkRequirement: () => player.celestials.laitela.hadrons.dark >= 32 && Hadrons.timeFactor.div(5).gte(100),
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
     description: "Unlock Hypercubes",
+  },
+  {
+    name: "Deepened Desolation",
+    id: 26,
+    cost: new Decimal("1e500"),
+    requirement: () => `Acquire ${format(1e95, 2, 2)} Null Particles`,
+    hasFailed: () => false,
+    checkRequirement: () => Currency.nullParticles.gte(1e95),
+    checkEvent: GAME_EVENT.GAME_TICK_AFTER,
+    description: "Uncap Null Matter and have it boost Divine Dimensions at a severely reduced rate",
+    effect: () => player.disablePostReality ? 1 : Currency.nullMatter.value.max(1).log10().pow(0.04),
+    formatEffect: value => `${formatPow(value, 2, 3)}`
+  },
+  {
+    name: "Compressed Collections",
+    id: 27,
+    cost: new Decimal("1e600"),
+    requirement: () => `Reach ${formatInt(20000)} Hawking Radiation`,
+    hasFailed: () => false,
+    checkRequirement: () => Currency.hawkingRadiation.gte(20000),
+    checkEvent: GAME_EVENT.GAME_TICK_AFTER,
+    description: "The Galaxy-based Endgame Skill cost scaling is severely reduced"
+  },
+  {
+    name: "Cubic Collapse",
+    id: 28,
+    cost: new Decimal("1e700"),
+    requirement: () => `Obtain ${formatInt(47)} Hexeracts`,
+    hasFailed: () => false,
+    checkRequirement: () => Hexeracts.effectiveCount >= 47,
+    checkEvent: GAME_EVENT.GAME_TICK_AFTER,
+    description: "The reward for destablizing Lai'tela's Reality is stronger based on Hexeracts",
+    effect: () => player.disablePostReality ? 1 : Math.pow(Hexeracts.effectiveCount, 3),
+    formatEffect: value => `${formatPow(value, 2)}`
+  },
+  {
+    name: "Aethereal Augmentations",
+    id: 29,
+    cost: new Decimal("1e800"),
+    requirement: () => `Reach ${format(1e42, 2, 2)} Star Power`,
+    hasFailed: () => false,
+    checkRequirement: () => Currency.starPower.gte(1e42),
+    checkEvent: GAME_EVENT.GAME_TICK_AFTER,
+    description: "Star Power boosts Galactic Power generation at a severely reduced rate",
+    effect: () => player.disablePostReality ? 1 : Currency.starPower.value.max(1).log10().pow(0.05),
+    formatEffect: value => `${formatPow(value, 2, 3)}`
+  },
+  {
+    name: "Timeless Transcension",
+    id: 30,
+    cost: new Decimal("1e900"),
+    requirement: () => `Reach ${format(Decimal.pow10(1e272), 2, 2)} ${player.universes.current === 2 ? "Matter" : "Antimatter"} outside Doomed/Cursed Realities`,
+    hasFailed: () => Pelle.isDoomed || Slabdrill.isCursed,
+    checkRequirement: () => player.antimatter.gte(Decimal.pow10(Decimal.pow10(Math.E * 100))) && !Pelle.isDoomed && !Slabdrill.isCursed,
+    checkEvent: GAME_EVENT.GAME_TICK_AFTER,
+    description: () => `The 9th ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimension is stronger based on Tickspeed`,
+    effect: () => player.disablePostReality ? 1 : Tickspeed.perSecond.max(1).log10(),
+    formatEffect: value => `${formatX(value, 2, 2)}`
   },
 ];

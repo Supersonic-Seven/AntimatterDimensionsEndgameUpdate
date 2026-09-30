@@ -129,6 +129,7 @@ export function decimalMigration(player) {
   player.reality.glyphs.sac.dilation = new Decimal(player.reality.glyphs.sac.dilation);
   player.reality.glyphs.sac.effarig = new Decimal(player.reality.glyphs.sac.effarig);
   player.reality.glyphs.sac.reality = new Decimal(player.reality.glyphs.sac.reality);
+  player.reality.perkPoints = new Decimal(player.reality.perkPoints);
   player.reality.partEternitied = new Decimal(player.reality.partEternitied);
   player.reality.achTimer = new Decimal(player.reality.achTimer);
   player.celestials.teresa.pouredAmount = new Decimal(player.celestials.teresa.pouredAmount);

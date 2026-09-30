@@ -30,7 +30,7 @@ export default {
       return this.upgrade.config;
     },
     costText() {
-      if (this.cost.gte(DC.NUMMAX)) return `Cost: ${Notations.current.infinite} Null Matter`;
+      if (this.cost.gte(DC.NUMMAX) && !DualityUpgrade(26).isBought) return `Cost: ${Notations.current.infinite} Null Matter`;
       return `Cost: ${format(this.cost, 2)} Null Matter`;
     },
     classObject() {

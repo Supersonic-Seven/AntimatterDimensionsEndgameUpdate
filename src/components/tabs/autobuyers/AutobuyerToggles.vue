@@ -16,6 +16,7 @@ export default {
       disableContinuum: false,
       allAutobuyersDisabled: false,
       antimatterAutobuyersBuyMax: false,
+      isFlipped: false
     };
   },
   watch: {
@@ -44,6 +45,7 @@ export default {
       this.antimatterAutobuyersBuyMax = Autobuyer.antimatterDimension.zeroIndexed.every(
         autobuyer => autobuyer.mode === AUTOBUYER_MODE.BUY_10
       );
+      this.isFlipped = player.universes.current === 2;
     },
     toggleAllAutobuyers() {
       for (const autobuyer of Autobuyers.unlocked) {
@@ -77,7 +79,7 @@ export default {
       class="o-primary-btn--subtab-option"
       @click="toggleAntimatterSingles()"
     >
-      Set AD autobuyers to buy {{ antimatterAutobuyersBuyMax ? "singles" : "max" }}
+      Set {{ isFlipped ? "MD" : "AD" }} autobuyers to buy {{ antimatterAutobuyersBuyMax ? "singles" : "max" }}
     </PrimaryButton>
     <span v-if="false">
       <PrimaryButton

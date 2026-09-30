@@ -3,7 +3,8 @@ export const glyphSacrifice = {
     id: "power",
     effect: added => {
       if (Pelle.isDisabled("glyphsac") && !PelleRealityUpgrade.scourToEmpower.canBeApplied) return new Decimal(0);
-      const sac = player.disablePostReality ? DC.D0 : player.reality.glyphs.sac.power.add(added ?? 0);
+      const sac = player.disablePostReality && !SlabdrillUnlocks.galaxy.isUnlocked
+        ? DC.D0 : player.reality.glyphs.sac.power.add(added ?? 0);
       const capped = Decimal.clampMax(sac, GlyphSacrificeHandler.maxSacrificeForEffects);
       const base = new Decimal(Decimal.log10(capped.add(1))).div(100);
       return Decimal.floor(Decimal.pow(base, 1.2).times(750));
@@ -22,7 +23,8 @@ export const glyphSacrifice = {
     id: "infinity",
     effect: added => {
       if (Pelle.isDisabled("glyphsac") && !PelleRealityUpgrade.scourToEmpower.canBeApplied) return new Decimal(1);
-      const sac = player.disablePostReality ? DC.D0 : player.reality.glyphs.sac.infinity.add(added ?? 0);
+      const sac = player.disablePostReality && !SlabdrillUnlocks.galaxy.isUnlocked
+        ? DC.D0 : player.reality.glyphs.sac.infinity.add(added ?? 0);
       const capped = Decimal.clampMax(sac, GlyphSacrificeHandler.maxSacrificeForEffects);
       return new Decimal(Decimal.log10(Decimal.pow(capped, 0.2).div(100).add(1))).add(1);
     },
@@ -33,7 +35,8 @@ export const glyphSacrifice = {
     id: "time",
     effect: added => {
       if (Pelle.isDisabled("glyphsac") && !PelleRealityUpgrade.scourToEmpower.canBeApplied) return new Decimal(1);
-      const sac = player.disablePostReality ? DC.D0 : player.reality.glyphs.sac.time.add(added ?? 0);
+      const sac = player.disablePostReality && !SlabdrillUnlocks.galaxy.isUnlocked
+        ? DC.D0 : player.reality.glyphs.sac.time.add(added ?? 0);
       const capped = Decimal.clampMax(sac, GlyphSacrificeHandler.maxSacrificeForEffects);
       return Decimal.pow(Decimal.pow(capped, 0.2).div(100).add(1), 2);
     },
@@ -44,7 +47,8 @@ export const glyphSacrifice = {
     id: "replication",
     effect: added => {
       if (Pelle.isDisabled("glyphsac") && !PelleRealityUpgrade.scourToEmpower.canBeApplied) return new Decimal(0);
-      const sac = player.disablePostReality ? DC.D0 : player.reality.glyphs.sac.replication.add(added ?? 0);
+      const sac = player.disablePostReality && !SlabdrillUnlocks.galaxy.isUnlocked
+        ? DC.D0 : player.reality.glyphs.sac.replication.add(added ?? 0);
       const capped = Decimal.clampMax(sac, GlyphSacrificeHandler.maxSacrificeForEffects);
       const base = new Decimal(Decimal.log10(capped.add(1))).div(100);
       return Decimal.floor(Decimal.pow(base, 1.2).times(1500));
@@ -63,7 +67,8 @@ export const glyphSacrifice = {
     id: "dilation",
     effect: added => {
       if (Pelle.isDisabled("glyphsac") && !PelleRealityUpgrade.scourToEmpower.canBeApplied) return new Decimal(1);
-      const sac = player.disablePostReality ? DC.D0 : player.reality.glyphs.sac.dilation.add(added ?? 0);
+      const sac = player.disablePostReality && !SlabdrillUnlocks.galaxy.isUnlocked
+        ? DC.D0 : player.reality.glyphs.sac.dilation.add(added ?? 0);
       const capped = Decimal.clampMax(sac, GlyphSacrificeHandler.maxSacrificeForEffects);
       const exponent = Decimal.pow(new Decimal(Decimal.log10(capped.add(1))).div(100), 0.1).times(0.32);
       return Decimal.pow(Decimal.clampMin(capped, 1), exponent);

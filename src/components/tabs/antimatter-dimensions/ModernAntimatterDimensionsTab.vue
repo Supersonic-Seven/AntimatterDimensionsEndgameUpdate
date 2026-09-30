@@ -34,6 +34,8 @@ export default {
       isContinuumActive: false,
       multiplierText: "",
       isFullyAutomated: false,
+      inCursedCore: false,
+      isFlipped: false
     };
   },
   computed: {
@@ -41,8 +43,9 @@ export default {
       if (this.isFullyAutomated) {
         return "Sacrifice autobuyer is enabled and Achievement 118 is unlocked, so Sacrifice is now fully automated";
       }
-      if (Ascensions.sacA.isUnlocked) return `Boosts 8th Antimatter Dimension by +${formatPow(this.sacrificePower, 2, 3)}`;
-      return `Boosts 8th Antimatter Dimension by ${formatX(this.sacrificeBoost, 2, 2)}`;
+      if (Ascensions.sacA.isUnlocked) return `Boosts 8th ${this.isFlipped ? "Matter" : "Antimatter"} Dimension by
+        +${formatPow(this.sacrificePower, 2, 3)}`;
+      return `Boosts 8th ${this.isFlipped ? "Matter" : "Antimatter"} Dimension by ${formatX(this.sacrificeBoost, 2, 2)}`;
     },
     sacText() {
       if (Ascensions.sacA.isUnlocked) return `Dimensional Sacrifice (${formatPow(this.sacrificePower, 2, 3)})`;
@@ -103,7 +106,7 @@ export default {
       if (!isSacrificeUnlocked) return;
       this.isFullyAutomated = Autobuyer.sacrifice.isActive && Achievement(118).canBeApplied &&
         (!player.disablePostReality || (Alpha.isRunning && Alpha.currentStage >= 12) ||
-        (LHC.voidRunning && NullUpgrade.limerick1.isBought));
+        (LHC.voidRunning && NullUpgrade.limerick1.isBought) || SlabdrillUnlocks.eternityChallengeTen.isUnlocked);
       this.isSacrificeAffordable = Sacrifice.canSacrifice && !this.isFullyAutomated;
       this.currentSacrifice.copyFrom(Sacrifice.totalBoost);
       this.currentPower.copyFrom(Sacrifice.totalPower);
@@ -116,6 +119,8 @@ export default {
           : ` | Dimensional Sacrifice multiplier: ${formatX(this.currentSacrifice, 2, 2)}`)
         : "";
       this.multiplierText += sacText;
+      this.inCursedCore = player.celestials.slabdrill.core.isActive;
+      this.isFlipped = player.universes.current === 2;
     }
   }
 };
@@ -123,7 +128,10 @@ export default {
 
 <template>
   <div class="l-antimatter-dim-tab">
-    <div class="modes-container">
+    <div
+      v-if="!inCursedCore"
+      class="modes-container"
+    >
       <button
         class="o-primary-btn l-button-container"
         @click="changeBuyMode"
@@ -150,16 +158,19 @@ export default {
         Max All (M)
       </button>
     </div>
-    <span>{{ multiplierText }}</span>
-    <TickspeedRow />
+    <span v-if="!inCursedCore">{{ multiplierText }}</span>
+    <TickspeedRow v-if="!inCursedCore" />
     <div class="l-dimensions-container">
       <AntimatterDimensionRow
-        v-for="tier in 8"
+        v-for="tier in 9"
         :key="tier"
         :tier="tier"
       />
     </div>
-    <div class="resets-container">
+    <div
+      v-if="!inCursedCore"
+      class="resets-container"
+    >
       <DimensionBoostRow />
       <PrimaryButton
         v-if="isQuickResetAvailable"
@@ -172,7 +183,7 @@ export default {
       </PrimaryButton>
       <AntimatterGalaxyRow />
     </div>
-    <AntimatterDimensionProgressBar />
+    <AntimatterDimensionProgressBar v-if="!inCursedCore" />
   </div>
 </template>
 

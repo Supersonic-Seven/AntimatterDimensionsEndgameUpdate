@@ -11,6 +11,7 @@ export default {
       replicanti: new Decimal(),
       divideReplicanti: false,
       canBeBought: new Decimal(),
+      isFlipped: false
     };
   },
   computed: {
@@ -23,9 +24,9 @@ export default {
           (${format(this.replicanti, 2, 2)} to
           ${format(this.replicanti.divide(DC.NUMMAX.pow(this.canBeBought)), 2, 2)})`
         : `reset your Replicanti to ${formatInt(1)}`;
-      return `A Replicanti Galaxy boosts Tickspeed the same way an Antimatter Galaxy does. However, it does not
-        increase the cost of Antimatter Galaxies, nor is it affected by multipliers to Antimatter Galaxies specifically.
-        It will ${reductionString}.`;
+      return `A Replicanti Galaxy boosts Tickspeed the same way an ${this.isFlipped ? "Matter" : "Antimatter"} Galaxy does.
+        However, it does not increase the cost of ${this.isFlipped ? "Matter" : "Antimatter"} Galaxies, nor is it affected by
+        multipliers to ${this.isFlipped ? "Matter" : "Antimatter"} Galaxies specifically. It will ${reductionString}.`;
     }
   },
   methods: {
@@ -33,6 +34,7 @@ export default {
       this.replicanti.copyFrom(player.replicanti.amount);
       this.divideReplicanti = Achievement(126).isUnlocked;
       this.canBeBought.copyFrom(Replicanti.galaxies.gain);
+      this.isFlipped = player.universes.current === 2;
       if (this.replicanti.lt(Number.MAX_VALUE)) this.emitClose();
     },
     handleYesClick() {

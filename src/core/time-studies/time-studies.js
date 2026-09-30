@@ -166,7 +166,7 @@ export class TimeStudyState extends GameMechanicState {
 
   get STCost() {
     const base = this.config.STCost;
-    return VUnlocks.raUnlock.canBeApplied
+    return VUnlocks.raUnlock.canBeApplied && !player.disablePostReality
       ? base - 2
       : base;
   }

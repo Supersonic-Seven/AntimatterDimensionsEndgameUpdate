@@ -4,10 +4,13 @@ export default {
   data() {
     return {
       opacity: 0,
+      warping: false,
+      goodbye: false,
       isDarker: false,
       hasSeenIntro: false,
       forceStars: false,
-      forceDark: false
+      forceDark: false,
+      newCredits: false
     };
   },
   computed: {
@@ -22,11 +25,16 @@ export default {
   methods: {
     update() {
       this.isDarker = Alpha.isRunning;
+      this.warping = player.celestials.slabdrill.isWarping;
+      this.goodbye = player.celestials.slabdrill.isGoodbye;
       this.hasSeenIntro = player.hasSeenIntro;
-      this.opacity = !this.hasSeenIntro ? 1.1 :
-        (this.isDarker ? (player.options.brightAlpha ? 0.2 : 0.5) : (GameEnd.endState - END_STATE_MARKERS.FADE_AWAY) / 2);
+      this.opacity = (!this.hasSeenIntro || this.newCredits) ? 1.1 :
+        (this.goodbye ? ((-Math.abs(Math.min(player.celestials.slabdrill.goodbyeTick, 4000) / 2000 - 1) * 2) + 2) :
+        (this.warping ? ((-Math.abs(player.celestials.slabdrill.warpTick / 2500 - 1) * 1.25) + 1.25) :
+        (this.isDarker ? (player.options.brightAlpha ? 0.2 : 0.5) : (GameEnd.endState - END_STATE_MARKERS.FADE_AWAY) / 2)));
       this.forceStars = player.introTick > 35000 && player.introTick <= 45000;
       this.forceDark = player.introTick > 45000 && player.introTick <= 60000;
+      this.newCredits = player.endgame.credits;
     }
   }
 };

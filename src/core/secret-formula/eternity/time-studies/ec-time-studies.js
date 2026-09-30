@@ -5,7 +5,7 @@ export const ecTimeStudies = [
     requirement: [171],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     secondary: {
-      resource: "Eternities",
+      resource: () => "Eternities",
       current: () => Currency.eternities.value,
       required: completions => new Decimal(20000 + Math.min(completions, Enslaved.isRunning ? 999 : 4) * 20000),
       formatValue: formatInt
@@ -17,7 +17,7 @@ export const ecTimeStudies = [
     requirement: [171],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     secondary: {
-      resource: "Tickspeed upgrades from Time Dimensions",
+      resource: () => "Tickspeed upgrades from Time Dimensions",
       current: () => player.totalTickGained,
       required: completions => new Decimal(1300 + Math.min(completions, 4) * 150),
       formatValue: value => formatInt(Math.floor(value.toNumber()))
@@ -29,7 +29,7 @@ export const ecTimeStudies = [
     requirement: [171],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     secondary: {
-      resource: "8th Antimatter Dimensions",
+      resource: () => `8th ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions`,
       current: () => AntimatterDimension(8).totalAmount,
       required: completions => new Decimal(17300 + Math.min(completions, 4) * 1250),
       formatValue: value => formatInt(Math.floor(value.toNumber()))
@@ -41,7 +41,7 @@ export const ecTimeStudies = [
     requirement: [143],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     secondary: {
-      resource: "Infinities",
+      resource: () => "Infinities",
       current: () => Currency.infinitiesTotal.value,
       required: completions => new Decimal(1e8 + Math.min(completions, 4) * 2.5e7),
       formatValue: value => formatInt(Math.floor(value.toNumber()))
@@ -53,7 +53,7 @@ export const ecTimeStudies = [
     requirement: [42],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     secondary: {
-      resource: "Antimatter Galaxies",
+      resource: () => `${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxies`,
       current: () => player.galaxies,
       required: completions => new Decimal(160 + Math.min(completions, 4) * 14),
       formatValue: formatInt
@@ -65,7 +65,7 @@ export const ecTimeStudies = [
     requirement: [121],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     secondary: {
-      resource: "Replicanti Galaxies",
+      resource: () => "Replicanti Galaxies",
       current: () => player.replicanti.galaxies,
       required: completions => new Decimal(40 + Math.min(completions, 4) * 5),
       formatValue: formatInt
@@ -77,7 +77,7 @@ export const ecTimeStudies = [
     requirement: [111],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     secondary: {
-      resource: "antimatter",
+      resource: () => player.universes.current === 2 ? "matter" : "antimatter",
       current: () => Currency.antimatter.value,
       required: completions => DC.E300000.pow(Math.min(completions, 4)).times(DC.E500000),
       formatValue: value => format(value)
@@ -89,7 +89,7 @@ export const ecTimeStudies = [
     requirement: [123],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     secondary: {
-      resource: "Infinity Points",
+      resource: () => "Infinity Points",
       current: () => Currency.infinityPoints.value,
       required: completions => DC.E1000.pow(Math.min(completions, 4)).times(DC.E4000),
       formatValue: value => format(value)
@@ -101,7 +101,7 @@ export const ecTimeStudies = [
     requirement: [151],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     secondary: {
-      resource: "Infinity Power",
+      resource: () => "Infinity Power",
       current: () => Currency.infinityPower.value,
       required: completions => DC.E2000.pow(Math.min(completions, 4)).times(DC.E17500),
       formatValue: value => format(value)
@@ -113,7 +113,7 @@ export const ecTimeStudies = [
     requirement: [181],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     secondary: {
-      resource: "Eternity Points",
+      resource: () => "Eternity Points",
       current: () => Currency.eternityPoints.value,
       required: completions => DC.E20.pow(Math.min(completions, 4)).times(DC.E100),
       formatValue: value => format(value)
@@ -125,7 +125,7 @@ export const ecTimeStudies = [
     requirement: [231, 232],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     secondary: {
-      path: "Antimatter Dimension",
+      path: () => `${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimension`,
       forbiddenStudies: [72, 73],
     }
   },
@@ -135,7 +135,7 @@ export const ecTimeStudies = [
     requirement: [233, 234],
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     secondary: {
-      path: "Time Dimension",
+      path: () => "Time Dimension",
       forbiddenStudies: [71, 72],
     }
   }

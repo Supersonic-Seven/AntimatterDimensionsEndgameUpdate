@@ -5,7 +5,8 @@ export default {
     return {
       isModern: false,
       smallCrunch: false,
-      shouldDisplay: false
+      shouldDisplay: false,
+      isFlipped: false
     };
   },
   methods: {
@@ -14,6 +15,7 @@ export default {
       if (!this.shouldDisplay) return;
       this.isModern = player.options.newUI;
       this.smallCrunch = Time.bestInfinityRealTime.totalMinutes.toNumber() <= 1;
+      this.isFlipped = player.universes.current === 2;
     },
     handleClick() {
       if (PlayerProgress.infinityUnlocked()) bigCrunchResetRequest();
@@ -30,7 +32,7 @@ export default {
         v-if="!smallCrunch"
         class="l-spacing"
       >
-        The world has collapsed due to excess antimatter.
+        The world has collapsed due to excess {{ isFlipped ? "matter" : "antimatter" }}.
       </h3>
       <button
         :class="{
@@ -58,7 +60,7 @@ export default {
         v-if="!smallCrunch"
         class="o-emptiness"
       >
-        The world has collapsed due to excess of antimatter.
+        The world has collapsed due to excess of {{ isFlipped ? "matter" : "antimatter" }}.
       </div>
     </div>
   </span>

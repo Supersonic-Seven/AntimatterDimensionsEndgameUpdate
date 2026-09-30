@@ -22,6 +22,7 @@ export default {
       uniqueNews: 0,
       totalNews: 0,
       secretAchievementCount: 0,
+      isFlipped: false,
       infinity: {
         isUnlocked: false,
         count: new Decimal(0),
@@ -207,6 +208,7 @@ export default {
       this.totalNews = player.news.totalSeen;
       this.secretAchievementCount = SecretAchievements.all.filter(a => a.isUnlocked).length;
       this.timeSinceCreation = Date.now() - player.records.gameCreatedTime;
+      this.isFlipped = player.universes.current === 2;
 
       const progress = PlayerProgress.current;
       const isInfinityUnlocked = progress.isInfinityUnlocked;
@@ -383,25 +385,30 @@ export default {
         General
       </div>
       <div class="c-stats-tab-general">
-        <div>You have made a total of {{ format(totalAntimatter, 2, 1) }} antimatter.</div>
+        <div>You have made a total of {{ format(totalAntimatter, 2, 1) }} {{ isFlipped ? "matter" : "antimatter" }}.</div>
         <div v-if="divinity.isUnlocked">
-          You have made a total of {{ format(bestDoomedAntimatterThisDivinity, 2, 1) }} antimatter in Doom this Divinity.
+          You have made a total of {{ format(bestDoomedAntimatterThisDivinity, 2, 1) }} {{ isFlipped ? "matter" : "antimatter" }}
+          in Doom this Divinity.
         </div>
         <div v-if="endgame.isUnlocked">
-          You have made a total of {{ format(totalAntimatterOutsideDoom, 2, 1) }} antimatter outside Doom.
+          You have made a total of {{ format(totalAntimatterOutsideDoom, 2, 1) }} {{ isFlipped ? "matter" : "antimatter" }}
+          outside Doom.
         </div>
         <div v-if="endgame.isUnlocked">
-          You have made a total of {{ format(endgame.totalEndgameAntimatter, 2, 1) }} antimatter this Endgame.
+          You have made a total of {{ format(endgame.totalEndgameAntimatter, 2, 1) }} {{ isFlipped ? "matter" : "antimatter" }}
+          this Endgame.
         </div>
         <div v-if="reality.isUnlocked" :class="{ 'c-stats-tab-doomed' : isDoomed }">
-          You have made a total of {{ format(reality.totalRealityAntimatter, 2, 1) }} antimatter
+          You have made a total of {{ format(reality.totalRealityAntimatter, 2, 1) }} {{ isFlipped ? "matter" : "antimatter" }}
           this {{ isDoomed ? "Armageddon" : "Reality" }}.
         </div>
         <div v-if="eternity.isUnlocked">
-          You have made a total of {{ format(eternity.totalEternityAntimatter, 2, 1) }} antimatter this Eternity.
+          You have made a total of {{ format(eternity.totalEternityAntimatter, 2, 1) }} {{ isFlipped ? "matter" : "antimatter" }}
+          this Eternity.
         </div>
         <div v-if="infinity.isUnlocked">
-          You have made a total of {{ format(infinity.totalInfinityAntimatter, 2, 1) }} antimatter this Infinity.
+          You have made a total of {{ format(infinity.totalInfinityAntimatter, 2, 1) }} {{ isFlipped ? "matter" : "antimatter" }}
+          this Infinity.
         </div>
         <div v-if="endgame.isUnlocked" class="c-stats-tab-celestials">
           You have made a total of {{ format(totalCelMatter, 2, 1) }} Celestial Matter.

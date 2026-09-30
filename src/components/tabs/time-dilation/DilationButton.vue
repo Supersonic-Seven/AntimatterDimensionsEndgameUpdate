@@ -12,7 +12,8 @@ export default {
       tachyonGain: new Decimal(),
       remnantRequirement: 0,
       showRequirement: false,
-      creditsClosed: false
+      creditsClosed: false,
+      isFlipped: false
     };
   },
   computed: {
@@ -39,6 +40,7 @@ export default {
         this.requiredForGain.copyFrom(getTachyonReq());
       }
       this.creditsClosed = GameEnd.creditsEverClosed;
+      this.isFlipped = player.universes.current === 2;
     },
     dilate() {
       if (this.creditsClosed) return;
@@ -74,7 +76,7 @@ export default {
     <span v-else>
       {{ disableText }}
       <br>
-      Reach {{ format(requiredForGain, 2, 1) }} antimatter to gain more Tachyon Particles.
+      Reach {{ format(requiredForGain, 2, 1) }} {{ isFlipped ? "matter" : "antimatter" }} to gain more Tachyon Particles.
     </span>
   </button>
 </template>

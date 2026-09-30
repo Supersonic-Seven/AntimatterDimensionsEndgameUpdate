@@ -36,7 +36,7 @@ export const GalaxyGenerator = {
       GalaxyGeneratorUpgrades.EPMult,
       GalaxyGeneratorUpgrades.RSMult,
       GalaxyGeneratorUpgrades.DTMult
-    ).times(extraGain).powEffectsOf(GalaxyGeneratorUpgrades.remnantPow, GalaxyGeneratorUpgrades.exponential).pow(Accelerators.cosmic.effectValue1).pow(
+    ).times(extraGain).powEffectsOf(GalaxyGeneratorUpgrades.remnantPow, GalaxyGeneratorUpgrades.exponential).pow(Accelerators.cosmic.effectValue1).pow(Universes.ephemeralLightToGalGen).pow(
       GalacticPowers.galaxyGenerationEmpowerment.isUnlocked ? GalacticPowers.galaxyGenerationEmpowerment.reward : 1);
     if (galaxyGen.gt(10)) {
       let logGal = galaxyGen.log10();

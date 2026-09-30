@@ -22,6 +22,7 @@ export default {
   },
   computed: {
     classObject() {
+      let unUIC = this.universesUIClass;
       return {
         "o-tab-btn": true,
         "o-tab-btn--secondary": true,
@@ -34,13 +35,14 @@ export default {
         "o-tab-btn--cd-expansion": this.parentName === "CD Expansion",
         "o-tab-btn--divinity": this.parentName === "Divinity",
         "o-tab-btn--universes": this.parentName === "Universes" && this.universe === 0,
-        "o-tab-btn--universes__transient": this.parentName === "Universes" && this.universe === 1
+        "o-tab-btn--universes__transient": this.parentName === "Universes" && this.universe === 1,
+        "o-tab-btn--universes__tangible": this.parentName === "Universes" && this.universe === 2
       };
     },
   },
   methods: {
     update() {
-      this.universe = 0;
+      this.universe = player.universes.current;
       this.isAvailable = this.subtab.isAvailable;
       this.hasNotification = this.subtab.hasNotification;
       this.isCurrentSubtab = this.subtab.isOpen && Theme.currentName() !== "S9";

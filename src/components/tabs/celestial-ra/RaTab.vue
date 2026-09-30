@@ -80,7 +80,7 @@ export default {
       return `Within Ra's Reality, Memory Chunks for Celestial Memories
         will be generated based on certain resource amounts.`;
     },
-    isDoomed: () => Pelle.isDoomed,
+    isDoomed: () => Pelle.isDoomed || Slabdrill.isCursed,
   },
   methods: {
     update() {

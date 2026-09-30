@@ -4,7 +4,7 @@ export default {
   data() {
     return {
       hasTutorial: false,
-      isModern: false,
+      isModern: false
     };
   },
   computed: {

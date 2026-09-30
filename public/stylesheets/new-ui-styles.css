@@ -202,6 +202,10 @@ body.t-s12 {
   animation: a-universes--transient-glow-border-left 10s infinite;
 }
 
+.o-tab-btn--universes__tangible::after {
+  animation: a-universes--tangible-glow-border-left 10s infinite;
+}
+
 .tab-button.shop {
   background-color: #d9bb26;
 }
@@ -402,6 +406,15 @@ body.t-s12 {
 
 .o-tab-btn--universes__transient .o-subtab__tooltip::after {
   animation: a-universes--transient-glow-border-top 10s infinite;
+}
+
+.o-tab-btn--universes__tangible .o-subtab__tooltip {
+  background: var(--color-prestige--accent);
+  animation: a-universes--tangible-glow-primary 10s infinite;
+}
+
+.o-tab-btn--universes__tangible .o-subtab__tooltip::after {
+  animation: a-universes--tangible-glow-border-top 10s infinite;
 }
 
 .active {
@@ -605,7 +618,6 @@ body.t-s12 {
   font-size: 1.2rem;
   font-weight: bold;
   color: var(--color-text);
-  border-bottom: 0.1rem solid var(--color-good);
   margin-top: 1rem;
   margin-bottom: 0.5rem;
   padding-bottom: 0.6rem;

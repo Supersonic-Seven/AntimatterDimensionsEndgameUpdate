@@ -44,7 +44,7 @@ export const perks = {
     label: "SAM",
     family: PERK_FAMILY.ANTIMATTER,
     get description() {
-      return `Start every reset with ${format(5e130)} antimatter.`;
+      return `Start every reset with ${format(5e130)} ${player.universes.current === 2 ? "matter" : "antimatter"}.`;
     },
     bumpCurrency: () => Currency.antimatter.bumpTo(5e130),
     effect: 5e130,
@@ -125,8 +125,10 @@ export const perks = {
     id: 30,
     label: "ANR",
     family: PERK_FAMILY.ANTIMATTER,
-    description: `Dimension Boosts and Antimatter Galaxies no longer reset
-      Antimatter, Antimatter Dimensions, Tickspeed, or Dimensional Sacrifice.`,
+    get description() {
+      return `Dimension Boosts and ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxies no longer reset
+        ${player.universes.current === 2 ? "Matter" : "Antimatter"}, ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions, Tickspeed, or Dimensional Sacrifice.`;
+    },
     layoutPosList: [85343, 81000, 79799, 80199, 82194, 92553],
   },
   studyPassive: {
@@ -205,7 +207,9 @@ export const perks = {
     id: 51,
     label: "IDR",
     family: PERK_FAMILY.INFINITY,
-    description: "Infinity Dimensions no longer have antimatter requirements.",
+    get description() {
+      return `Infinity Dimensions no longer have ${player.universes.current === 2 ? "matter" : "antimatter"} requirements.`;
+    },
     layoutPosList: [51317, 80998, 79397, 80997, 82600, 104489],
   },
   bypassTGReset: {
@@ -433,7 +437,7 @@ export const perks = {
     label: "TTF",
     family: PERK_FAMILY.AUTOMATION,
     get description() {
-      return `Purchasing Time Theorems no longer spends your Antimatter, Infinity Points, or Eternity Points.`;
+      return `Purchasing Time Theorems no longer spends your ${player.universes.current === 2 ? "Matter" : "Antimatter"}, Infinity Points, or Eternity Points.`;
     },
     layoutPosList: [33840, 78998, 80597, 81002, 77800, 67309],
   },

@@ -9,7 +9,8 @@ class TabNotificationState {
   }
 
   get triggered() {
-    return player.triggeredTabNotificationBits & (1 << this.config.id);
+    // return player.triggeredTabNotificationBits & (1 << this.config.id);
+    return player.triggeredNotifications.includes(this.config.id);
   }
 
   tryTrigger() {
@@ -20,6 +21,7 @@ class TabNotificationState {
         if (tab !== currentTabKey) player.tabNotifications.add(tab);
       });
     player.triggeredTabNotificationBits |= 1 << this.config.id;
+    player.triggeredNotifications.push(this.config.id);
 
     // Force all tabs and subtabs of this notification to be unhidden
     for (const location of this.config.tabsToHighLight) {
@@ -33,6 +35,7 @@ class TabNotificationState {
   // In some cases we want to clear a trigger via an event that isn't tab-clicking, in order to show it again
   clearTrigger() {
     player.triggeredTabNotificationBits &= -1 - (1 << this.config.id);
+    player.triggeredNotifications = player.triggeredNotifications.filter(id => id !== this.config.id);
     this.config.tabsToHighLight.map(t => t.parent + t.tab)
       .forEach(tab => player.tabNotifications.delete(tab));
   }

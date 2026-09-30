@@ -8,7 +8,7 @@ export const tabs = [
     subtabs: [
       {
         key: "antimatter",
-        name: "Antimatter Dimensions",
+        name: () => `${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions`,
         symbol: "Ω",
         component: "AntimatterDimensionsTab",
         id: 0,
@@ -530,6 +530,15 @@ export const tabs = [
         condition: () => Alpha.isUnlocked,
         id: 8,
         hidable: true,
+      },
+      {
+        key: "slabdrill",
+        name: "Slabdrill",
+        symbol: "⁹δ",
+        component: "SlabdrillTab",
+        condition: () => Slabdrill.isUnlocked,
+        id: 9,
+        hidable: true,
       }
     ]
   },
@@ -662,6 +671,15 @@ export const tabs = [
         condition: () => Ascension.isUnlocked,
         id: 11,
         hidable: true,
+      },
+      {
+        key: "compression",
+        name: "Time Compression",
+        symbol: "<i class='fas fa-down-left-and-up-right-to-center'></i>",
+        component: "TimeCompressionTab",
+        condition: () => PlayerProgress.compressionUnlocked(),
+        id: 12,
+        hidable: true,
       }
     ],
   },
@@ -753,9 +771,9 @@ export const tabs = [
     key: "universes",
     name: "Universes",
     hideAt: 2.4,
-    UIClass: "o-tab-btn--universes",
+    UIClass: () => universesUI(player.universes.current),
     id: 14,
-    condition: () => player.celestials.pelle.divinities >= 13,
+    condition: () => Universes.areUnlocked,
     hidable: true,
     subtabs: [
       {
@@ -763,7 +781,17 @@ export const tabs = [
         name: "Transient Universe",
         symbol: "<i class='fas fa-stopwatch-20'></i>",
         component: "TransientUniverseTab",
+        condition: () => Universes.isUnlocked(1),
         id: 0,
+        hidable: true,
+      },
+      {
+        key: "tangible",
+        name: "Tangible Universe",
+        symbol: "℧",
+        component: "TangibleUniverseTab",
+        condition: () => Universes.isUnlocked(2),
+        id: 1,
         hidable: true,
       },
     ],

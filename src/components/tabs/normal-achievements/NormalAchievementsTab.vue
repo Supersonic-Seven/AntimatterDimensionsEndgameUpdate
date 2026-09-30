@@ -38,7 +38,8 @@ export default {
       achPowToTP: 0,
       achPowToCD: 0,
       achPowToVD: 0,
-      achPowToEn: 0
+      achPowToEn: 0,
+      isFlipped: false
     };
   },
   computed: {
@@ -58,7 +59,8 @@ export default {
       const boostList = [];
 
       const dimMultList = [];
-      dimMultList.push("Antimatter");
+      if (!this.isFlipped) dimMultList.push("Antimatter");
+      if (this.isFlipped) dimMultList.push("Matter");
       if (this.achMultToIDS) dimMultList.push("Infinity");
       if (this.achMultToTDS) dimMultList.push("Time");
       boostList.push(`${makeEnumeration(dimMultList)} Dimensions: ${achievementPower}`);
@@ -81,7 +83,8 @@ export default {
       const powersList = [];
 
       const dimPowList = [];
-      dimPowList.push("Antimatter");
+      if (!this.isFlipped) dimPowList.push("Antimatter");
+      if (this.isFlipped) dimPowList.push("Matter");
       if (this.achMultToIDS) dimPowList.push("Infinity");
       if (this.achMultToTDS) dimPowList.push("Time");
       powersList.push(`${makeEnumeration(dimPowList)} Dimensions: ${achievementPowers}`);
@@ -140,6 +143,7 @@ export default {
       this.achPowToCD = Achievements.powerConv(EndgameMastery(191).effectOrDefault(DC.D1));
       this.achPowToVD = Achievements.powerConv(EndgameMastery(192).effectOrDefault(DC.D1));
       this.achPowToEn = Achievements.powerConv(EndgameMastery(201).effectOrDefault(DC.D1));
+      this.isFlipped = player.universes.current === 2;
     },
     startRowRendering() {
       const unlockedRows = [];
@@ -174,6 +178,12 @@ export default {
       return this.renderedRowIndices.includes(row);
     },
     isObscured(row) {
+      if (player.celestials.slabdrill.hasBoughtNinthDimension && player.endgame.creditsTick > 0 && !player.endgame.credits) {
+        return row >= 30;
+      }
+      if (Slabdrill.isCursed || Slabdrill.isDestroyed) {
+        return row >= 25;
+      }
       if (ImaginaryUpgrade(30).isBought) {
         return row >= 24;
       }

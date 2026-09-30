@@ -9,7 +9,7 @@ export const stars = {
       if (player.disablePostReality) return DC.D1;
       return Decimal.pow(Decimal.pow(Decimal.log10(amount.add(1)), 0.4).div(200).add(1), boost.div(100).add(1));
     },
-    description: amount => `Raise the Exponents of all Antimatter Dimension Multipliers to ${formatPow(amount, 2, 4)}`
+    description: amount => `Raise the Exponents of all ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimension Multipliers to ${formatPow(amount, 2, 4)}`
   },
   orange: {
     id: 1,
@@ -94,7 +94,7 @@ export const stars = {
       if (player.disablePostReality) return DC.D1;
       return Decimal.pow(Decimal.pow(Decimal.log10(amount.add(1)), 1.3).div(200).add(1), boost.div(100).add(1));
     },
-    description: amount => `Raise the Antimatter Exponent to ${formatPow(amount, 2, 4)}`
+    description: amount => `Raise the ${player.universes.current === 2 ? "Matter" : "Antimatter"} Exponent to ${formatPow(amount, 2, 4)}`
   },
   gray: {
     id: 8,
@@ -103,7 +103,7 @@ export const stars = {
     resetReq: 1e125,
     effect: (amount = player.endgame.ethereal.stars.gray) => {
       if (player.disablePostReality) return DC.D0;
-      return Decimal.log10(Decimal.log10(amount.add(1)).add(1)).times(20);
+      return Decimal.log10(Decimal.log10(amount.add(1)).add(1)).times(20).times(Universes.stellarAugmentersToGrayStarEffectiveness);
     },
     description: amount => `Increase the effectiveness of all other stars by ${formatPercents(amount.div(100).toNumber(), 2)}`
   },

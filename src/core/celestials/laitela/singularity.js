@@ -99,11 +99,12 @@ class SingularityMilestoneState extends GameMechanicState {
   }
 
   get description() {
-    return this.config.description;
+    return typeof this.config.description === "function" ? this.config.description() : this.config.description;
   }
 
   get canBeApplied() {
-    return this.isUnlocked && (!Pelle.isDisabled("singularity") || PelleDestructionUpgrade.singularityMilestones.canBeApplied) && !player.disablePostReality;
+    return this.isUnlocked && (!Pelle.isDisabled("singularity") || PelleDestructionUpgrade.singularityMilestones.canBeApplied)
+      && !player.disablePostReality && player.universes.current !== 2;
   }
 }
 
@@ -242,7 +243,9 @@ export const Singularity = {
     return Decimal.floor(Decimal.pow(this.gainPerCapIncrease, player.celestials.laitela.singularityCapIncreases).times(
       SingularityMilestone.singularityMult.effectOrDefault(new Decimal(1)).times(entropicCondensing).times(
       DualityUpgrade(10).effectOrDefault(1)))).times(Hadrons.singularityMultiplier).powEffectsOf(
-      SingularityMilestone.divinitySingPower, SingularityMilestone.hadronEffect1Improvement);
+      SingularityMilestone.divinitySingPower, SingularityMilestone.hadronEffect1Improvement, Achievement(277)).pow(
+      DivinityMilestone.powerBurst.isReached ? player.records.bestEndgame.galaxies.max(10).log10().log10().sub(4).max(0).div(5).add(1).pow(3) : 1).pow(
+      DivinityMilestone.serpentPower.isReached ? 2 : 1);
   },
 
   // Time (in seconds) to go from 0 DE to the condensing requirement

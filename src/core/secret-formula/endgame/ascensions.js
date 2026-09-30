@@ -21,7 +21,7 @@ export const ascensions = {
     id: 2,
     name: "Dimension Boost Ascension",
     zeroIndex: new Decimal("1e60000"),
-    description: () => `Refactor Dimension Boosts into Dimension Surges, which provide a power effect to all Antimatter Dimensions`,
+    description: () => `Refactor Dimension Boosts into Dimension Surges, which provide a power effect to all ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions`,
     onUnlock: () => {
       player.dimensionBoosts = DC.D0;
     }
@@ -30,7 +30,7 @@ export const ascensions = {
     id: 3,
     name: "Buy 10 Multiplier Ascension",
     zeroIndex: new Decimal("1e100000"),
-    description: () => `Refactor the Buy 10 Multiplier for Antimatter Dimensions into a Buy OoM Power`
+    description: () => `Refactor the Buy 10 Multiplier for ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions into a Buy OoM Power`
   },
   sacA: {
     id: 4,
@@ -59,7 +59,7 @@ export const ascensions = {
   oc4A: {
     id: 8,
     name: "Overcharge Ascension Type 4",
-    zeroIndex: new Decimal("1e25000000"),
+    zeroIndex: new Decimal("1e50000000"),
     description: () => `Unlock the Overcharge Level 4`
   }
 };

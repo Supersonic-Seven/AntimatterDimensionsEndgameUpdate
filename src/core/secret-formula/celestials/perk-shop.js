@@ -45,7 +45,7 @@ export const perkShop = {
     initialCost: 1,
     increment: 2,
     description: () => PerkShopUpgrade.rmMult.viewCharge ? `Multiply Reality Machine gain and cap based on
-      Antimatter amount` : `Double Reality Machine gain`,
+      ${player.universes.current === 2 ? "Matter" : "Antimatter"} amount` : `Double Reality Machine gain`,
     effect: () => player.disablePostReality ? DC.D1 : (PerkShopUpgrade.rmMult.isCharged
       ? PerkShopUpgrade.rmMult.chargedEffect()
       : PerkShopUpgrade.rmMult.preChargedEffect()),

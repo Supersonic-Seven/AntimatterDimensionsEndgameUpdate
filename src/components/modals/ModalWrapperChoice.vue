@@ -16,11 +16,6 @@ export default {
       required: false,
       default: "o-primary-btn--width-medium c-modal-message__okay-btn"
     },
-    confirmClass: {
-      type: String,
-      required: false,
-      default: "o-primary-btn--width-medium c-modal-message__okay-btn c-modal__confirm-btn"
-    },
     showCancel: {
       type: Boolean,
       required: false,
@@ -45,6 +40,14 @@ export default {
       type: Function,
       required: false,
       default: undefined
+    }
+  },
+  computed: {
+    confirmClass() {
+      return {
+        "o-primary-btn--width-medium c-modal-message__okay-btn c-modal__confirm-btn": true,
+        "o-primary-btn--long": ui.view.modal.current._component.name === "ExitTheCurseModal"
+      };
     }
   },
   created() {
@@ -121,5 +124,9 @@ export default {
 <style scoped>
 .c-modal__header {
   margin-bottom: 0.5rem;
+}
+
+.o-primary-btn--long {
+  width: 20rem;
 }
 </style>

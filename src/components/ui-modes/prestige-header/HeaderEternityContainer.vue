@@ -35,8 +35,8 @@ export default {
       this.isPenteractUnlocked = DualityUpgrade(25).isBought && !player.disablePostReality;
       this.penteractCost = Penteracts.nextCost;
       this.penteractText = this.penteractProgress();
-      this.hasCelestial = PlayerProgress.celestialEternityUnlocked() ||
-        player.endgame.celDimExpansion.celestialInfinityPoints.gte(DC.NUMMAX);
+      this.hasCelestial = (PlayerProgress.celestialEternityUnlocked() ||
+        player.endgame.celDimExpansion.celestialInfinityPoints.gte(DC.NUMMAX)) && !Slabdrill.isCursed;
       this.celEternityPoints.copyFrom(Currency.celestialEternityPoints.value.floor());
     },
     penteractProgress() {

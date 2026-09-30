@@ -54,6 +54,9 @@ export default {
             case ENDGAME_MASTERY_PATH.ETERNITY_POINTS: return "o-endgame-mastery-eternity-points";
             case ENDGAME_MASTERY_PATH.REALITY_MACHINES: return "o-endgame-mastery-reality-machines";
             case ENDGAME_MASTERY_PATH.IMAGINARY_MACHINES: return "o-endgame-mastery-imaginary-machines";
+            case ENDGAME_MASTERY_PATH.ENDGAME_ENTANGLEMENT: return "o-endgame-mastery-endgame-entanglement";
+            case ENDGAME_MASTERY_PATH.CELESTIAL_ENTANGLEMENT: return "o-endgame-mastery-celestial-entanglement";
+            case ENDGAME_MASTERY_PATH.DIVINE_ENTANGLEMENT: return "o-endgame-mastery-divine-entanglement";
             default: return "o-endgame-mastery-normal";
           }
         case ENDGAME_MASTERY_TYPE.PERMANENT:

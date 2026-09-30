@@ -48,6 +48,7 @@ export default {
       if (!this.inputIsValidTree) return {};
       const importedTree = new EndgameMasteryTree(this.truncatedInput);
       const newMasteriesArray = importedTree.purchasedMasteries.map(s => this.masteryString(s));
+      const entanglement = EndgameMastery.timeCompression.isBought ? makeEnumeration(importedTree.entanglementPaths) : null;
       return {
         endgameSkills: importedTree.spentSkills[0],
         newMasteries: makeEnumeration(newMasteriesArray),
@@ -55,6 +56,7 @@ export default {
         invalidMasteries: importedTree.invalidMasteries,
         firstPaths: makeEnumeration(importedTree.compressionPaths),
         secondPaths: makeEnumeration(importedTree.currencyPaths),
+        thirdPaths: entanglement,
         hasInfo: makeEnumeration(importedTree.compressionPaths),
       };
     },
@@ -66,12 +68,14 @@ export default {
       const combinedTree = this.combinedTreeObject;
       const newMasteriesArray = combinedTree.purchasedMasteries
         .filter(m => !currentMasteryTree.purchasedMasteries.includes(m)).map(m => this.masteryString(m));
+      const entanglement = EndgameMastery.timeCompression.isBought ? makeEnumeration(combinedTree.entanglementPaths) : null;
       return {
         endgameSkills: combinedTree.spentSkills[0] - currentMasteryTree.spentSkills[0],
         newMasteries: makeEnumeration(newMasteriesArray),
         newMasteriesArray,
         firstPaths: makeEnumeration(combinedTree.compressionPaths),
         secondPaths: makeEnumeration(combinedTree.currencyPaths),
+        thirdPaths: entanglement,
         hasInfo: makeEnumeration(combinedTree.compressionPaths),
       };
     },

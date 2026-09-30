@@ -15,6 +15,7 @@ export default {
       sacrificeBoost: new Decimal(0),
       nextPower: new Decimal(0),
       disabledCondition: "",
+      isFlipped: false
     };
   },
   computed: {
@@ -23,8 +24,8 @@ export default {
       return `Dimensional Sacrifice (${formatX(this.sacrificeBoost, 2, 2)})`;
     },
     sacrificeTooltip() {
-      return `Boosts 8th Antimatter Dimension by +${formatPow(this.nextPower, 2, 3)}`;
-      return `Boosts 8th Antimatter Dimension by ${formatX(this.sacrificeBoost, 2, 2)}`;
+      return `Boosts 8th ${this.isFlipped ? "Matter" : "Antimatter"} Dimension by +${formatPow(this.nextPower, 2, 3)}`;
+      return `Boosts 8th ${this.isFlipped ? "Matter" : "Antimatter"} Dimension by ${formatX(this.sacrificeBoost, 2, 2)}`;
     },
   },
   methods: {
@@ -38,6 +39,7 @@ export default {
       this.sacrificeBoost.copyFrom(Sacrifice.nextBoost);
       this.nextPower.copyFrom(Sacrifice.nextPower);
       this.disabledCondition = Sacrifice.disabledCondition;
+      this.isFlipped = player.universes.current === 2;
     },
     sacrifice() {
       sacrificeBtnClick();
