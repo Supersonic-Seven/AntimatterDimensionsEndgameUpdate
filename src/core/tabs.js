@@ -5,7 +5,7 @@ class SubtabState {
   }
 
   get name() {
-    return this.config.name;
+    return typeof this.config.name === "function" ? this.config.name() : this.config.name;
   }
 
   get symbol() {
@@ -96,7 +96,7 @@ class TabState {
   }
 
   get name() {
-    return this.config.name;
+    return typeof this.config.name === "function" ? this.config.name() : this.config.name;
   }
 
   get key() {

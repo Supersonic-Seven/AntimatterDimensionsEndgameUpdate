@@ -105,6 +105,8 @@ export function totalIPMult() {
   if (!Ascensions.ipA.isUnlocked) ipMult = ipMult.timesEffectOf(InfinityUpgrade.ipMult);
   if (Replicanti.areUnlocked) ipMult = ipMult.times(ReplicantiMultipliers.ipMult);
   if (LHC.voidRunning) ipMult = ipMult.timesEffectOf(NullUpgrade.infinityPointMult);
+  if (SlabdrillUnlocks.breakInfinity.isUnlocked) ipMult = ipMult.times(Slabdrill.slabPowers.ipMult());
+  if (Slabdrill.isCursed && BreakInfinityUpgrade.autobuyerSpeed.isBought) ipMult = ipMult.times(666);
   return ipMult;
 }
 

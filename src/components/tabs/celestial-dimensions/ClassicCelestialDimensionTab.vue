@@ -36,7 +36,7 @@ export default {
       this.celestialMatter.copyFrom(Currency.celestialMatter);
       this.conversionExponent = CelestialDimensions.conversionExponent;
       this.dimMultiplier.copyFrom(this.celestialMatter.pow(this.conversionExponent).max(1));
-      this.matterPerSecond.copyFrom(CelestialDimension(1).productionPerRealSecond);
+      this.matterPerSecond.copyFrom(CelestialDimension(1).productionPerSecond);
       this.incomeType = "Celestial Matter";
       this.totalDimCap.copyFrom(CelestialDimensions.totalDimCap);
       this.creditsClosed = GameEnd.creditsEverClosed;
@@ -84,7 +84,7 @@ export default {
       <p>
         You have
         <span class="c-celestial-dim-description__accent">{{ format(celestialMatter, 2, 1) }}</span>
-        Celestial Matter <span v-if="!isEffectActive">(Disabled)</span>,
+        Celestial Matter<span v-if="!isEffectActive"> (Disabled)</span>,
         <br>
         <span>
           increased by

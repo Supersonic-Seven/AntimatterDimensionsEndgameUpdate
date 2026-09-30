@@ -130,7 +130,7 @@ export const imaginaryUpgrades = [
     hasFailed: () => false,
     checkRequirement: () => player.celestials.effarig.relicShards.gte(1e90),
     checkEvent: GAME_EVENT.REALITY_RESET_AFTER,
-    description: "Time Dimension power based on total antimatter",
+    description: () => `Time Dimension power based on total ${player.universes.current === 2 ? "matter" : "antimatter"}`,
     effect: () => player.disablePostReality ? 1 : 1 + Decimal.log10(player.records.totalEndgameAntimatter.add(10).log10()).div(100).toNumber(),
     formatEffect: value => `${formatPow(value, 0, 4)}`,
     isDisabledInDoomed: () => !PelleImaginaryUpgrade.suspicionOfInterference.canBeApplied
@@ -183,7 +183,7 @@ export const imaginaryUpgrades = [
     name: "Fabrication of Ideals",
     id: 15,
     cost: new Decimal(1e9),
-    requirement: () => `Reach ${format("1e1500000000000")} antimatter without
+    requirement: () => `Reach ${format("1e1500000000000")} ${player.universes.current === 2 ? "matter" : "antimatter"} without
       ever having any 1st Infinity Dimensions`,
     hasFailed: () => player.requirementChecks.reality.maxID1.gt(0),
     checkRequirement: () => player.requirementChecks.reality.maxID1.eq(0) && player.antimatter.add(1).log10().gte(1.5e12),
@@ -195,7 +195,7 @@ export const imaginaryUpgrades = [
     // - Purchasing any TD with any amount of EC7 completions (edge case: acceptable within EC1 or EC10)
     // - Entering EC7 with any amount of purchased TD
     description: () => `${
-      Pelle.isDoomed ? "Unlock" : "Convert Antimatter Dimensions to Continuum and unlock"
+      Pelle.isDoomed ? "Unlock" : `Convert ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions to Continuum and unlock`
     } Lai'tela, Celestial of Dimensions`,
   },
   {
@@ -227,9 +227,7 @@ export const imaginaryUpgrades = [
     formatCost: x => format(x, 1),
     requirement: () => `Have ${formatInt(80000)} total Galaxies`,
     hasFailed: () => false,
-    checkRequirement: () => GalacticPowers.galacticAscension.isUnlocked ? Replicanti.galaxies.total.max(1).times(player.galaxies.max(1)).times(
-      player.dilation.totalTachyonGalaxies.max(1)).times(GalacticPower.freeGalaxies.max(1)).gte(80000) : Replicanti.galaxies.total.add(player.galaxies).add(
-      player.dilation.totalTachyonGalaxies).add(GalacticPower.freeGalaxies).gte(80000),
+    checkRequirement: () => actualBaseGalaxiesWithoutGeneration().gte(80000),
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
     description: "Unlock the 4th Dark Matter Dimension",
   },
@@ -265,7 +263,7 @@ export const imaginaryUpgrades = [
     name: "Existential Elimination",
     id: 21,
     cost: new Decimal(1e13),
-    requirement: () => `Reach ${format("1e7400000000000")} antimatter with Continuum disabled for the entire Reality`,
+    requirement: () => `Reach ${format("1e7400000000000")} ${player.universes.current === 2 ? "matter" : "antimatter"} with Continuum disabled for the entire Reality`,
     hasFailed: () => !player.requirementChecks.reality.noContinuum,
     checkRequirement: () => player.requirementChecks.reality.noContinuum &&
       Currency.antimatter.value.add(1).log10().gte(7.4e12),
@@ -282,7 +280,7 @@ export const imaginaryUpgrades = [
     id: 22,
     cost: new Decimal(1.5e14),
     formatCost: x => format(x, 1),
-    requirement: () => `Reach ${format("1e150000000000")} antimatter in Effarig's Reality with
+    requirement: () => `Reach ${format("1e150000000000")} ${player.universes.current === 2 ? "matter" : "antimatter"} in Effarig's Reality with
       at least ${formatInt(4)} Cursed Glyphs equipped`,
     // Note: 4 cursed glyphs is -12 glyph count, but equipping a positive glyph in the last slot is allowed
     hasFailed: () => !Effarig.isRunning || player.requirementChecks.reality.maxGlyphs > -10,
@@ -315,7 +313,7 @@ export const imaginaryUpgrades = [
     // We unfortunately don't have the UI space to be more descriptive on this button without causing text overflow,
     // so hopefully the additional modals (from the upgrade lock) will mostly communicate the idea that this is under
     // the same conditions as hard V's Post-destination
-    requirement: () => `Have ${formatInt(13000)} Antimatter Galaxies in Ra's Reality
+    requirement: () => `Have ${formatInt(13000)} ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxies in Ra's Reality
       with a fully inverted Black Hole`,
     hasFailed: () => !Ra.isRunning || player.requirementChecks.reality.slowestBH > 1e-300,
     checkRequirement: () => Ra.isRunning && player.requirementChecks.reality.slowestBH <= 1e-300 &&
@@ -358,7 +356,7 @@ export const imaginaryUpgrades = [
     name: "Exigent Extinction",
     id: 27,
     cost: new Decimal(1e100),
-    requirement: () => `Reach ${format(DC.E9E15)} Antimatter in Pelle without ever equipping Glyphs`,
+    requirement: () => `Reach ${format(DC.E9E15)} ${player.universes.current === 2 ? "Matter" : "Antimatter"} in Pelle without ever equipping Glyphs`,
     hasFailed: () => !Pelle.isDoomed || player.requirementChecks.endgame.noGlyphsDoomed === false,
     checkRequirement: () => Currency.antimatter.value.add(1).log10().gte(9e15) && Pelle.isDoomed &&
       player.requirementChecks.endgame.noGlyphsDoomed === true,
@@ -392,9 +390,7 @@ export const imaginaryUpgrades = [
     cost: new Decimal(1e200),
     requirement: () => `Have a total of ${format(1e75, 2, 2)} Galaxies`,
     hasFailed: () => false,
-    checkRequirement: () => GalacticPowers.galacticAscension.isUnlocked ? Replicanti.galaxies.total.max(1).times(player.galaxies.max(1)).times(
-      player.dilation.totalTachyonGalaxies.max(1)).times(GalacticPower.freeGalaxies.max(1)).times(GalaxyGenerator.galaxies.max(1)).gte(1e75) :
-      Replicanti.galaxies.total.add(player.galaxies).add(player.dilation.totalTachyonGalaxies).add(GalacticPower.freeGalaxies).add(GalaxyGenerator.galaxies).gte(1e75),
+    checkRequirement: () => actualBaseGalaxies().gte(1e75),
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
     description: () => `Unlock the 8th Dark Matter Dimension, raise Dark Matter cap to ${formatPostBreak("1e100000")}`,
   },

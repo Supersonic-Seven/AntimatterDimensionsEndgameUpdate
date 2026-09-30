@@ -8,7 +8,7 @@ export default {
   },
   data() {
     return {
-      pp: 0,
+      pp: new Decimal(0),
       treeLayout: 0,
       physicsEnabled: false,
       physicsOverride: false,
@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     update() {
-      this.pp = Math.floor(Currency.perkPoints.value);
+      this.pp.copyFrom(Decimal.floor(Currency.perkPoints.value));
       this.physicsEnabled = player.options.perkPhysicsEnabled;
     },
     togglePhysics() {

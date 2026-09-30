@@ -32,6 +32,12 @@ export default {
     >
       Currency Split: {{ treeStatus.secondPaths }}
     </div>
+    <div
+      v-if="treeStatus.thirdPaths"
+      class="l-modal-import-tree__tree-info-line"
+    >
+      Entanglement Split: {{ treeStatus.thirdPaths }}
+    </div>
   </div>
 </template>
 

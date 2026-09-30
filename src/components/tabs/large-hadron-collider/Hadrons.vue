@@ -29,11 +29,11 @@ export default {
   },
   methods: {
     update() {
-      this.lcount = Math.min(Math.floor(Math.min(player.celestials.laitela.hadrons.light, 100) *
+      this.lcount = Math.min(Math.floor(Math.min(player.celestials.laitela.hadrons.totalLight, 100) *
         Math.max(Math.log10(player.celestials.laitela.hadrons.light) / 2, 1)), 500);
-      this.dcount = Math.min(Math.floor(Math.min(player.celestials.laitela.hadrons.dark, 100) *
+      this.dcount = Math.min(Math.floor(Math.min(player.celestials.laitela.hadrons.totalDark, 100) *
         Math.max(Math.log10(player.celestials.laitela.hadrons.dark) / 2, 1)), 500);
-      this.ecount = Math.min(Math.floor(Math.min(player.celestials.laitela.hadrons.exotic, 100) *
+      this.ecount = Math.min(Math.floor(Math.min(player.celestials.laitela.hadrons.totalExotic, 100) *
         Math.max(Math.log10(player.celestials.laitela.hadrons.exotic) / 2, 1)), 500);
       this.isBlob = Theme.currentName() === "S11";
     },

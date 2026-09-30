@@ -3,8 +3,8 @@ export const accelerators = {
     id: 1,
     key: "potency",
     name: "Potency Accelerator",
-    drainResource: "Antimatter",
-    baseEffect1: x => `Antimatter Generation ${formatPow(x, 2, 3)}`,
+    drainResource: () => player.universes.current === 2 ? "Matter" : "Antimatter",
+    baseEffect1: x => `${player.universes.current === 2 ? "Matter" : "Antimatter"} Generation ${formatPow(x, 2, 3)}`,
     baseEffect2: x => `Entropy Gain ${formatX(x, 2, 2)}`,
     baseEffect3: x => `Divine Matter/Energy Production ${formatX(x, 2, 2)}`,
     percentage: totalFill => Decimal.log10(totalFill.plus(1).log10().div(1e200)).div(100).toNumber(),
@@ -20,14 +20,14 @@ export const accelerators = {
       {
         resource: "potency",
         requirement: 0.15,
-        description: "Antimatter Dimensions are squared while inside The Void",
+        description: () => `${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions are squared while inside The Void`,
         effect: () => 2
       },
       {
         resource: "potency",
         requirement: 0.4,
-        description: "Total Hadrons increase the Antimatter Hardcap",
-        effect: () => player.disablePostReality ? 0 : Math.clamp(Math.floor(Math.pow(2 * Math.max(player.celestials.laitela.hadrons.total - 100, 0) + 0.25, 0.5) - 0.5), 0, 25),
+        description: () => `Total Hadrons increase the ${player.universes.current === 2 ? "Matter" : "Antimatter"} Hardcap`,
+        effect: () => player.disablePostReality ? 0 : Math.clamp(Math.floor(Math.pow(2 * Math.max(player.celestials.laitela.hadrons.trueTotal - 100, 0) + 0.25, 0.5) - 0.5), 0, 25),
         formatEffect: value => `${format(LHC.breakingPoint.root(Decimal.pow10(value)), 2)} ➜ ${format(LHC.breakingPoint, 2)}`
       },
       {
@@ -42,9 +42,9 @@ export const accelerators = {
     key: "emptiness",
     name: "Emptiness Accelerator",
     drainResource: "Null Matter",
-    baseEffect1: x => `ADs ${formatPow(x, 2, 3)} while inside The Void`,
+    baseEffect1: x => `${player.universes.current === 2 ? "MDs" : "ADs"} ${formatPow(x, 2, 3)} while inside The Void`,
     baseEffect2: x => `Hadron Effectiveness cap +${formatPercents(x - 1, 2)}`,
-    baseEffect3: x => `Antimatter Overflow Magnitude ${formatInt(10)} ➜ ${format(x, 2, 2)}`,
+    baseEffect3: x => `${player.universes.current === 2 ? "Matter" : "Antimatter"} Overflow Magnitude ${formatInt(10)} ➜ ${format(x, 2, 2)}`,
     percentage: totalFill => Decimal.min(totalFill.div(20000), totalFill.max(1).log10()).div(100).toNumber(),
     percentageToFill: percentage => Decimal.max(new Decimal(percentage * 100).times(20000), Decimal.pow10(percentage * 100)),
     effects: {
@@ -58,21 +58,21 @@ export const accelerators = {
       {
         resource: "emptiness",
         requirement: 0.07,
-        description: "While inside The Void, Antimatter Dimensions are raised to a power based on total Antimatter produced outside Doom",
+        description: () => `While inside The Void, ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions are raised to a power based on total ${player.universes.current === 2 ? "Matter" : "Antimatter"} produced outside Doom`,
         effect: () => Decimal.log10(Decimal.log10(player.records.totalAntimatterOutsideDoom)).div(200).add(1),
         formatEffect: value => formatPow(value, 2, 3)
       },
       {
         resource: "emptiness",
         requirement: 0.3,
-        description: "Divine Dimensions are powered based on best Antimatter inside The Void",
+        description: () => `Divine Dimensions are powered based on best ${player.universes.current === 2 ? "Matter" : "Antimatter"} inside The Void`,
         effect: () => player.disablePostReality ? DC.D1 : Decimal.log10(Decimal.log10(player.endgame.largeHadronCollider.void.highestAntimatter)).div(100).add(1),
         formatEffect: value => formatPow(value, 2, 3)
       },
       {
         resource: "emptiness",
         requirement: 1,
-        description: () => `The Antimatter Hardcap is increased by ${formatInt(25)} OoM^2s`,
+        description: () => `The ${player.universes.current === 2 ? "Matter" : "Antimatter"} Hardcap is increased by ${formatInt(25)} OoM^2s`,
         effect: () => player.disablePostReality ? 0 : 25
       },
     ]
@@ -83,8 +83,8 @@ export const accelerators = {
     name: "Cosmic Accelerator",
     drainResource: "Galaxies",
     baseEffect1: x => `Galaxy Generation ${formatPow(x, 2, 3)}`,
-    baseEffect2: x => `AM Exponent ${formatPow(x, 2, 3)} while Doomed`,
-    baseEffect3: x => `AM Exponent^2 ${formatPow(x, 2, 4)} while Doomed`,
+    baseEffect2: x => `${player.universes.current === 2 ? "M" : "AM"} Exponent ${formatPow(x, 2, 3)} while Doomed`,
+    baseEffect3: x => `${player.universes.current === 2 ? "M" : "AM"} Exponent^2 ${formatPow(x, 2, 4)} while Doomed`,
     percentage: totalFill => Math.min(Decimal.log10(totalFill.max("1e3000")).sub(3000).div(5000).sqrt().times(20).div(100).toNumber(),
       Decimal.log10(totalFill.max(1)).sub(3000).div(5000).times(20).div(100).toNumber()),
     percentageToFill: percentage => Decimal.max(Decimal.pow10(Decimal.sqr(percentage * 100 / 20).times(5000).add(3000)),
@@ -112,7 +112,7 @@ export const accelerators = {
       {
         resource: "cosmic",
         requirement: 1,
-        description: () => `The Antimatter Hardcap is increased by ${format(Decimal.log10(DC.NUMMAX).sub(275), 4, 4)} OoM^2s`,
+        description: () => `The ${player.universes.current === 2 ? "Matter" : "Antimatter"} Hardcap is increased by ${format(Decimal.log10(DC.NUMMAX).sub(275), 4, 4)} OoM^2s`,
         effect: () => player.disablePostReality ? 0 : Decimal.log10(DC.NUMMAX).sub(275).toNumber()
       },
     ]

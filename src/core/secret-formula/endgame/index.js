@@ -1,6 +1,7 @@
 import { accelerators } from "./accelerators";
 import { ascensions } from "./ascensions";
 import { breakEternityUpgrades } from "./break-eternity-upgrades";
+import { compressionUpgrades } from "./compression-upgrades";
 import { endgameMasteries } from "./endgame-masteries";
 import { permanentEndgameMasteries } from "./permanent-endgame-masteries";
 import { endgameMilestones } from "./endgame-milestones";
@@ -31,5 +32,6 @@ export const endgame = {
   },
   accelerators: accelerators,
   nullUpgrades: nullUpgrades,
-  ascensions: ascensions
+  ascensions: ascensions,
+  compression: compressionUpgrades
 };

@@ -96,7 +96,7 @@ export default {
       this.has2 = PlayerProgress.condenseUnlocked();
       this.has3 = (DivinityUpgrades.all.filter(u => u.layer === 2 && u.isBought).length === DivinityUpgrades.all.filter(u => u.layer === 2).length) || PlayerProgress.supernovaUnlocked();
       this.has4 = PlayerProgress.supernovaUnlocked();
-      this.has5 = (DivinityUpgrades.all.filter(u => u.layer === 4 && u.isBought).length === DivinityUpgrades.all.filter(u => u.layer === 4).length);
+      this.has5 = (DivinityUpgrades.all.filter(u => u.layer === 4 && u.isBought).length === DivinityUpgrades.all.filter(u => u.layer === 4).length) && Slabdrill.isDestroyed;
       this.hasBonus = DivinityUpgrade.divineL4U1.isBought;
       this.bonus1.copyFrom(DivinityUpgrade.divineL4U1.effects.energy.effectOrDefault(DC.D1));
       this.bonus2.copyFrom(DivinityUpgrade.divineL4U1.effects.matter.effectOrDefault(DC.D1));

@@ -69,13 +69,13 @@ export const shortcuts = [
     function: () => player.options.simpleHotkeysCelestialMode ? manualRequestCelestialDimensionBoost(false) : manualRequestDimensionBoost(false),
     visible: false
   }, {
-    name: "Antimatter Galaxy",
+    name: `${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxy`,
     keys: ["g"],
     type: "bindRepeatableHotkey",
     function: () => player.options.simpleHotkeysCelestialMode ? manualRequestCelestialGalaxyReset(true) : manualRequestGalaxyReset(true),
     visible: true
   }, {
-    name: "Single Antimatter Galaxy",
+    name: `Single ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxy`,
     keys: ["shift", "g"],
     type: "bindRepeatableHotkey",
     function: () => player.options.simpleHotkeysCelestialMode ? manualRequestCelestialGalaxyReset(false) : manualRequestGalaxyReset(false),
@@ -120,7 +120,10 @@ export const shortcuts = [
     name: "Reality",
     keys: ["y"],
     type: "bindRepeatableHotkey",
-    function: () => requestManualReality(),
+    function: () => {
+      if (Slabdrill.isCursed) return;
+      requestManualReality();
+    },
     visible: () => PlayerProgress.realityUnlocked() || isRealityAvailable() || PlayerProgress.endgameUnlocked()
   }, {
     name: "Toggle Glyph unequip",
@@ -247,6 +250,16 @@ export const shortcuts = [
       supernovaResetRequest();
     },
     visible: () => PlayerProgress.supernovaUnlocked()
+  }, {
+    name: "Toggle Glyph unequip (Slabdrill)",
+    keys: ["shift", "r"],
+    type: "bindHotkey",
+    function: () => {
+      if (!Slabdrill.isCursed) return;
+      player.reality.respec = !player.reality.respec;
+      GameUI.notify.info(`Glyph respec is now ${player.reality.respec ? "active" : "inactive"}`);
+    },
+    visible: () => Slabdrill.isCursed || Slabdrill.isDestroyed
   }, {
     name: "Save game",
     keys: ["mod", "s"],

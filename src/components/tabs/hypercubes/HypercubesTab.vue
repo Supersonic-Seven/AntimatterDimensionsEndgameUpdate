@@ -19,8 +19,13 @@ export default {
       canBuyTesseract: false,
       boughtTesseracts: 0,
       extraTesseracts: 0,
+      tesseractMult: 0,
       isTesseractAutoUnlocked: false,
       isTesseractAutoActive: false,
+      tesseractMultText: "",
+      additiveTesseractString: "",
+      multiplicativeTesseractString: "",
+      tesseractStringArray: [],
       penteractsUnlocked: false,
       nextFreeTickspeedReduction: new Decimal(0),
       penteractCost: new Decimal(0),
@@ -62,8 +67,9 @@ export default {
   },
   computed: {
     tesseractCountString() {
-      const extra = this.extraTesseracts > 0 ? ` + ${format(this.extraTesseracts, 2, 2)}` : "";
-      return `${formatHybridSmall(this.boughtTesseracts, 3)}${extra}`;
+      if (LHC.hadronC >= 1) return this.multiplicativeTesseractString;
+      if (LHC.hadronC >= 0.5) return `${wordShift.wordCycle(this.tesseractStringArray, true)}`;
+      return this.additiveTesseractString;
     },
     tesseractAutobuyer() {
       return Autobuyer.tesseract;
@@ -108,11 +114,18 @@ export default {
       this.tesseractCost.copyFrom(Tesseracts.nextCost);
       this.totalInfinityDimCap.copyFrom(InfinityDimensions.totalDimCap);
       this.canBuyTesseract = Tesseracts.canBuyTesseract;
-      this.boughtTesseracts = Tesseracts.bought * Tesseracts.totalMult;
-      this.extraTesseracts = Tesseracts.extra * Tesseracts.totalMult;
+      this.boughtTesseracts = Tesseracts.bought;
+      this.extraTesseracts = Tesseracts.extra;
+      this.tesseractMult = Tesseracts.totalMult;
       const tesseractAuto = Autobuyer.tesseract;
       this.isTesseractAutoUnlocked = tesseractAuto.isUnlocked;
       this.isTesseractAutoActive = tesseractAuto.isActive;
+      this.tesseractMultText = this.tesseractMult !== 1 ? ` × ${format(this.tesseractMult, 2, 2)}` : "";
+      this.additiveTesseractString = `${formatHybridSmall(this.boughtTesseracts, 3)}${this.tesseractMultText}${this.extraTesseracts > 0
+        ? ` + ${format(this.extraTesseracts, 2, 2)}${this.tesseractMultText}` : ""}`;
+      this.multiplicativeTesseractString = `${formatHybridSmall(this.boughtTesseracts, 3)}${this.extraTesseracts > 0
+        ? ` × ${format(this.extraTesseracts, 2, 2)}${this.tesseractMultText}` : ""}`;
+      this.tesseractStringArray = [this.multiplicativeTesseractString, this.additiveTesseractString];
       this.penteractsUnlocked = DualityUpgrade(25).isBought;
       this.nextFreeTickspeedReduction.copyFrom(Penteracts.eachPenteractReduction.sub(1));
       this.penteractCost.copyFrom(Penteracts.nextCost);
@@ -185,10 +198,11 @@ export default {
 
 <template>
   <div class="l-hypercubes-tab">
+    Penteracts cannot be purchased while Doomed.
     <div class="l-hypercubes-container">
       <div class="l-hypercubes-btn">
         <button
-          class="c-infinity-dim-tab__tesseract-button"
+          class="c-infinity-dim-tab__tesseract-button l-hypercubes-button"
           :class="{
             'c-infinity-dim-tab__tesseract-button--disabled': !canBuyTesseract,
             'o-pelle-disabled-pointer': creditsClosed
@@ -214,7 +228,7 @@ export default {
       </div>
       <div class="l-hypercubes-btn">
         <button
-          class="c-penteract-button"
+          class="c-penteract-button l-hypercubes-button"
           :class="{
             'c-penteract-button--disabled': !canBuyPenteract,
             'o-pelle-disabled-pointer': creditsClosed
@@ -231,7 +245,7 @@ export default {
       </div>
       <div class="l-hypercubes-btn">
         <button
-          class="c-hexeract-button"
+          class="c-hexeract-button l-hypercubes-button"
           :class="{
             'c-hexeract-button--disabled': !canBuyHexeract,
             'o-pelle-disabled-pointer': creditsClosed
@@ -250,7 +264,7 @@ export default {
     <div class="l-hypercubes-container">
       <div class="l-hypercubes-btn">
         <button
-          class="c-hepteract-button"
+          class="c-hepteract-button l-hypercubes-button"
           :class="{
             'c-hepteract-button--disabled': !canBuyHepteract,
             'o-pelle-disabled-pointer': creditsClosed
@@ -267,7 +281,7 @@ export default {
       </div>
       <div class="l-hypercubes-btn">
         <button
-          class="c-octeract-button"
+          class="c-octeract-button l-hypercubes-button"
           :class="{
             'c-octeract-button--disabled': !canBuyOcteract,
             'o-pelle-disabled-pointer': creditsClosed
@@ -305,6 +319,11 @@ export default {
   margin-top: 1rem;
   margin-bottom: 1rem;
   padding: 1rem;
+  height: 20rem;
+}
+
+.l-hypercubes-button {
   width: 35rem;
+  height: 15rem;
 }
 </style>

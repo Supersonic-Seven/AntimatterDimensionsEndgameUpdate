@@ -48,7 +48,7 @@ export default {
       };
     },
     dimBoostName() {
-      if (Ascensions.dbA.isUnlocked) return "Dimension Surge";
+      if (this.hasSurge) return "Dimension Surge";
       return "Dimension Boost";
     },
     imaginaryText() {

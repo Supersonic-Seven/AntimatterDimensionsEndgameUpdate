@@ -12,6 +12,7 @@ export default {
       capRM: new Decimal(),
       scaleTime: 0,
       capStr: "",
+      showingRows: 5
     };
   },
   computed: {
@@ -25,6 +26,7 @@ export default {
       this.capRM.copyFrom(MachineHandler.hardcapRM);
       this.scaleTime = MachineHandler.scaleTimeForIM;
       this.capStr = formatMachines(MachineHandler.hardcapRM, MachineHandler.currentIMCap, MachineHandler.currentDMCap);
+      this.showingRows = PlayerProgress.endgameUnlocked() ? 6 : 5;
     },
     id(row, column) {
       return (row - 1) * 5 + column - 1;
@@ -60,7 +62,7 @@ export default {
       </span>
     </div>
     <div
-      v-for="row in 6"
+      v-for="row in showingRows"
       :key="row"
       class="l-reality-upgrade-grid__row"
     >

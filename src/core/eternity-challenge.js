@@ -8,7 +8,7 @@ export function startEternityChallenge() {
   InfinityDimensions.fullReset();
   Replicanti.reset();
   resetChallengeStuff();
-  AntimatterDimensions.reset();
+  AntimatterDimensions.resetUpToNine();
   player.replicanti.galaxies = DC.D0;
   Currency.infinityPoints.reset();
   InfinityDimensions.resetAmount();
@@ -128,6 +128,9 @@ export class EternityChallengeState extends GameMechanicState {
   }
 
   get initialGoal() {
+    if (Slabdrill.isCursed && this.config.slabGoal) {
+      return this.config.slabGoal;
+    }
     if (Alpha.isRunning && this.config.alphaGoal) {
       return this.config.alphaGoal;
     }
@@ -138,6 +141,9 @@ export class EternityChallengeState extends GameMechanicState {
   }
 
   get goalIncrease() {
+    if (Slabdrill.isCursed && this.config.slabGoalIncrease) {
+      return this.config.slabGoalIncrease;
+    }
     if (Alpha.isRunning && this.config.alphaGoalIncrease) {
       return this.config.alphaGoalIncrease;
     }

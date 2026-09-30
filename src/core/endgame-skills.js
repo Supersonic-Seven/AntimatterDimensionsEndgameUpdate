@@ -75,7 +75,7 @@ EndgameSkillPurchaseType.gg = new class extends EndgameSkillPurchaseType {
 
   get currency() { return Currency.galaxyGeneratorGalaxies; }
   get costBase() { return DC.E10; }
-  get costIncrement() { return DC.E2; }
+  get costIncrement() { return DualityUpgrade(27).isBought ? new Decimal(1.1) : DC.E2; }
 
   bulkCost(amount) {
     return this.costIncrement.pow(amount + this.amount).subtract(this.cost);
@@ -112,7 +112,8 @@ export const EndgameSkills = {
   checkForBuying(auto) {
     if (CelestialDimension(1).baseAmount.gt(0)) return true;
     if (!auto) Modal.message.show(`You need to buy at least ${formatInt(1)} Celestial Dimension before you can purchase
-      Endgame Skills. You also need to be outside Doom to prevent AM overflow.`, { closeEvent: GAME_EVENT.ENDGAME_RESET_AFTER });
+      Endgame Skills. You also need to be outside Doom to prevent
+      ${player.universes.current === 2 ? "M" : "AM"} overflow.`, { closeEvent: GAME_EVENT.ENDGAME_RESET_AFTER });
     return false;
   },
 
@@ -146,8 +147,11 @@ export const EndgameSkills = {
   },
 
   calculateEndgameMasteriesCost() {
-    let list = EndgameMastery.permaMasteries.isBought ? EndgameMastery.boughtEM().filter(m => m.id >= 180) : EndgameMastery.boughtEM();
+    let list = EndgameMastery.permaMasteries.isBought
+      ? EndgameMastery.boughtEM().filter(m => m.id >= 180 && m.id < 280)
+      : EndgameMastery.boughtEM().filter(m => m.id < 280);
     let totalCost = list.map(em => em.cost).reduce(Number.sumReducer, 0);
+    totalCost += masteryIncrease.entanglementCost();
     return totalCost;
   }
 };

@@ -90,6 +90,9 @@ export class EndgameMasteryTree {
       ["ep", [142, 152]],
       ["rm", [143, 153]],
       ["im", [144, 154]],
+      ["endgameE", [281, 291, 301]],
+      ["celestialE", [282, 292, 302]],
+      ["divineE", [283, 293, 303]]
     ]);
   }
 
@@ -197,7 +200,11 @@ export class EndgameMasteryTree {
         reqSatisfied = config.requirement.every(r => check(r)) && this.currCurrPathCount < this.allowedCurrPathCount;
         break;
       case EM_REQUIREMENT_TYPE.EXPANDED:
-        reqSatisfied = EndgameMastery.permaMasteries.isBought;
+        reqSatisfied = EndgameMastery.permaMasteries.isBought && config.requirement.every(r => check(r));
+        break;
+      case EM_REQUIREMENT_TYPE.ENTANGLEMENT:
+        reqSatisfied = EndgameMastery.timeCompression.isBought &&
+          config.requirement.every(r => check(r)) && this.currEntanglePathCount < this.allowedEntanglePathCount;
         break;
       default:
         throw Error(`Unrecognized EM requirement type: ${this.reqType}`);
@@ -226,6 +233,10 @@ export class EndgameMasteryTree {
     return [141, 142, 143, 144].countWhere(x => this.purchasedMasteries.includes(EndgameMastery(x)));
   }
 
+  get currEntanglePathCount() {
+    return [281, 282, 283].countWhere(x => this.purchasedMasteries.includes(EndgameMastery(x)));
+  }
+
   get allowedCompPathCount() {
     if (EndgameUpgrade(20).isBought) return 4;
     if (EndgameUpgrade(19).isBought) return 3;
@@ -237,6 +248,11 @@ export class EndgameMasteryTree {
     if (EndgameUpgrade(20).isBought) return 4;
     if (EndgameUpgrade(18).isBought) return 3;
     if (EndgameUpgrade(16).isBought) return 2;
+    return 1;
+  }
+
+  get allowedEntanglePathCount() {
+    if (CompressionUpgrade.entanglementSplit.isBought) return 3;
     return 1;
   }
 
@@ -258,6 +274,21 @@ export class EndgameMasteryTree {
   get currencyPaths() {
     const pathSet = new Set();
     const validPaths = [ENDGAME_MASTERY_PATH.INFINITY_POINTS, ENDGAME_MASTERY_PATH.ETERNITY_POINTS, ENDGAME_MASTERY_PATH.REALITY_MACHINES, ENDGAME_MASTERY_PATH.IMAGINARY_MACHINES];
+    for (const path of validPaths) {
+      const pathEntry = EndgameMasteries.pathList.find(p => p.path === path);
+      for (const mastery of this.purchasedMasteries) {
+        if (pathEntry.masteries.includes(mastery.id)) {
+          pathSet.add(pathEntry.name);
+          break;
+        }
+      }
+    }
+    return Array.from(pathSet);
+  }
+
+  get entanglementPaths() {
+    const pathSet = new Set();
+    const validPaths = [ENDGAME_MASTERY_PATH.ENDGAME_ENTANGLEMENT, ENDGAME_MASTERY_PATH.CELESTIAL_ENTANGLEMENT, ENDGAME_MASTERY_PATH.DIVINE_ENTANGLEMENT];
     for (const path of validPaths) {
       const pathEntry = EndgameMasteries.pathList.find(p => p.path === path);
       for (const mastery of this.purchasedMasteries) {

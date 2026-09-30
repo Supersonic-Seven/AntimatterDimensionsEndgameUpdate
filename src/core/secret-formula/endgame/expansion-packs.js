@@ -18,12 +18,12 @@ export const expansionPacks = {
     id: "effarigPack",
     symbol: "Ϙ",
     get description() {
-      return ` Multiply Relic Shard gain by the logarithm of your Antimatter amount (Currently ${formatX(player.antimatter.max(10).log10(), 2)}).
+      return ` Multiply Relic Shard gain by the logarithm of your ${player.universes.current === 2 ? "Matter" : "Antimatter"} amount (Currently ${formatX(player.antimatter.max(10).log10(), 2)}).
         The Effarig Level ${formatInt(10)} reward in Ra is improved so that Effarig Glyphs are always generated with ${formatInt(7)} effects.
         Increase Glyph Alchemy caps to a base of one-third of your all-time maximum Glyph Level (Currently ${formatHybridLarge(player.records.bestEndgame.glyphLevel.div(3), 3)}).
         Alchemy resources are kept on Endgame, and making a Reality Glyph no longer spends Reality resources.
         Effarig's Shop starts completed.
-        Layers of Effarig's Reality will automatically complete at one-tenth the time of your fastest Endgame (Currently ${TimeSpan.fromMilliseconds(new Decimal(player.records.bestEndgame.realTime).div(10)).toStringShort()} per layer)`
+        Layers of Effarig's Reality will automatically complete themselves ten times faster than the time of your fastest Endgame (Currently ${TimeSpan.fromMilliseconds(new Decimal(player.records.bestEndgame.realTime).div(10)).toStringShort()} per layer)`
     },
     cost: Decimal.pow(10, 1e50),
     formatCost: value => formatPostBreak(value, 2, 0)
@@ -61,7 +61,7 @@ export const expansionPacks = {
     symbol: "\uf185",
     get description() {
       return ` Ra is kept on Endgame.
-        Raise the level cap of all Celestials to the double-logarithm of your record Antimatter amount (Currently ${formatHybridLarge(Decimal.max(Decimal.floor(player.records.bestAntimatterExponentOutsideDoom.max(1).log10()), 25), 3)}).
+        Raise the level cap of all Celestials to the double-logarithm of your record ${player.universes.current === 2 ? "Matter" : "Antimatter"} amount (Currently ${formatHybridLarge(Decimal.max(Decimal.floor(player.records.bestAntimatterExponentOutsideDoom.max(1).log10()), 25), 3)}).
         Unlock ${formatInt(7)} new effects for each Celestial which can be obtained by increasing the level of each Celestial.
         Multiply Memory and Memory Chunk gain by ${formatX(10)}.`
     },
@@ -77,7 +77,7 @@ export const expansionPacks = {
         While in Lai'tela's Reality, Game Speed returns to normal twice as fast.
         Square the Annihilation to ${formatInt(8)}th DMD multiplier if Annihilation multiplier currently affects the ${formatInt(8)}th DMD.
         Reduce the DMD Interval increase on Ascension by ${formatInt(200)}.
-        Multiply Dark Matter gain by the double-logarithm of your Antimatter amount or the logarithm of your Imaginary Machine amount, whichever is bigger (Currently ${formatX(Decimal.max(player.antimatter.max(1e10).log10().log10(), player.reality.imaginaryMachines.max(10).log10()), 2, 2)}).
+        Multiply Dark Matter gain by the double-logarithm of your ${player.universes.current === 2 ? "Matter" : "Antimatter"} amount or the logarithm of your Imaginary Machine amount, whichever is bigger (Currently ${formatX(Decimal.max(player.antimatter.max(1e10).log10().log10(), player.reality.imaginaryMachines.max(10).log10()), 2, 2)}).
         Start Endgames with ${formatInt(10)} Singularities.
         Multiply Dark Energy gain by the logarithm of your Singularity amount squared (Currently ${formatX(player.celestials.laitela.singularities.max(10).log10().pow(2), 2, 2)}).
         Raise the Annihilation effect to a power based on Dark Matter (Currently ${formatPow(Decimal.pow((Decimal.log10(Decimal.log10(Currency.darkMatter.value.add(1)).add(1)).add(1)).div(2), 2).add(1), 2, 3)}).
@@ -106,10 +106,22 @@ export const expansionPacks = {
     id: "alphaPack",
     symbol: "α",
     get description() {
-      return ` Unlock the Large Hadron Collider, which can accelerate your Hadrons to exponentially gain more Antimatter.
+      return ` Unlock the Large Hadron Collider, which can accelerate your Hadrons to exponentially gain more ${player.universes.current === 2 ? "Matter" : "Antimatter"}.
         Unlock The Void, which is a feature that functions similarly to Time Dilation and boosts Accelerator production.`
     },
     cost: Decimal.pow(10, 1e200),
+    formatCost: value => formatPostBreak(value, 2, 0)
+  },
+  slabPack: {
+    name: "Slabdrill's Expansion Pack",
+    id: "slabPack",
+    symbol: "⁹δ",
+    get description() {
+      return ` Allow Serpentine Power to be collected outside the Cursed Reality.
+        Reunlock the Cursed Core, and boost Chaos Core find chance and interval by Celestial Points, Celestial Reality Machines and Celestial Runes rather than Slabdrill Strikes.
+        Refactor all Serpentine Power effects.`
+    },
+    cost: Decimal.pow(10, 1e275),
     formatCost: value => formatPostBreak(value, 2, 0)
   }
 };

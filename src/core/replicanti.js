@@ -8,6 +8,7 @@ export const ReplicantiGrowth = {
     if (Replicanti.amount.gte(DC.E9E15)) return EndgameMastery(272).effectOrDefault(10);
     if (PelleStrikes.eternity.hasStrike && !PelleStrikes.eternity.isDestroyed() && Replicanti.amount.gte(DC.E2000)) return 10;
     if (Pelle.isDoomed) return 2;
+    if (SlabdrillUnlocks.replicanti.isUnlocked) return 2;
     if (Alpha.isRunning) return AlphaUnlocks.timestudy192.effects.nerf.effectOrDefault(1.2);
     return AlchemyResource.cardinality.effectValue;
   }
@@ -47,6 +48,12 @@ export const ReplicantiMultipliers = {
   },
   get dePow() {
     return replicantiMultToPower(this.deMult);
+  },
+  get stMult() {
+    return CompressionUpgrade.stMultReplicanti.effectOrDefault(DC.D1);
+  },
+  get stPow() {
+    return replicantiMultToPower(this.stMult);
   }
 };
 
@@ -140,6 +147,7 @@ export function getReplicantiInterval(overCapOverride, intervalIn) {
   if ((TimeStudy(133).isBought && !Achievement(138).isUnlocked) || overCap) {
     interval = interval.times(10);
   }
+  if (SlabdrillUnlocks.replicanti.isUnlocked) interval = interval.times(1000);
 
   if (overCap) {
     let increases = (amount.log10().sub(replicantiCap().log10())).div(ReplicantiGrowth.scaleLog10);
@@ -216,7 +224,7 @@ export function totalReplicantiSpeedMult(overCap) {
     totalMult = totalMult.times((Perk.studyPassive.isBought && !player.disablePostReality) ? 3 : 1.5);
   }
 
-  if (!overCap && Achievement(134).isUnlocked && !player.disablePostReality) {
+  if (!overCap && Achievement(134).isUnlocked && (!player.disablePostReality || SlabdrillUnlocks.eternityChallengeTen.isUnlocked)) {
     totalMult = totalMult.times(2);
   }
   totalMult = totalMult.times(getAdjustedGlyphEffect("replicationspeed"));
@@ -226,6 +234,8 @@ export function totalReplicantiSpeedMult(overCap) {
   totalMult = totalMult.timesEffectsOf(AlchemyResource.replication, Ra.unlocks.continuousTTBoost.effects.replicanti);
 
   if (LHC.voidRunning) totalMult = totalMult.timesEffectOf(NullUpgrade.replicantiSpeedMult);
+
+  if (SlabdrillUnlocks.replicanti.isUnlocked) totalMult = totalMult.times(Slabdrill.slabPowers.repSpeed());
 
   return totalMult;
 }
@@ -410,11 +420,12 @@ export const ReplicantiUpgrade = {
     set value(value) { player.replicanti.chance = value; }
 
     get nextValue() {
-      return this.decimalNearestPercent(this.value.add(0.01));
+      return SlabdrillUnlocks.replicanti.isUnlocked ? this.decimalNearestTenthPercent(this.value.add(0.001)) :
+        this.decimalNearestPercent(this.value.add(0.01));
     }
 
     get rawValue() {
-      return this.value.times(100);
+      return SlabdrillUnlocks.replicanti.isUnlocked ? this.value.times(1000) : this.value.times(100);
     }
 
     get cost() {
@@ -426,7 +437,7 @@ export const ReplicantiUpgrade = {
 
     get costIncrease() { return 1e15; }
 
-    get costThreshold() { return 100; }
+    get costThreshold() { return SlabdrillUnlocks.replicanti.isUnlocked ? 1000 : 100; }
 
     get costExponent() { return 1.0002; }
 
@@ -437,7 +448,8 @@ export const ReplicantiUpgrade = {
     }
 
     get isCapped() {
-      return this.decimalNearestPercent(this.value).gte(this.cap);
+      return SlabdrillUnlocks.replicanti.isUnlocked ? this.decimalNearestTenthPercent(this.value).gte(this.cap) :
+        this.decimalNearestPercent(this.value).gte(this.cap);
     }
 
     get autobuyerMilestone() {
@@ -448,15 +460,17 @@ export const ReplicantiUpgrade = {
       // Fixed price increase of 1e15; so total cost for N upgrades is:
       // cost + cost * 1e15 + cost * 1e30 + ... + cost * 1e15^(N-1) == cost * (1e15^N - 1) / (1e15 - 1)
       // N = log(IP * (1e15 - 1) / cost + 1) / log(1e15)
+      let per = SlabdrillUnlocks.replicanti.isUnlocked ? 1000 : 100;
+      let invPer = SlabdrillUnlocks.replicanti.isUnlocked ? 0.001 : 0.01;
       let N = Currency.infinityPoints.value.times(this.costIncrease - 1)
         .dividedBy(this.cost).plus(1).log(this.costIncrease);
-      N = Decimal.round((Decimal.min(Decimal.floor(N).times(0.01).add(this.value.min(this.costThreshold / 100)), this.costThreshold / 100).sub(this.value.min(this.costThreshold / 100))).times(100));
+      N = Decimal.round((Decimal.min(Decimal.floor(N).times(invPer).add(this.value.min(this.costThreshold / per)), this.costThreshold / per).sub(this.value.min(this.costThreshold / per))).times(per));
       let totalCost = DC.E150.times(Decimal.pow(this.costIncrease, this.rawValue.min(this.costThreshold).sub(1))).times(Decimal.pow(this.costIncrease, N).minus(1).dividedBy(this.costIncrease - 1).max(1));
       const threshold = DC.E150.times(Decimal.pow(this.costIncrease, this.costThreshold - 2)).dividedByEffectOf(PelleRifts.vacuum.milestones[1]);
       const aboveThreshold = this.cost.gt(threshold) && Alpha.isDestroyed;
       const affordableAboveThreshold = Decimal.floor(Currency.infinityPoints.value.div(threshold).max(1e15).log(this.costIncrease).log(this.costExponent).add(1));
       if (aboveThreshold) {
-        N = N.add(affordableAboveThreshold.add(1).sub(this.value.times(100).sub(this.costThreshold - 1)));
+        N = N.add(affordableAboveThreshold.add(1).sub(this.value.times(per).sub(this.costThreshold - 1)));
         totalCost = threshold.times(Decimal.pow(this.costIncrease, Decimal.pow(this.costExponent, affordableAboveThreshold)));
       }
       if (N.lte(0)) return;
@@ -466,7 +480,8 @@ export const ReplicantiUpgrade = {
         costGain = costGain.times(Decimal.pow(this.costIncrease, Decimal.pow(this.costExponent, affordableAboveThreshold)));
       }
       this.baseCost = costGain;
-      this.value = this.decimalNearestPercent(N.times(0.01).add(this.value)).min(this.cap);;
+      this.value = SlabdrillUnlocks.replicanti.isUnlocked ? this.decimalNearestTenthPercent(N.times(invPer).add(this.value)).min(this.cap) :
+        this.decimalNearestPercent(N.times(invPer).add(this.value)).min(this.cap);
     }
 
     // Rounding errors suck
@@ -475,6 +490,9 @@ export const ReplicantiUpgrade = {
     }
     decimalNearestPercent(x) {
       return Decimal.round(x.times(100)).div(100);
+    }
+    decimalNearestTenthPercent(x) {
+      return Decimal.round(x.times(1000)).div(1000);
     }
   }(),
   interval: new class ReplicantiIntervalUpgrade extends ReplicantiUpgradeState {
@@ -744,11 +762,12 @@ export const Replicanti = {
   },
   reset(force = false) {
     const unlocked = force && !(LHC.voidRunning && NullUpgrade.repUnl.isBought) ? false : EternityMilestone.unlockReplicanti.isReached;
+    const chanceStart = SlabdrillUnlocks.replicanti.isUnlocked ? DC.D1.div(1000) : DC.D1.div(100);
     player.replicanti = {
       unl: unlocked,
       amount: unlocked ? DC.D1 : DC.D0,
       timer: 0,
-      chance: DC.D1.div(100),
+      chance: chanceStart,
       chanceCost: DC.E150,
       interval: DC.E3,
       intervalCost: DC.E140,
@@ -770,6 +789,13 @@ export const Replicanti = {
     if (Alpha.isRunning && Alpha.currentStage === 9) {
       Alpha.advanceLayer();
       Alpha.quotes.replicanti.show();
+    }
+    if (Slabdrill.isCursed && Slabdrill.currentStage === 5) {
+      player.endgame.ethereal.power = DC.D0;
+      player.endgame.ethereal.sector = 1;
+      Slabdrill.advanceLayer();
+      player.replicanti.chance = DC.D1.div(1000);
+      Slabdrill.quotes.replicanti.show();
     }
   },
   get amount() {

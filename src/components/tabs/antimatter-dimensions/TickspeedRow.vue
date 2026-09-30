@@ -17,6 +17,8 @@ export default {
       hasTutorial: false,
       hasRealityButton: false,
       isEC9: false,
+      isTransient: false,
+      isFlipped: false
     };
   },
   computed: {
@@ -27,7 +29,7 @@ export default {
       };
     },
     multiplierDisplay() {
-      if (InfinityChallenge(3).isRunning) return `Multiply all Antimatter Dimensions by
+      if (InfinityChallenge(3).isRunning) return `Multiply all ${this.isFlipped ? "Matter" : "Antimatter"} Dimensions by
         ${formatX(this.galaxyCount.times(0.005).add(1.05), 3, 3)}`;
       const tickmult = this.mult;
       return `${formatX(tickmult.reciprocal(), 2, 3)} faster / upgrade.`;
@@ -51,7 +53,8 @@ export default {
       this.purchasedTickspeed.copyFrom(player.totalTickBought);
       this.freeTickspeed.copyFrom(FreeTickspeed.amount);
       this.isEC9 = EternityChallenge(9).isRunning;
-      this.isVisible = Tickspeed.isUnlocked || this.isEC9;
+      this.isTransient = player.universes.current === 1;
+      this.isVisible = Tickspeed.isUnlocked || this.isEC9 || this.isTransient;
       if (!this.isVisible) return;
       this.mult.copyFrom(Tickspeed.multiplier);
       this.cost.copyFrom(Tickspeed.cost);
@@ -62,6 +65,7 @@ export default {
       this.isContinuumActive = Laitela.continuumActive;
       if (this.isContinuumActive) this.continuumValue.copyFrom(Tickspeed.continuumValue);
       this.hasTutorial = Tutorial.isActive(TUTORIAL_STATE.TICKSPEED);
+      this.isFlipped = player.universes.current === 2;
     },
     buttonClass() {
       return {
@@ -89,6 +93,9 @@ export default {
         </span>
         <span v-else-if="isEC9">
           Tickspeed Unpurchasable (EC 9)
+        </span>
+        <span v-else-if="isTransient">
+          Tickspeed Does Not Exist (Transient Universe)
         </span>
         <span v-else>
           Tickspeed Cost: {{ format(cost) }}

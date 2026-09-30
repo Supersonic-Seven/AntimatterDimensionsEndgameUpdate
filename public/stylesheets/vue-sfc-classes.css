@@ -53,6 +53,66 @@
   text-decoration: underline;
 }
 
+.c-news-ticker--forsaken {
+  display: inline-block;
+  color: black;
+  -webkit-text-stroke: 0.05rem white;
+  text-shadow:
+    -0.1rem -0.1rem 0 white,
+    0.1rem -0.1rem 0 white,
+    -0.1rem 0.1rem 0 white,
+    0.1rem 0.1rem 0 white;
+  animation: a-news-ticker--forsaken-shake 0.12s steps(2, jump-none) infinite;
+}
+
+@keyframes a-news-ticker--forsaken-shake {
+  0% { transform: translateY(-0.12rem); }
+  50% { transform: translateY(0.12rem); }
+  100% { transform: translateY(-0.12rem); }
+}
+
+.c-news-ticker--rainbow {
+  color: transparent;
+  background: linear-gradient(90deg, red, orange, yellow, lime, cyan, blue, violet, red);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: a-news-ticker--rainbow 1s linear infinite;
+}
+
+@keyframes a-news-ticker--rainbow {
+  from { background-position: 0 0; }
+  to { background-position: 200% 0; }
+}
+
+.teal-pink-wave {
+  background: linear-gradient(90deg, #12cfd0, #ff4fa3, #12cfd0);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  animation: tealPinkWave 1s linear infinite;
+}
+
+@keyframes tealPinkWave {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.supersonic-7-seven-text {
+  background: linear-gradient(90deg, #800000, #400000, #800000);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  text-decoration-color: rgb(128, 0, 0);
+}
+
 .new-ui .c-news-ticker {
   width: 100%;
   height: 3.9rem;

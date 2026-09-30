@@ -7,6 +7,7 @@ export default {
       showPelleGlow: false,
       gainedCP: 0,
       gainedDP: 0,
+      isFlipped: false
     };
   },
   computed: {
@@ -35,6 +36,7 @@ export default {
       }
       this.gainedCP = gainedCelestialPoints();
       this.gainedDP = gainedDoomedParticles();
+      this.isFlipped = player.universes.current === 2;
     },
     handleClick() {
       if (this.canEndgame) {
@@ -61,7 +63,9 @@ export default {
           <div>{{ formatDPGain }}</div>
         </template>
         <template v-else>
-          <div>Reach {{ format("1e9000000000000000") }} Antimatter to unlock the ability to Enter the Endgame</div>
+          <div>
+            Reach {{ format("e9e15", 2, 2) }} {{ isFlipped ? "Matter" : "Antimatter" }} to unlock the ability to Enter the Endgame
+          </div>
         </template>
         <div
           v-if="canEndgame"

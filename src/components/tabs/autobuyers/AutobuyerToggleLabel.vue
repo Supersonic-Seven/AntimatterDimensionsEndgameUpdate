@@ -5,8 +5,9 @@ export default {
     isActive: Boolean,
     isDisabled: Boolean,
     name: {
-      type: String,
-      required: true
+      type: [Function, String],
+      required: true,
+      default: ""
     },
   },
   computed: {

@@ -91,6 +91,15 @@ export class EndgameMasteryTreeLayout {
         normalRow(                   EndgameMastery.timeCompression                   )
       );
     }
+
+    if (EndgameMastery.timeCompression.isBought) {
+      this.rows.push(
+        normalRow(                     EM(281), EM(282), EM(283)                      ),
+        normalRow(                     EM(291), EM(292), EM(293)                      ),
+        normalRow(                     EM(301), EM(302), EM(303)                      ),
+        normalRow(                  EndgameMastery.celestialReality                   )
+      );
+    }
     /* eslint-enable no-multi-spaces, space-in-parens, func-call-spacing */
 
     /**

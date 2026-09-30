@@ -29,6 +29,7 @@ export default {
       extraTesseracts: 0,
       creditsClosed: false,
       showLockedDimCostNote: true,
+      isFlipped: false
     };
   },
   computed: {
@@ -64,6 +65,7 @@ export default {
       this.boughtTesseracts = Tesseracts.bought;
       this.extraTesseracts = Tesseracts.extra;
       this.creditsClosed = GameEnd.creditsEverClosed;
+      this.isFlipped = player.universes.current === 2;
     },
     maxAll() {
       InfinityDimensions.buyMax();
@@ -112,7 +114,7 @@ export default {
         to a
         <span class="c-infinity-dim-description__accent">{{ formatX(dimMultiplier, 2, 1) }}</span>
         multiplier on all
-        <span v-if="!isEC9Running">Antimatter Dimensions.</span>
+        <span v-if="!isEC9Running">{{ isFlipped ? "Matter" : "Antimatter" }} Dimensions.</span>
         <span v-else>Time Dimensions due to Eternity Challenge 9.</span>
       </p>
     </div>

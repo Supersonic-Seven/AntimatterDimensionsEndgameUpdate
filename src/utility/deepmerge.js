@@ -1,6 +1,60 @@
 // Deepmerge library modified for Antimatter Dimensions usage (mainly Decimal integration)
 // Source: https://github.com/TehShrike/deepmerge
 
+export function matchOnlyDeepmerge(firstObject, secondObject, ignoreKey = "") {
+  if (!firstObject || !secondObject || typeof firstObject !== 'object' || typeof secondObject !== 'object') {
+    return secondObject !== undefined ? secondObject : firstObject;
+  }
+  if (Array.isArray(secondObject) && Array.isArray(firstObject)) {
+    return secondObject.map((item, index) => {
+      if (index in firstObject) {
+        return matchOnlyDeepmerge(firstObject[index], item, ignoreKey);
+      }
+      return simpleClone(item);
+    });
+  }
+  return Object.keys(secondObject).reduce((acc, key) => {
+    if (key === ignoreKey) {
+      if (key in firstObject) {
+        acc[key] = simpleClone(firstObject[key]);
+      }
+      return acc;
+    }
+    if (key in firstObject) {
+      if (secondObject[key] instanceof Decimal) {
+        acc[key] = new Decimal(firstObject[key]);
+      } else if (secondObject[key] instanceof Set) {
+        acc[key] = new Set(firstObject[key]);
+      } else {
+        acc[key] = (typeof secondObject[key] === 'object' && typeof firstObject[key] === 'object' &&
+          !(secondObject[key] instanceof Array))
+          ? matchOnlyDeepmerge(firstObject[key], secondObject[key], ignoreKey)
+          : simpleClone(firstObject[key]);
+      }
+    } else {
+      acc[key] = simpleClone(secondObject[key]);
+    }
+    return acc;
+  }, {});
+}
+
+function simpleClone(value) {
+  if (!value || typeof value !== 'object') return value;
+  if (value instanceof Decimal) {
+    return new Decimal(value);
+  }
+  if (value instanceof Set) {
+    return new Set(value);
+  }
+  if (Array.isArray(value)) {
+    return value.map(item => simpleClone(item));
+  }
+  return Object.keys(value).reduce((acc, key) => {
+    acc[key] = simpleClone(value[key]);
+    return acc;
+  }, {});
+}
+
 function emptyTarget(val) {
   return Array.isArray(val) ? [] : {};
 }

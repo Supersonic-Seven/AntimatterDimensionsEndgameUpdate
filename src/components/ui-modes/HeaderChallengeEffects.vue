@@ -18,6 +18,9 @@ export default {
       isInAlpha: false,
       alphaDecayTimer: new Decimal(0),
       alphaDecayTimeToMax: "",
+      isCompressed: false,
+      compressionNerf: new Decimal(0),
+      isFlipped: false
     };
   },
   computed: {
@@ -29,6 +32,10 @@ export default {
       if (this.alphaDecayTimer.lte(0)) return `Alpha Decay is capped`;
       return `Alpha Decay will cap in ${this.alphaDecayTimeToMax}`;
     },
+    compressionText() {
+      return `Time Compression is currently raising the exponents of the multipliers of
+        the first three Dimension types and Tickspeed by ${formatPow(this.compressionNerf, 2, 4)}`;
+    }
   },
   methods: {
     update() {
@@ -64,22 +71,31 @@ export default {
         this.alphaDecayTimer = TimeSpan.fromHours(Decimal.max(Alpha.hoursToMax, 0)).totalMilliseconds;
         this.alphaDecayTimeToMax = TimeSpan.fromHours(Decimal.max(Alpha.hoursToMax, 0)).toStringShort();
       }
+      this.isCompressed = player.compression.active;
+      if (this.isCompressed) {
+        this.compressionNerf.copyFrom(Decimal.pow(
+          player.antimatter.max(10).log10().log10().div(500).min(0.01), Decimal.pow(
+            CompressionUpgrade.compressionPenalty.isBought ? 0.98 : 0.99, Time.thisEndgameRealTime.totalHours.cbrt())));
+      }
+      this.isFlipped = player.universes.current === 2;
     },
     updateChallengePower() {
       const isC2Running = NormalChallenge(2).isRunning;
       const isC3Running = NormalChallenge(3).isRunning;
       const isIC6Running = InfinityChallenge(6).isRunning;
       const isIC8Running = InfinityChallenge(8).isRunning;
-      const isChallengePowerVisible = isC2Running || isC3Running || isIC6Running || isIC8Running;
+      const isC12SlabdrillRunning = NormalChallenge(12).isRunning && Slabdrill.isCursed;
+      const isChallengePowerVisible = isC2Running || isC3Running || isIC6Running || isIC8Running || isC12SlabdrillRunning;
       this.isChallengePowerVisible = isChallengePowerVisible;
       if (isChallengePowerVisible) {
         const powerArray = [];
         if (isC2Running) powerArray.push(`Production: ${formatPercents(player.chall2Pow, 2, 2)}`);
         if (isC3Running) powerArray.push(`First dimension: ${formatX(player.chall3Pow, 3, 4)}`);
-        if (isIC6Running) powerArray.push(`Matter: Antimatter Dimensions /
-          ${format(new Decimal(1).timesEffectOf(InfinityChallenge(6)), 2, 2)}`);
+        if (isIC6Running) powerArray.push(`${this.isFlipped ? "Antimatter" : "Matter"}: ${this.isFlipped ? "Matter" : "Antimatter"}
+          Dimensions / ${format(new Decimal(1).timesEffectOf(InfinityChallenge(6)), 2, 2)}`);
         if (isIC8Running) powerArray.push(`Production: /
           ${format(new Decimal(1).timesEffectOf(InfinityChallenge(8)).reciprocal(), 2, 2)}`);
+        if (isC12SlabdrillRunning) powerArray.push(`Production: ${formatPow(0.5 + player.chall2Pow / 2, 2, 3)}`);
         this.challengePower = powerArray.join(", ");
       }
     },
@@ -89,6 +105,9 @@ export default {
 
 <template>
   <div>
+    <div v-if="isCompressed">
+      {{ compressionText }}
+    </div>
     <div v-if="isInAlpha">
       {{ alphaText }}
     </div>
@@ -104,7 +123,7 @@ export default {
       Entropy: {{ laitelaEntropy }} ({{ laitelaTimer }})
     </div>
     <div v-if="isInMatterChallenge">
-      There is {{ format(matter, 2, 1) }} matter.
+      There is {{ format(matter, 2, 1) }} {{ isFlipped ? "antimatter" : "matter" }}.
     </div>
     <div v-if="isChallengePowerVisible">
       {{ challengePower }}

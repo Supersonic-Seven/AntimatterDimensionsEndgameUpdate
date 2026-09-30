@@ -1,17 +1,26 @@
 import { EndgameMasteriesState } from "./endgame-masteries";
 
-export const EndgameMasteries = {};
-
-EndgameMasteries.pathList = [
-  { path: ENDGAME_MASTERY_PATH.ANTIMATTER_DIM_COMPRESSION, masteries: [81, 91, 101], name: "AD Compression" },
-  { path: ENDGAME_MASTERY_PATH.INFINITY_DIM_COMPRESSION, masteries: [82, 92, 102], name: "ID Compression" },
-  { path: ENDGAME_MASTERY_PATH.TIME_DIM_COMPRESSION, masteries: [83, 93, 103], name: "TD Compression" },
-  { path: ENDGAME_MASTERY_PATH.CELESTIAL_DIM_COMPRESSION, masteries: [84, 94, 104], name: "CD Compression" },
-  { path: ENDGAME_MASTERY_PATH.INFINITY_POINTS, masteries: [141, 151], name: "IP" },
-  { path: ENDGAME_MASTERY_PATH.ETERNITY_POINTS, masteries: [142, 152], name: "EP" },
-  { path: ENDGAME_MASTERY_PATH.REALITY_MACHINES, masteries: [143, 153], name: "RM" },
-  { path: ENDGAME_MASTERY_PATH.IMAGINARY_MACHINES, masteries: [144, 154], name: "iM" },
-];
+export const EndgameMasteries = {
+  get pathList() {
+    let pathArr = [];
+    if (player.universes.current === 2) {
+      pathArr.push({ path: ENDGAME_MASTERY_PATH.ANTIMATTER_DIM_COMPRESSION, masteries: [81, 91, 101], name: "MD Compression" });
+    } else {
+      pathArr.push({ path: ENDGAME_MASTERY_PATH.ANTIMATTER_DIM_COMPRESSION, masteries: [81, 91, 101], name: "AD Compression" });
+    }
+    pathArr.push({ path: ENDGAME_MASTERY_PATH.INFINITY_DIM_COMPRESSION, masteries: [82, 92, 102], name: "ID Compression" });
+    pathArr.push({ path: ENDGAME_MASTERY_PATH.TIME_DIM_COMPRESSION, masteries: [83, 93, 103], name: "TD Compression" });
+    pathArr.push({ path: ENDGAME_MASTERY_PATH.CELESTIAL_DIM_COMPRESSION, masteries: [84, 94, 104], name: "CD Compression" });
+    pathArr.push({ path: ENDGAME_MASTERY_PATH.INFINITY_POINTS, masteries: [141, 151], name: "IP" });
+    pathArr.push({ path: ENDGAME_MASTERY_PATH.ETERNITY_POINTS, masteries: [142, 152], name: "EP" });
+    pathArr.push({ path: ENDGAME_MASTERY_PATH.REALITY_MACHINES, masteries: [143, 153], name: "RM" });
+    pathArr.push({ path: ENDGAME_MASTERY_PATH.IMAGINARY_MACHINES, masteries: [144, 154], name: "iM" });
+    pathArr.push({ path: ENDGAME_MASTERY_PATH.ENDGAME_ENTANGLEMENT, masteries: [281, 291, 301], name: "Endgame Entanglement" });
+    pathArr.push({ path: ENDGAME_MASTERY_PATH.CELESTIAL_ENTANGLEMENT, masteries: [282, 292, 302], name: "Celestial Entanglement" });
+    pathArr.push({ path: ENDGAME_MASTERY_PATH.DIVINE_ENTANGLEMENT, masteries: [283, 293, 303], name: "Divine Entanglement" });
+    return pathArr;
+  }
+};
 
 EndgameMasteries.paths = EndgameMasteries.pathList.mapToObject(e => e.path, e => e.masteries);
 
@@ -48,7 +57,11 @@ export class EndgameMasteryState extends EndgameMasteriesState {
         return this.config.requirement.every(r => check(r)) && currTree &&
           currTree.currCurrPathCount < currTree.allowedCurrPathCount;
       case EM_REQUIREMENT_TYPE.EXPANDED:
-        return EndgameMastery.permaMasteries.isBought;
+        return EndgameMastery.permaMasteries.isBought && this.config.requirement.every(r => check(r));
+      case EM_REQUIREMENT_TYPE.ENTANGLEMENT:
+        return EndgameMastery.timeCompression.isBought &&
+          this.config.requirement.every(r => check(r)) && currTree &&
+          currTree.currEntanglePathCount < currTree.allowedEntanglePathCount;
       default:
         throw Error(`Unrecognized EM requirement type: ${this.reqType}`);
     }
@@ -69,8 +82,12 @@ export class EndgameMasteryState extends EndgameMasteriesState {
   purchase() {
     if (this.isBought || !this.isAffordable || !this.canBeBought) return false;
     if (GameEnd.creditsEverClosed) return false;
+    if (this.id >= 280) Currency.endgameSkills.subtract(this.cost);
     player.endgameMasteries.masteries.push(this.id);
-    if (!EndgameMastery.permaMasteries.isBought || this.id >= 180) Currency.endgameSkills.subtract(this.cost);
+    if (this.id >= 280) {
+      player.endgameMasteries.maxSkills = player.endgameMasteries.skills.plus(EndgameSkills.calculateEndgameMasteriesCost());
+    }
+    if ((!EndgameMastery.permaMasteries.isBought || this.id >= 180) && this.id < 280) Currency.endgameSkills.subtract(this.cost);
     GameCache.endgameMasteries.invalidate();
     EndgameMasteryTree.commitToGameState([EndgameMastery(this.id)]);
     this.onPurchased();
@@ -169,5 +186,25 @@ EndgameMastery.preferredPaths = {
     get usePriority() {
       return this.path.length > 1;
     }
+  },
+  entanglement: {
+    get path() {
+      return player.endgameMasteries.preferredPaths[2];
+    },
+    set path(value) {
+      const options = [9, 10, 11];
+      player.endgameMasteries.preferredPaths[2] = value.filter(id => options.includes(id));
+    },
+    get masteries() {
+      return player.endgameMasteries.preferredPaths[2].flatMap(path => EndgameMasteries.paths[path]);
+    },
+    get usePriority() {
+      return this.path.length > 1;
+    }
   }
 };
+
+export const masteryIncrease = {
+  entanglement: () => Math.pow(2, EndgameMastery.boughtEM().countWhere(e => e.id > 280 && e.id < 310)),
+  entanglementCost: () => Math.pow(2, EndgameMastery.boughtEM().countWhere(e => e.id > 280 && e.id < 310)) * 1e6 - 1e6
+}

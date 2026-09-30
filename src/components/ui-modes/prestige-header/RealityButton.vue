@@ -7,6 +7,11 @@ export default {
       showSpecialEffect: false,
       beatingAlpha: false,
       readyToWarp: false,
+      isWarping: false,
+      cursed: false,
+      trapped: false,
+      overridden: false,
+      destroyed: false,
       hasRealityStudy: false,
       machinesGained: new Decimal(),
       projectedRM: new Decimal(),
@@ -61,15 +66,17 @@ export default {
       return quantify("Relic Shard", this.shardsGained, 2);
     },
     warpMessage() {
-      return false ? "Curse Your Reality" : "Enter Pelle's Domain";
+      return this.isWarping ? "Curse Your Reality" : "Enter Pelle's Domain";
     },
     classObject() {
       return {
-        "c-reality-button--unlocked": this.canReality || this.readyToWarp,
-        "c-reality-button--locked": !this.canReality && !this.readyToWarp,
+        "c-reality-button--unlocked": this.canReality || (this.readyToWarp && !this.destroyed),
+        "c-reality-button--locked": !this.canReality && (!this.readyToWarp || this.destroyed),
         "c-reality-button--special": this.showSpecialEffect,
         "c-reality-button--alpha": this.beatingAlpha,
-        "c-reality-button--warp": this.readyToWarp
+        "c-reality-button--warp": this.readyToWarp && !this.cursed && !this.destroyed,
+        "c-reality-button--cursed": this.cursed && (!this.canReality || this.trapped) && !this.overridden,
+        "c-reality-button--escape": this.cursed && this.canReality && (!this.trapped || this.overridden)
       };
     }
   },
@@ -86,6 +93,11 @@ export default {
       this.showSpecialEffect = this.hasSpecialReward();
       this.beatingAlpha = Alpha.isRunning && Currency.eternityPoints.value.add(1).log10().gt(4000);
       this.readyToWarp = CelestialEternityPlusUpgrade.oldStoneSlabAndSteelDrill.isBought;
+      this.isWarping = player.celestials.slabdrill.isWarping;
+      this.cursed = Slabdrill.isCursed;
+      this.trapped = player.celestials.slabdrill.goodbyeTick >= 3000;
+      this.overridden = player.records.totalRealityAntimatter.gte(DC.ENUMMAX);
+      this.destroyed = Slabdrill.isDestroyed;
       if (!this.canReality) {
         this.sGained = new Decimal(0);
         return;
@@ -129,11 +141,16 @@ export default {
         [Teresa.isRunning, teresaReward, teresaThreshold]];
     },
     handleClick() {
-      if (this.readyToWarp) {
-        Modal.message.show(`This feature will be available in v2.0. Thank you for playing Antimatter Dimensions: Endgame!`, {}, 3);
-        //requestRealityWarp();
+      if (this.cursed && this.canReality && this.overridden) {
+        Modal.trueEscape.show();
       }
-      else if (this.canReality) {
+      else if (this.cursed && this.canReality && !this.trapped) {
+        Modal.exitCurse.show();
+      }
+      else if (this.readyToWarp && !this.isWarping && !this.cursed && !this.destroyed) {
+        requestRealityWarp();
+      }
+      else if (this.canReality && (!this.trapped || this.destroyed)) {
         requestManualReality();
       }
     },
@@ -164,7 +181,16 @@ export default {
       @click="handleClick"
     >
       <div class="l-reality-button__contents">
-        <template v-if="readyToWarp">
+        <template v-if="cursed && canReality && overridden">
+          <div>ESCAPE</div>
+        </template>
+        <template v-else-if="cursed && (!canReality || trapped) && !overridden">
+          <div>You cannot escape a Cursed Reality</div>
+        </template>
+        <template v-else-if="cursed && canReality && !trapped">
+          <div>Escape the Cursed Reality...</div>
+        </template>
+        <template v-else-if="readyToWarp && !cursed && !destroyed">
           <div>{{ warpMessage }}</div>
         </template>
         <template v-else-if="canReality">
@@ -181,7 +207,7 @@ export default {
           <div>Purchase the study in the Eternity tab to unlock a new Reality</div>
         </template>
         <div
-          v-if="canReality && !readyToWarp"
+          v-if="canReality && (!readyToWarp || destroyed)"
           class="infotooltiptext"
         >
           <div>Other resources gained:</div>

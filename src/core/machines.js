@@ -10,11 +10,12 @@ export const MachineHandler = {
     const largeBoost = DC.D1.timesEffectsOf(SingularityMilestone.rmCap, Ra.unlocks.realityMachineCap).times(DivineDimensions.conversionFormula2).timesEffectOf(ResurgenceUpgrade.machineSurge);
     return Decimal.pow(this.baseRMCap.times(effectMultipliers).times(
       Decimal.pow(ImaginaryUpgrade(6).effectOrDefault(1), smallBoost)), largeBoost).times(
-      ResurgenceUpgrade.rmSurge.isBought && !player.disablePostReality ? player.realities : 1);
+      ResurgenceUpgrade.rmSurge.isBought && !player.disablePostReality ? player.realities : 1).powEffectOf(CompressionUpgrade.entanglementSplit);
   },
 
   get hardcapRM() {
-    return Alpha.isDestroyed ? this.baseHardcapRM.pow(this.uncappedRM.div(this.baseHardcapRM).add(1).log10().add(1).log10().add(1).log10().add(1)).times(Teresa.rmMultiplier) : this.baseHardcapRM;
+    const rmHardcap = this.baseHardcapRM;
+    return Alpha.isDestroyed ? rmHardcap.pow(this.uncappedRM.div(rmHardcap).add(1).log10().add(1).log10().add(1).log10().add(1)).times(Teresa.rmMultiplier) : rmHardcap;
   },
 
   get distanceToRMCap() {
@@ -42,6 +43,7 @@ export const MachineHandler = {
     }
     rmGain = rmGain.pow(DivineDimensions.conversionFormula2);
     rmGain = rmGain.times(ResurgenceUpgrade.rmSurge.isBought && !player.disablePostReality ? player.realities : 1);
+    rmGain = rmGain.powEffectOf(CompressionUpgrade.entanglementSplit);
     return rmGain.floor();
   },
 
@@ -54,15 +56,16 @@ export const MachineHandler = {
   },
 
   get baseIMCap() {
+    const uncappedRM = this.uncappedRM;
     if (Pelle.isDoomed) return new Decimal(1.6e15);
-    return Decimal.min((Decimal.pow(Decimal.clampMin(new Decimal(this.uncappedRM.add(1).log10()).sub(1000), 0), 2).times(
-      Decimal.pow(Decimal.clampMin(new Decimal(this.uncappedRM.add(1).log10()).sub(100000), 1), 0.2)).times(
-      Decimal.pow(Decimal.clampMin(new Decimal(this.uncappedRM.add(1).log10()).div(1000000000), 1),
-      new Decimal(Decimal.log10(this.uncappedRM.add(1).log10())).div(7.5)))).pow(
+    return Decimal.min((Decimal.pow(Decimal.clampMin(new Decimal(uncappedRM.add(1).log10()).sub(1000), 0), 2).times(
+      Decimal.pow(Decimal.clampMin(new Decimal(uncappedRM.add(1).log10()).sub(100000), 1), 0.2)).times(
+      Decimal.pow(Decimal.clampMin(new Decimal(uncappedRM.add(1).log10()).div(1000000000), 1),
+      new Decimal(Decimal.log10(uncappedRM.add(1).log10())).div(7.5)))).pow(
       new Decimal(Effects.product(EndgameMastery(144), Ra.unlocks.imaginaryMachines, Ra.unlocks.imaginaryMachineEternityPower)).times(
-      Decimal.max(Decimal.log10(this.uncappedRM.add(1).log10()).sub(45), 0).div(10).add(1)).times(
+      Decimal.max(Decimal.log10(uncappedRM.add(1).log10()).sub(45), 0).div(10).add(1)).times(
       EtherealStars.green.reward).times(DivineDimensions.conversionFormula2).timesEffectsOf(
-      ResurgenceUpgrade.imSurge, ResurgenceUpgrade.machineSurge)), this.hardcapIM);
+      ResurgenceUpgrade.imSurge, ResurgenceUpgrade.machineSurge, CompressionUpgrade.entanglementSplit)), this.hardcapIM);
   },
 
   get baseIMHardcap() {
@@ -72,24 +75,26 @@ export const MachineHandler = {
   get baseHardcapIM() {
     return this.baseIMHardcap.times(DualityUpgrade(6).effectOrDefault(1)).pow(EtherealStars.green.reward.times(
       DivineDimensions.conversionFormula2).timesEffectsOf(
-      ResurgenceUpgrade.imSurge, ResurgenceUpgrade.machineSurge));
+      ResurgenceUpgrade.imSurge, ResurgenceUpgrade.machineSurge, CompressionUpgrade.entanglementSplit));
   },
 
   get hardcapIM() {
-    return Alpha.isDestroyed ? this.baseHardcapIM.pow(this.uncappedIM.div(this.baseHardcapIM).add(1).log10().add(1).log10().add(1).log10().add(1)) : this.baseHardcapIM;
+    const imHardcap = this.baseHardcapIM;
+    return Alpha.isDestroyed ? imHardcap.pow(this.uncappedIM.div(imHardcap).add(1).log10().add(1).log10().add(1).log10().add(1)) : imHardcap;
   },
 
   get uncappedIM() {
+    const uncappedRM = this.uncappedRM;
     return Pelle.isDoomed
       ? new Decimal(1.6e15)
-      : (Decimal.pow(Decimal.clampMin(new Decimal(this.uncappedRM.add(1).log10()).sub(1000), 0), 2).times(
-        Decimal.pow(Decimal.clampMin(new Decimal(this.uncappedRM.add(1).log10()).sub(100000), 1), 0.2)).times(
-        Decimal.pow(Decimal.clampMin(new Decimal(this.uncappedRM.add(1).log10()).div(1000000000), 1),
-        new Decimal(Decimal.log10(this.uncappedRM.add(1).log10())).div(7.5)))).pow(
+      : (Decimal.pow(Decimal.clampMin(new Decimal(uncappedRM.add(1).log10()).sub(1000), 0), 2).times(
+        Decimal.pow(Decimal.clampMin(new Decimal(uncappedRM.add(1).log10()).sub(100000), 1), 0.2)).times(
+        Decimal.pow(Decimal.clampMin(new Decimal(uncappedRM.add(1).log10()).div(1000000000), 1),
+        new Decimal(Decimal.log10(uncappedRM.add(1).log10())).div(7.5)))).pow(
         new Decimal(Effects.product(EndgameMastery(144), Ra.unlocks.imaginaryMachines, Ra.unlocks.imaginaryMachineEternityPower)).times(
-        Decimal.max(Decimal.log10(this.uncappedRM.add(1).log10()).sub(45), 0).div(10).add(1)).times(
+        Decimal.max(Decimal.log10(uncappedRM.add(1).log10()).sub(45), 0).div(10).add(1)).times(
         EtherealStars.green.reward).times(DivineDimensions.conversionFormula2).timesEffectsOf(
-        ResurgenceUpgrade.imSurge, ResurgenceUpgrade.machineSurge));
+        ResurgenceUpgrade.imSurge, ResurgenceUpgrade.machineSurge, CompressionUpgrade.entanglementSplit));
   },
 
   get currentIMCap() {
@@ -137,26 +142,54 @@ export const MachineHandler = {
   },
 
   get baseDMCap() {
+    const uncappedRM = this.uncappedRM;
+    return Decimal.min(Decimal.pow(Decimal.clampMin(this.uncappedIM.add(1).log10().sub(1000), 0), Decimal.clampMin(
+      Decimal.log10(Currency.realityMachines.value.add(1).log10().add(1)).sub(3).min(2).times(
+      Decimal.log10(Currency.realityMachines.value.add(1).log10().add(1)).div(5).max(1).pow(0.5)), 1).times(
+      Decimal.clampMin(Decimal.log10(Decimal.log10(Decimal.log10(uncappedRM.add(1)).add(1)).add(1)).sub(
+      1.75).times(12).min(0.6).add(1), 1).add(Decimal.clampMin(Decimal.log10(Decimal.log10(Decimal.log10(
+      uncappedRM.add(1)).add(1)).add(1)).sub(1.8).times(4).min(0.6), 0)).add(Decimal.clampMin(
+      Decimal.log10(Decimal.log10(Decimal.log10(uncappedRM.add(1)).add(1)).add(1)).sub(1.95).times(2), 0))).times(
+      DivinityMilestone.firstDivine.isReached && !player.disablePostReality ? 1.1 : 1).times(
+      DivineDimensions.conversionFormula2).timesEffectsOf(
+      ResurgenceUpgrade.machineSurge, EndgameMastery(213), CompressionUpgrade.entanglementSplit)).timesEffectOf(
+      EndgameMastery(223)), this.hardcapDM);
+  },
+
+  get baseDMHardcap() {
+    return DC.E1000;
+  },
+
+  get baseHardcapDM() {
+    return this.baseDMHardcap;
+  },
+
+  get hardcapDM() {
+    return this.baseHardcapDM;
+  },
+
+  get uncappedDM() {
+    const uncappedRM = this.uncappedRM;
     return Decimal.pow(Decimal.clampMin(this.uncappedIM.add(1).log10().sub(1000), 0), Decimal.clampMin(
       Decimal.log10(Currency.realityMachines.value.add(1).log10().add(1)).sub(3).min(2).times(
       Decimal.log10(Currency.realityMachines.value.add(1).log10().add(1)).div(5).max(1).pow(0.5)), 1).times(
-      Decimal.clampMin(Decimal.log10(Decimal.log10(Decimal.log10(this.uncappedRM.add(1)).add(1)).add(1)).sub(
+      Decimal.clampMin(Decimal.log10(Decimal.log10(Decimal.log10(uncappedRM.add(1)).add(1)).add(1)).sub(
       1.75).times(12).min(0.6).add(1), 1).add(Decimal.clampMin(Decimal.log10(Decimal.log10(Decimal.log10(
-      this.uncappedRM.add(1)).add(1)).add(1)).sub(1.8).times(4).min(0.6), 0)).add(Decimal.clampMin(
-      Decimal.log10(Decimal.log10(Decimal.log10(this.uncappedRM.add(1)).add(1)).add(1)).sub(1.95).times(2), 0))).times(
+      uncappedRM.add(1)).add(1)).add(1)).sub(1.8).times(4).min(0.6), 0)).add(Decimal.clampMin(
+      Decimal.log10(Decimal.log10(Decimal.log10(uncappedRM.add(1)).add(1)).add(1)).sub(1.95).times(2), 0))).times(
       DivinityMilestone.firstDivine.isReached && !player.disablePostReality ? 1.1 : 1).times(
       DivineDimensions.conversionFormula2).timesEffectsOf(
-      ResurgenceUpgrade.machineSurge, EndgameMastery(213))).timesEffectOf(
+      ResurgenceUpgrade.machineSurge, EndgameMastery(213), CompressionUpgrade.entanglementSplit)).timesEffectOf(
       EndgameMastery(223));
   },
 
   get currentDMCap() {
-    return player.reality.jMCap.times(DualityUpgrade(13).effectOrDefault(1));
+    return Decimal.min(player.reality.jMCap.times(DualityUpgrade(13).effectOrDefault(1)), this.hardcapDM);
   },
 
   // This is jM cap based on in-game values at that instant, may be lower than the actual cap
   get projectedDMCap() {
-    return this.baseDMCap.times(DualityUpgrade(13).effectOrDefault(1));
+    return Decimal.min(this.baseDMCap.times(DualityUpgrade(13).effectOrDefault(1)), this.hardcapDM);
   },
 
   // Use DMCap to store the base cap; applying multipliers separately avoids some design issues the 3xTP upgrade has

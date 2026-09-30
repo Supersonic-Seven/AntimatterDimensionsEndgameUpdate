@@ -105,7 +105,7 @@ export const dilationUpgrades = {
     cost: 1e9,
     description: () => {
       const rep10 = replicantiMult().pLog10();
-      let multiplier = "0.1";
+      let multiplier = Slabdrill.isCursed ? "0.01" : "0.1";
       if (rep10.gt(9000)) {
         const ratio = DilationUpgrade.tdMultReplicanti.effectValue.pLog10().div(rep10);
         if (ratio.lt(0.095)) {
@@ -116,7 +116,7 @@ export const dilationUpgrades = {
         effect above ${formatX(DC.E9000)}`;
     },
     effect: () => {
-      let rep10 = replicantiMult().pLog10().times(0.1);
+      let rep10 = replicantiMult().pLog10().times(Slabdrill.isCursed ? 0.01 : 0.1);
       rep10 = rep10.gt(9000) ? (rep10.sub(9000)).times(0.5).add(9000) : rep10;
       return Decimal.pow10(rep10);
     },
@@ -125,15 +125,15 @@ export const dilationUpgrades = {
   ndMultDT: {
     id: 6,
     cost: 5e7,
-    description: "Antimatter Dimension multiplier based on Dilated Time, unaffected by Time Dilation",
-    effect: () => Currency.dilatedTime.value.pow(308).clampMin(1),
+    description: () => `${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimension multiplier based on Dilated Time, unaffected by Time Dilation`,
+    effect: () => Currency.dilatedTime.value.pow(308 * (Slabdrill.isCursed ? 8 : 1)).clampMin(1),
     formatEffect: value => formatX(value, 2, 1)
   },
   ipMultDT: {
     id: 7,
     cost: 2e12,
     description: "Gain a multiplier to Infinity Points based on Dilated Time",
-    effect: () => Currency.dilatedTime.value.pow(1000).clampMin(1),
+    effect: () => Currency.dilatedTime.value.pow(1000 * (Slabdrill.isCursed ? 32 : 1)).clampMin(1),
     formatEffect: value => formatX(value, 2, 1),
     cap: () => Effarig.eternityCap
   },
@@ -152,7 +152,8 @@ export const dilationUpgrades = {
     id: 10,
     cost: 1e15,
     description: "Generate Time Theorems based on Tachyon Particles",
-    effect: () => Currency.tachyonParticles.value.div(20000).times(
+    effect: () => Slabdrill.isCursed ? Currency.tachyonParticles.value.pow(2).div(1000) :
+      Currency.tachyonParticles.value.div(20000).times(
       Alpha.isRunning ? AlphaUnlocks.timeTheoremGeneration.effects.nerf.effectOrDefault(1) : 1),
     formatEffect: value => `${format(value, 2, 1)}/sec`
   },

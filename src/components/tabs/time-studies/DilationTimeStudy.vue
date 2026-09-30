@@ -60,7 +60,7 @@ export default {
         this.showRequirement = !Pelle.isDoomed;
       }
       this.currTT.copyFrom(Currency.timeTheorems.value);
-      this.ttGen.copyFrom(getTTPerSecond().times(Alpha.isRunning ? 1 : getGameSpeedupFactor()));
+      this.ttGen.copyFrom(getTTPerSecond().times(Alpha.isRunning || Slabdrill.isCursed ? 1 : getGameSpeedupFactor()));
     },
     clickHandler() {
       switch (this.id) {

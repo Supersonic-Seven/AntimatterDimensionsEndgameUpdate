@@ -11,7 +11,8 @@ export default {
   data() {
     return {
       isUnlocked: false,
-      antimatterReq: new Decimal(0)
+      antimatterReq: new Decimal(0),
+      isFlipped: false
     };
   },
   computed: {
@@ -45,6 +46,7 @@ export default {
     update() {
       this.isUnlocked = (PlayerProgress.endgameUnlocked() && player.antimatter.gte(DC.E9E15)) || player.break2;
       this.antimatterReq = DC.E9E15;
+      this.isFlipped = player.universes.current === 2;
     },
     btnClassObject(column) {
       return {
@@ -62,7 +64,8 @@ export default {
 <template>
   <div class="l-break-eternity-tab">
     <div v-if="!isUnlocked">
-      Reach {{ format(antimatterReq, 2, 1) }} with at least one Endgame to unlock Break Eternity
+      Reach {{ format(antimatterReq, 2, 1) }} {{ isFlipped ? "matter" : "antimatter" }} with at least one Endgamed stat
+      to unlock Break Eternity
     </div>
     <BreakEternityButton class="l-break-eternity-tab__break-btn" />
     <div
@@ -83,7 +86,7 @@ export default {
       </div>
     </div>
     <div>
-      All Break Eternity Upgrades can only be purchased with Antimatter gained outside Pelle.
+      All Break Eternity Upgrades can only be purchased with {{ isFlipped ? "Matter" : "Antimatter" }} gained outside Pelle.
     </div>
   </div>
 </template>

@@ -60,7 +60,8 @@ export const Enslaved = {
   get canModifyGameTimeStorage() {
     return Enslaved.isUnlocked && (!Pelle.isDoomed || PelleDestructionUpgrade.blackHole.canBeApplied) &&
       !BlackHoles.arePaused && !EternityChallenge(12).isRunning && !Enslaved.isRunning && !Laitela.isRunning &&
-      !player.endgame.overcharge.isRunning;
+      !player.endgame.overcharge.isRunning && !player.compression.active &&
+      !(player.universes.current >= 1 && (player.universes.current === 1 || player.universes.current % 2 === 0));
   },
   get canModifyRealTimeStorage() {
     return Enslaved.isUnlocked && (!Pelle.isDoomed || PelleDestructionUpgrade.blackHole.canBeApplied);
@@ -111,6 +112,7 @@ export const Enslaved = {
   },
   canRelease(auto) {
     return !Enslaved.isStoringRealTime && !EternityChallenge(12).isRunning && !Laitela.isRunning && !player.endgame.overcharge.isRunning &&
+      !player.compression.active && !(player.universes.current >= 1 && (player.universes.current === 1 || player.universes.current % 2 === 0)) &&
       !(Enslaved.isRunning && auto) && (!Pelle.isDoomed || PelleDestructionUpgrade.blackHole.canBeApplied);
   },
   // "autoRelease" should only be true when called with the Ra upgrade
@@ -248,7 +250,7 @@ class EnslavedProgressState extends BitUpgradeState {
   }
 
   get hintInfo() {
-    return this.config.hint;
+    return typeof this.config.hint === "function" ? this.config.hint() : this.config.hint;
   }
 
   get completedInfo() {
@@ -304,7 +306,7 @@ export const Tesseracts = {
   },
 
   get effectiveCount() {
-    return (this.bought + this.extra) * this.totalMult;
+    return CMilestones.tesseractEqualizer(this.bought, this.extra) * this.totalMult;
   },
 
   buyTesseract() {

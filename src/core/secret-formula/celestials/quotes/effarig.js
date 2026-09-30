@@ -173,7 +173,7 @@ export const effarigQuotes = {
     lines: [
       "This purchase is a lifesaver.",
       "It saves hours of grinding for every Endgame.",
-      "Speaking of which, have you met the Elemental yet?."
+      "Speaking of which, have you met the Elemental yet?"
     ]
   },
   moreRarityCap: {

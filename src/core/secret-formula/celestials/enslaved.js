@@ -27,8 +27,8 @@ export const enslaved = {
     },
     c10: {
       id: 4,
-      hint: "Is there a way to get Antimatter Galaxies without 8th Antimatter Dimensions?",
-      condition: "Used Challenge 10 to get more than one Antimatter Galaxy with 6th Antimatter Dimensions",
+      hint: () => `Is there a way to get ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxies without 8th ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions?`,
+      condition: () => `Used Challenge 10 to get more than one ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxy with 6th ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions`,
     },
     secretStudy: {
       id: 5,

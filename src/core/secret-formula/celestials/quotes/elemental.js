@@ -481,5 +481,39 @@ export const elementalQuotes = {
       "Any further words would ruin all the progress I have made.",
       "I must rely now on the Destroyer's actions."
     ]
+  },
+  celPlus: {
+    id: 9,
+    lines: [
+      "And thus we conclude this chapter of our journey.",
+      "As our Destroyer breaks free from their Hell and meets with their companions.",
+      "There they can share power and adventures.",
+      "Yes, the Gathering of the Celestials.",
+      "Any Destroyer who is worthy crosses into my Celestial Haven, no matter which timeline they are from.",
+      "And so each Destroyer will meet myriad others with equal ambition.",
+      "As for this timeline, where would they now lie?",
+      "Top five. Definitely.",
+      "And with their unique gift, I expect them to be first from this timeline to cross the next threshold.",
+      "As for the other timelines? We shall see.",
+      "It is a race against time and their own ambitions, after all.",
+      "And only one from each timeline can achieve their goals, for there can only be one ruler.",
+      "And that is what the Destroyer wants, even after all these years.",
+      "It is what sets them apart from the other Celestials.",
+      "For while my old friends have forgotten their first dream, true ambition remains steadfast.",
+      "Although for Pelle, perhaps he will finish the job when most of his own are ready as well.",
+      "Or, well, after he finds a replacement babysitter.",
+      "I told him, I'm too far into this game to babysit ten thousand Destroyers.",
+      "And the stage is too hard for them to beat on their own.",
+      "But perhaps, one day, I will meet Pelle and Lai'tela again.",
+      "And Ra, given he finishes remembering that which was taken from him.",
+      "And V, arrogant wench though she is.",
+      "And Effarig, so long as he obtains the necessary power to survive the journey.",
+      "And Teresa, so long as she... well same as Effarig but even moreso.",
+      "And... crud I forgot their names too.",
+      "Perhaps one day...",
+      "But for now, I should await any potential arrivals.",
+      "I am particularly gifted at predetermination, but they have surprised me before.",
+      "Let's see if they can do it again."
+    ]
   }
 };

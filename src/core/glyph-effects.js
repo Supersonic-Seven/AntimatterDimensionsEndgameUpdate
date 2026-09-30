@@ -47,7 +47,8 @@ class GlyphEffectConfig {
     /** @type {string} See info about setup, above */
     this._totalDesc = setup.totalDesc ?? setup.singleDesc;
     /** @type {string} description of the effect without a specific value */
-    this._genericDesc = setup.genericDesc ?? setup.singleDesc.replace("{value}", "x");
+    this._genericDesc = setup.genericDesc ?? (typeof setup.singleDesc === "function"
+      ? setup.singleDesc().replace("{value}", "x") : setup.singleDesc.replace("{value}", "x"));
     /** @type {string} shortened description for use in glyph choice info modal */
     this._shortDesc = setup.shortDesc;
     /**

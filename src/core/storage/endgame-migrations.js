@@ -197,9 +197,87 @@ export function endgameMigration(player) {
     if (s12[g12].level) s12[g12].level = new Decimal(s12[g12].level);
   }
   player.records.bestReality.laitelaSet = s12;
+  if (player.dimensions.antimatter.length !== 9) {
+    let ad = [];
+    for (let adl = 0; adl < player.dimensions.antimatter.length; adl++) {
+      ad.push(player.dimensions.antimatter[adl]);
+    }
+    player.dimensions.antimatter = Array.range(0, 9).map(() => ({
+      bought: DC.D0,
+      costBumps: DC.D0,
+      amount: DC.D0
+    }));
+    for (let adnl = 0; adnl < ad.length; adnl++) {
+      player.dimensions.antimatter[adnl] = ad[adnl];
+    }
+  }
+  if (player.dimensions.infinity.length !== 9) {
+    let id = [];
+    for (let idl = 0; idl < player.dimensions.infinity.length; idl++) {
+      id.push(player.dimensions.infinity[idl]);
+    }
+    player.dimensions.infinity = Array.range(0, 9).map(tier => ({
+      isUnlocked: false,
+      bought: DC.D0,
+      amount: DC.D0,
+      cost: [DC.E8, DC.E9, DC.E10, DC.E20, DC.E140, DC.E200, DC.E250, DC.E280, new Decimal(Infinity)][tier],
+      baseAmount: DC.D0
+    }));
+    for (let idnl = 0; idnl < id.length; idnl++) {
+      player.dimensions.infinity[idnl] = id[idnl];
+    }
+  }
+  if (player.dimensions.time.length !== 9) {
+    let td = [];
+    for (let tdl = 0; tdl < player.dimensions.time.length; tdl++) {
+      td.push(player.dimensions.time[tdl]);
+    }
+    player.dimensions.time = Array.range(0, 9).map(tier => ({
+      cost: [DC.D1, DC.D5, DC.E2, DC.E3, DC.E2350, DC.E2650, DC.E3000, DC.E3350, new Decimal(Infinity)][tier],
+      amount: DC.D0,
+      bought: DC.D0
+    }));
+    for (let tdnl = 0; tdnl < td.length; tdnl++) {
+      player.dimensions.time[tdnl] = td[tdnl];
+    }
+  }
+  if (player.dimensions.celestial.length !== 9) {
+    let cd = [];
+    for (let cdl = 0; cdl < player.dimensions.celestial.length; cdl++) {
+      cd.push(player.dimensions.celestial[cdl]);
+    }
+    player.dimensions.celestial = Array.range(0, 9).map(tier => ({
+      isUnlocked: false,
+      bought: DC.D0,
+      amount: DC.D0,
+      cost: [DC.D1, DC.E1, DC.E2, DC.E4, DC.E10, DC.E30, DC.E100, DC.E300, new Decimal(Infinity)][tier],
+      baseAmount: DC.D0,
+    }));
+    for (let cdnl = 0; cdnl < cd.length; cdnl++) {
+      player.dimensions.celestial[cdnl] = cd[cdnl];
+    }
+  }
+  if (player.dimensions.divine.length !== 9) {
+    let vd = [];
+    for (let vdl = 0; vdl < player.dimensions.divine.length; vdl++) {
+      vd.push(player.dimensions.divine[vdl]);
+    }
+    player.dimensions.divine = Array.range(0, 9).map(tier => ({
+      bought: DC.D0,
+      amount: DC.D0,
+      cost: [DC.E1, DC.E3, DC.E6, DC.E10, DC.E15, DC.E21, DC.E28, DC.E36, new Decimal(Infinity)][tier],
+      baseAmount: DC.D0,
+    }));
+    for (let vdnl = 0; vdnl < vd.length; vdnl++) {
+      player.dimensions.divine[vdnl] = vd[vdnl];
+    }
+  }
   if (player.reality.dmCap) player.reality.jMCap = new Decimal(player.reality.dmCap);
   else player.reality.jMCap = DC.D0;
   delete player.reality.dmCap;
+  if (!Slabdrill.isCursed && player.infinityRebuyables[0] > 8) player.infinityRebuyables[0] = 0;
+  if (!Slabdrill.isCursed && player.infinityRebuyables[1] > 7) player.infinityRebuyables[1] = 0;
+
   if (player.celestials.teresa.quotes.length >= 100) {
     let terq = [];
     for (let terqid = 0; terqid < 100; terqid++) {
@@ -272,6 +350,15 @@ export function endgameMigration(player) {
     }
     player.celestials.alpha.quotes = alpq;
   }
+  if (player.celestials.slabdrill.quotes.length >= 100) {
+    let slaq = [];
+    for (let slaqid = 0; slaqid < 100; slaqid++) {
+      if (player.celestials.slabdrill.quotes.includes(slaqid)) {
+        slaq.push(slaqid);
+      }
+    }
+    player.celestials.slabdrill.quotes = slaq;
+  }
   if (player.expanse.elemental.quotes.length >= 100) {
     let eleq = [];
     for (let eleqid = 0; eleqid < 100; eleqid++) {
@@ -285,4 +372,5 @@ export function endgameMigration(player) {
   if (player.endgame.celDimExpansion.celestialEternityPoints.gt(DC.E4000)) {
     player.endgame.celDimExpansion.celestialEternityPoints = DC.E4000;
   }
+  if (!player.endgameMasteries.preferredPaths[2]) player.endgameMasteries.preferredPaths = [[], [], []];
 }

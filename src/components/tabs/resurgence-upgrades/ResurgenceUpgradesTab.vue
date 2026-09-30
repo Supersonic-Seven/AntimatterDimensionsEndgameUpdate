@@ -8,7 +8,7 @@ export default {
   },
   computed: {
     grid() {
-      return [
+      let g = [
         [
           ResurgenceUpgrade.ipSurge,
           ResurgenceUpgrade.epSurge,
@@ -36,15 +36,16 @@ export default {
           ResurgenceUpgrade.synergy3,
           ResurgenceUpgrade.synergy4,
           ResurgenceUpgrade.synergy5,
-        ],
-        [
-          ResurgenceUpgrade.synergy6,
-          ResurgenceUpgrade.unl1,
-          ResurgenceUpgrade.unl2,
-          ResurgenceUpgrade.unl3,
-          ResurgenceUpgrade.unl4,
         ]
       ];
+      if (Slabdrill.isDestroyed) g.push([
+        ResurgenceUpgrade.synergy6,
+        ResurgenceUpgrade.unl1,
+        ResurgenceUpgrade.unl2,
+        ResurgenceUpgrade.unl3,
+        ResurgenceUpgrade.unl4,
+      ]);
+      return g;
     }
   },
 };

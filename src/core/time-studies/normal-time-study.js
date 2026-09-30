@@ -1,17 +1,23 @@
 import { TimeStudyState } from "./time-studies";
 
-export const NormalTimeStudies = {};
-
-NormalTimeStudies.pathList = [
-  { path: TIME_STUDY_PATH.ANTIMATTER_DIM, studies: [71, 81, 91, 101], name: "Antimatter Dims" },
-  { path: TIME_STUDY_PATH.INFINITY_DIM, studies: [72, 82, 92, 102], name: "Infinity Dims" },
-  { path: TIME_STUDY_PATH.TIME_DIM, studies: [73, 83, 93, 103], name: "Time Dims" },
-  { path: TIME_STUDY_PATH.ACTIVE, studies: [121, 131, 141], name: "Active" },
-  { path: TIME_STUDY_PATH.PASSIVE, studies: [122, 132, 142], name: "Passive" },
-  { path: TIME_STUDY_PATH.IDLE, studies: [123, 133, 143], name: "Idle" },
-  { path: TIME_STUDY_PATH.LIGHT, studies: [221, 223, 225, 227, 231, 233], name: "Light" },
-  { path: TIME_STUDY_PATH.DARK, studies: [222, 224, 226, 228, 232, 234], name: "Dark" }
-];
+export const NormalTimeStudies = {
+  get pathList() {
+    let pathArr = [];
+    if (player.universes.current === 2) {
+      pathArr.push({ path: TIME_STUDY_PATH.ANTIMATTER_DIM, studies: [71, 81, 91, 101], name: "Matter Dims" });
+    } else {
+      pathArr.push({ path: TIME_STUDY_PATH.ANTIMATTER_DIM, studies: [71, 81, 91, 101], name: "Antimatter Dims" });
+    }
+    pathArr.push({ path: TIME_STUDY_PATH.INFINITY_DIM, studies: [72, 82, 92, 102], name: "Infinity Dims" });
+    pathArr.push({ path: TIME_STUDY_PATH.TIME_DIM, studies: [73, 83, 93, 103], name: "Time Dims" });
+    pathArr.push({ path: TIME_STUDY_PATH.ACTIVE, studies: [121, 131, 141], name: "Active" });
+    pathArr.push({ path: TIME_STUDY_PATH.PASSIVE, studies: [122, 132, 142], name: "Passive" });
+    pathArr.push({ path: TIME_STUDY_PATH.IDLE, studies: [123, 133, 143], name: "Idle" });
+    pathArr.push({ path: TIME_STUDY_PATH.LIGHT, studies: [221, 223, 225, 227, 231, 233], name: "Light" });
+    pathArr.push({ path: TIME_STUDY_PATH.DARK, studies: [222, 224, 226, 228, 232, 234], name: "Dark" });
+    return pathArr;
+  }
+};
 
 NormalTimeStudies.paths = NormalTimeStudies.pathList.mapToObject(e => e.path, e => e.studies);
 
@@ -109,6 +115,11 @@ export class NormalTimeStudyState extends TimeStudyState {
     if (this.id === 192 && Alpha.isRunning && Alpha.currentStage === 20) {
       Alpha.advanceLayer();
       Alpha.quotes.uncapReplicanti.show();
+    }
+    if (this.id === 181 && Slabdrill.isCursed && Slabdrill.currentStage === 7) {
+      Slabdrill.advanceLayer();
+      Glyphs.refreshActive();
+      Slabdrill.quotes.timeStudy181.show();
     }
     return true;
   }

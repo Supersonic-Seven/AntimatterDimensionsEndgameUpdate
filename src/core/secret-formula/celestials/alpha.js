@@ -51,7 +51,7 @@ export const alphaUnlocks = {
   breakInfinity: {
     id: 5,
     requirement: 6,
-    nerfDescription: () => `BIU costs ${formatX(1000)}, post-Break Tickspeed/AD cost scalings start at ${formatX(20)}, IPow Conversion Rate /${format(Decimal.max(DC.D8.div(Decimal.log10(Decimal.log10(Currency.infinityPoints.value.add(1)).add(1)).pow(2).clampMin(0.001)), 1).toNumber(), 2, 2)} (based on IP), but Galaxy strength is doubled`,
+    nerfDescription: () => `BIU costs ${formatX(1000)}, post-Break Tickspeed/${player.universes.current === 2 ? "MD" : "AD"} cost scalings start at ${formatX(20)}, IPow Conversion Rate /${format(Decimal.max(DC.D8.div(Decimal.log10(Decimal.log10(Currency.infinityPoints.value.add(1)).add(1)).pow(2).clampMin(0.001)), 1).toNumber(), 2, 2)} (based on IP), but Galaxy strength is doubled`,
     buffDescription: () => `Reduce Post-Break Tickspeed cost scaling by ${format(0.15, 2, 2)} and Post-Break Dimension cost scaling by ${format(0.25, 2, 2)}`,
     effects: {
       nerfA: 1000,
@@ -65,7 +65,7 @@ export const alphaUnlocks = {
     id: 6,
     requirement: 7,
     nerfDescription: () => `Distant Galaxy Cost Scaling starts at ${formatInt(1)} Galaxy`,
-    buffDescription: "Galaxy scalings for Distant/Remote Antimatter Galaxies are doubled",
+    buffDescription: () => `Galaxy scalings for Distant/Remote ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxies are doubled`,
     effects: {
       nerf: 1,
       buff: 2
@@ -182,8 +182,8 @@ export const alphaUnlocks = {
   timestudy181: {
     id: 18,
     requirement: 19,
-    nerfDescription: () => `All Antimatter Dimensions are raised ${formatPow(0.9, 2, 3)}`,
-    buffDescription: () => `All Antimatter Dimension Multipliers are raised ${formatPow(5)}`,
+    nerfDescription: () => `All ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions are raised ${formatPow(0.9, 2, 3)}`,
+    buffDescription: () => `All ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimension Multipliers are raised ${formatPow(5)}`,
     effects: {
       nerf: 0.9,
       buff: 5

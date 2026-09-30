@@ -84,13 +84,13 @@ export const realityUpgrades = [
     name: "Innumerably Construct",
     id: 7,
     cost: 15,
-    requirement: "Complete your first Infinity with at most 1 Antimatter Galaxy",
+    requirement: () => `Complete your first Infinity with at most 1 ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxy`,
     hasFailed: () => !(player.galaxies.lte(1) && player.requirementChecks.reality.noInfinities),
     checkRequirement: () => player.galaxies.lte(1) && player.requirementChecks.reality.noInfinities,
     checkEvent: GAME_EVENT.BIG_CRUNCH_BEFORE,
     canLock: true,
-    lockEvent: "gain another Antimatter Galaxy",
-    description: "Infinity gain is boosted from Antimatter Galaxy count",
+    lockEvent: () => `gain another ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxy`,
+    description: () => `Infinity gain is boosted from ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxy count`,
     effect: () => player.disablePostReality ? DC.D1 : player.galaxies.div(20).add(1),
     formatEffect: value => formatX(value, 2, 2)
   },
@@ -302,15 +302,10 @@ export const realityUpgrades = [
     name: "Cosmic Conglomerate",
     id: 21,
     cost: 100000,
-    requirement: () => `${formatInt(GalacticPowers.galacticAscension.isUnlocked ? Replicanti.galaxies.total.max(1).times(player.galaxies.max(1)).times(
-      player.dilation.totalTachyonGalaxies.max(1)).times(GalacticPower.freeGalaxies.max(1)) : Replicanti.galaxies.total.add(player.galaxies).add(
-      player.dilation.totalTachyonGalaxies).add(GalacticPower.freeGalaxies))}/${formatInt(2800)} total Galaxies from all types`,
-    checkRequirement: () =>
-      GalacticPowers.galacticAscension.isUnlocked ? Replicanti.galaxies.total.max(1).times(player.galaxies.max(1)).times(
-      player.dilation.totalTachyonGalaxies.max(1)).times(GalacticPower.freeGalaxies.max(1)).gte(2800) : Replicanti.galaxies.total.add(player.galaxies).add(
-      player.dilation.totalTachyonGalaxies).add(GalacticPower.freeGalaxies).gte(2800),
+    requirement: () => `${formatInt(actualBaseGalaxiesWithoutGeneration())}/${formatInt(2800)} total Galaxies from all types`,
+    checkRequirement: () => actualBaseGalaxiesWithoutGeneration().gte(2800),
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
-    description: () => `Remote Antimatter Galaxy scaling is moved to ${formatInt(1e5)} galaxies`,
+    description: () => `Remote ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxy scaling is moved to ${formatInt(1e5)} galaxies`,
     effect: () => player.disablePostReality ? 800 : 1e5
   },
   {
@@ -334,7 +329,7 @@ export const realityUpgrades = [
     checkRequirement: () => Time.thisReality.totalMinutes.lt(15),
     checkEvent: GAME_EVENT.REALITY_RESET_BEFORE,
     description: "Replicanti speed is boosted based on your fastest game-time Reality",
-    effect: () => player.disablePostReality ? 1 : DC.D15.div(Decimal.min(Time.bestReality.totalMinutes, DC.D15)).toNumber(),
+    effect: () => player.disablePostReality ? 1 : DC.D15.div(Decimal.clamp(Time.bestReality.totalMinutes, 1e-300, DC.D15)).toNumber(),
     cap: () => Alpha.isDestroyed ? Infinity : 180,
     formatEffect: value => formatX(value, 2, 2)
   },

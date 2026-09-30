@@ -83,7 +83,7 @@ export default {
     },
     // Use this here since Nameless has a fairly non-standard character, and SFCs don't support using \uf0c1
     enslavedSymbol: () => Enslaved.symbol,
-    isDoomed: () => Pelle.isDoomed,
+    isDoomed: () => Pelle.isDoomed || Slabdrill.isCursed,
     storeGameTimeClass() {
       return {
         "o-enslaved-mechanic-button": true,

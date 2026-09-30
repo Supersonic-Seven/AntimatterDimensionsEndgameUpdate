@@ -50,6 +50,11 @@ export function startDilatedEternity(auto) {
   eternity(false, auto, { switchingDilation: true });
   player.dilation.active = true;
   if (Pelle.isDoomed) PelleStrikes.dilation.trigger();
+  if (Slabdrill.isCursed && Slabdrill.currentStage === 9) {
+    Slabdrill.advanceLayer();
+    Glyphs.refreshActive();
+    Slabdrill.quotes.dilation.show();
+  }
   return true;
 }
 
@@ -198,19 +203,23 @@ export function getDilationGainPerSecond() {
   dtRate = dtRate.times(ShopPurchase.dilatedTimePurchases.currentMult);
   dtRate = dtRate.times(ReplicantiMultipliers.dtMult);
   if (LHC.voidRunning) dtRate = dtRate.timesEffectOf(NullUpgrade.dilatedTimeMult);
+  if (SlabdrillUnlocks.dilation.isUnlocked) dtRate = dtRate.times(Slabdrill.slabPowers.dtMult());
   if (Enslaved.isRunning && !dtRate.eq(0)) dtRate = Decimal.pow10(Decimal.pow(dtRate.plus(1).log10(), 0.85).sub(1));
   if (V.isRunning) dtRate = dtRate.pow(0.5);
   dtRate = dtRate.times(Alpha.isRunning ? getGameSpeedupForDisplay().pow(0.01) : getGameSpeedupForDisplay());
   if (getAdjustedGlyphEffect("replicationdtgain").neq(0) && ResurgenceUpgrade.repSurge.isBought && !player.disablePostReality) {
     dtRate = dtRate.pow(ReplicantiMultipliers.dtPow);
   }
+  dtRate = dtRate.pow(Universes.ephemeralLightToDilation);
   if (ResurgenceUpgrade.curr2Surge.isBought && !player.disablePostReality && !Pelle.isDoomed) {
     dtRate = dtRate.pow(player.dilation.dilatedTime.max(1e10).log10().log10());
   }
+  if (SlabdrillUnlocks.dilation.isUnlocked) dtRate = dtRate.pow(0.25);
   if (dtRate.gte(DilationSoftcapStart.PRIMARY_THRESHOLD())) {
     dtRate = Decimal.pow(10, (((Decimal.log10(dtRate).sub(Decimal.log10(DilationSoftcapStart.PRIMARY_THRESHOLD()))).div(10)).add(
       Decimal.log10(DilationSoftcapStart.PRIMARY_THRESHOLD()))));
   }
+  if (player.universes.current === 1) dtRate = Decimal.pow10(Decimal.pow(dtRate.max(10).log10(), 0.1));
   return dtRate;
 }
 
@@ -270,8 +279,11 @@ export function getBaseTP(antimatter, requireEternity) {
 // Returns the TP that would be gained this run
 export function getTP(antimatter, requireEternity) {
   let pend = getBaseTP(antimatter, requireEternity).times(tachyonGainMultiplier()).pow(player.disablePostReality ? 1 : AlphaUnlocks.dilatedEternity.effects.buff.effectOrDefault(1));
+  if (SlabdrillUnlocks.dilation.isUnlocked) pend = pend.pow(0.25);
   if (ResurgenceUpgrade.achSurge.isBought && !player.disablePostReality) pend = pend.pow(Achievements.powerConv(RealityUpgrade(8).effectOrDefault(1)));
+  if (!Pelle.isDoomed) pend = pend.pow(Universes.ephemeralLightToDilation);
   if (ResurgenceUpgrade.curr2Surge.isBought && !player.disablePostReality && !Pelle.isDoomed) pend = pend.pow(player.dilation.tachyonParticles.max(1e10).log10().log10());
+  if (player.universes.current === 1) pend = Decimal.pow10(Decimal.pow(pend.max(10).log10(), 0.1));
   return pend;
 }
 
@@ -283,8 +295,12 @@ export function getTachyonGain(requireEternity) {
 
 // Returns the minimum antimatter needed in order to gain more TP; used only for display purposes
 export function getTachyonReq() {
-  let effectiveTP = Currency.tachyonParticles.value.pow(1 / (player.disablePostReality ? 1 : AlphaUnlocks.dilatedEternity.effects.buff.effectOrDefault(1)));
+  let effectiveTP = Currency.tachyonParticles.value;
+  if (player.universes.current === 1) effectiveTP = Decimal.pow10(Decimal.pow(effectiveTP.max(10).log10(), 10));
+  effectiveTP = effectiveTP.pow(1 / (player.disablePostReality ? 1 : AlphaUnlocks.dilatedEternity.effects.buff.effectOrDefault(1)));
+  if (SlabdrillUnlocks.dilation.isUnlocked) effectiveTP = effectiveTP.pow(1 / 0.25);
   if (ResurgenceUpgrade.achSurge.isBought && !player.disablePostReality) effectiveTP = effectiveTP.pow(1 / Achievements.powerConv(RealityUpgrade(8).effectOrDefault(1)));
+  if (!Pelle.isDoomed) effectiveTP = effectiveTP.pow(DC.D1.div(Universes.ephemeralLightToDilation));
   if (ResurgenceUpgrade.curr2Surge.isBought && !player.disablePostReality && !Pelle.isDoomed) effectiveTP = effectiveTP.pow(DC.D1.div(player.dilation.tachyonParticles.max(1e10).log10().log10()));
   effectiveTP = effectiveTP.dividedBy(tachyonGainMultiplier());
   const reciprocalpow = DC.D1.timesEffectsOf(BreakEternityUpgrade.tachyonParticlePow).reciprocal();

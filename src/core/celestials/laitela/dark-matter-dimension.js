@@ -202,10 +202,10 @@ export class DarkMatterDimensionState extends DimensionState {
     if (Currency.darkMatter.lte(0)) return;
     const isBought = this.data.intervalUpgrades;
     const canBuyTotal = Currency.darkMatter.value.div(INTERVAL_START_COST).div(this.adjustedStartingCost).log(
-      this.intervalCostIncrease).add(1).floor();
+      this.intervalCostIncrease).add(1).max(0).floor();
     const gained = new Decimal(x).min(canBuyTotal.sub(isBought)).max(0);
     const cost = new Decimal(INTERVAL_START_COST).times(this.adjustedStartingCost).times(
-      Decimal.pow(this.intervalCostIncrease, canBuyTotal.sub(1))).floor();
+      Decimal.pow(this.intervalCostIncrease, canBuyTotal.sub(1).max(0))).floor();
     if (Currency.darkMatter.gte(cost)) {
       Currency.unnerfedDarkMatter.purchase(cost);
       this.data.intervalUpgrades = this.data.intervalUpgrades.add(gained);
@@ -216,10 +216,10 @@ export class DarkMatterDimensionState extends DimensionState {
     if (Currency.darkMatter.lte(0)) return;
     const isBought = this.data.powerDMUpgrades;
     const canBuyTotal = Currency.darkMatter.value.div(POWER_DM_START_COST).div(this.adjustedStartingCost).log(
-      this.powerDMCostIncrease).add(1).floor();
+      this.powerDMCostIncrease).add(1).max(0).floor();
     const gained = new Decimal(x).min(canBuyTotal.sub(isBought)).max(0);
     const cost = new Decimal(POWER_DM_START_COST).times(this.adjustedStartingCost).times(
-      Decimal.pow(this.powerDMCostIncrease, canBuyTotal.sub(1))).floor();
+      Decimal.pow(this.powerDMCostIncrease, canBuyTotal.sub(1).max(0))).floor();
     if (Currency.darkMatter.gte(cost)) {
       Currency.unnerfedDarkMatter.purchase(cost);
       this.data.powerDMUpgrades = this.data.powerDMUpgrades.add(gained);
@@ -230,10 +230,10 @@ export class DarkMatterDimensionState extends DimensionState {
     if (Currency.darkMatter.lte(0)) return;
     const isBought = this.data.powerDEUpgrades;
     const canBuyTotal = Currency.darkMatter.value.div(POWER_DE_START_COST).div(this.adjustedStartingCost).log(
-      this.powerDECostIncrease).add(1).floor();
+      this.powerDECostIncrease).add(1).max(0).floor();
     const gained = new Decimal(x).min(canBuyTotal.sub(isBought)).max(0);
     const cost = new Decimal(POWER_DE_START_COST).times(this.adjustedStartingCost).times(
-      Decimal.pow(this.powerDECostIncrease, canBuyTotal.sub(1))).floor();
+      Decimal.pow(this.powerDECostIncrease, canBuyTotal.sub(1).max(0))).floor();
     if (Currency.darkMatter.gte(cost)) {
       Currency.unnerfedDarkMatter.purchase(cost);
       this.data.powerDEUpgrades = this.data.powerDEUpgrades.add(gained);

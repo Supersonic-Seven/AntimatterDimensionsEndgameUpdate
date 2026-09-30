@@ -841,6 +841,15 @@
   color: var(--color-pelle--base);
 }
 
+.slabdrill-current-glyph-effects {
+  color: var(--color-slabdrill--base);
+}
+
+.c-glyph-tooltip .slabdrill-current-glyph-effects {
+  font-weight: bold;
+  color: var(--color-slabdrill--base);
+}
+
 .t-s8 .c-current-glyph-effects {
   border-color: black;
 }

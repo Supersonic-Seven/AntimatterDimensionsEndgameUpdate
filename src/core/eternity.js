@@ -113,7 +113,7 @@ export function eternity(force, auto, specialConditions = {}) {
   InfinityDimensions.fullReset();
   Replicanti.reset();
   resetChallengeStuff();
-  AntimatterDimensions.reset();
+  AntimatterDimensions.resetUpToNine();
 
   if (!specialConditions.enteringEC && player.respec) {
     if (noStudies) {
@@ -173,6 +173,18 @@ export function eternity(force, auto, specialConditions = {}) {
     Alpha.quotes.dilatedEternity.show();
   }
 
+  if (Slabdrill.isCursed && Slabdrill.currentStage === 6) {
+    Slabdrill.advanceLayer();
+    Glyphs.refreshActive();
+    Slabdrill.quotes.eternity.show();
+  }
+
+  if (Slabdrill.isCursed && Slabdrill.currentStage === 8 && EternityChallenge(10).completions >= 1) {
+    Slabdrill.advanceLayer();
+    Glyphs.refreshActive();
+    Slabdrill.quotes.eternityChallengeTen.show();
+  }
+
   EventHub.dispatch(GAME_EVENT.ETERNITY_RESET_AFTER);
   return true;
 }
@@ -209,7 +221,8 @@ export function initializeChallengeCompletions(isReality) {
   if (!isReality && EternityMilestone.keepAutobuyers.isReached || Pelle.isDoomed) {
     NormalChallenges.completeAll();
   }
-  if (Achievement(133).isUnlocked && !player.disablePostReality && (!Pelle.isDoomed || PelleAchievementUpgrade.achievement133.canBeApplied)) InfinityChallenges.completeAll();
+  if (Achievement(133).isUnlocked && (!player.disablePostReality || SlabdrillUnlocks.eternityChallengeTen.isUnlocked) &&
+    (!Pelle.isDoomed || PelleAchievementUpgrade.achievement133.canBeApplied)) InfinityChallenges.completeAll();
   player.challenge.normal.current = 0;
   player.challenge.infinity.current = 0;
 }
@@ -304,7 +317,25 @@ export const EternityMilestone = mapGameDataToObject(
     : new EternityMilestoneState(config))
 );
 
+class ChargedEternityUpgradeState extends GameMechanicState {
+  constructor(config, upgrade) {
+    super(config);
+    this._upgrade = upgrade;
+  }
+
+  get isEffectActive() {
+    return this._upgrade.isBought && this._upgrade.isCharged;
+  }
+}
+
 class EternityUpgradeState extends SetPurchasableMechanicState {
+  constructor(config) {
+    super(config);
+    if (config.charged) {
+      this._chargedEffect = new ChargedEternityUpgradeState(config.charged, this);
+    }
+  }
+
   get currency() {
     return Currency.eternityPoints;
   }
@@ -318,12 +349,91 @@ class EternityUpgradeState extends SetPurchasableMechanicState {
     return true;
   }
 
+  get isEffectActive() {
+    return this.isBought && !this.isCharged;
+  }
+
+  get chargedEffect() {
+    return this._chargedEffect;
+  }
+
+  purchase() {
+    if (super.purchase()) {
+      EventHub.dispatch(GAME_EVENT.ETERNITY_UPGRADE_BOUGHT);
+      return true;
+    }
+    if (this.canCharge) {
+      this.charge();
+      EventHub.dispatch(GAME_EVENT.ETERNITY_UPGRADE_CHARGED);
+      return true;
+    }
+    return false;
+  }
+
+  get hasChargeEffect() {
+    return this.config.charged !== undefined && Ascensions.oc2A.isUnlocked;
+  }
+
+  get isCharged() {
+    return player.endgame.overcharge.charged.eternal.has(this.id);
+  }
+
+  get canCharge() {
+    return this.isBought &&
+      this.hasChargeEffect &&
+      !this.isCharged &&
+      player.endgame.overcharge.chargesLeft.eternal !== 0;
+  }
+
+  charge() {
+    player.endgame.overcharge.charged.eternal.add(this.id);
+  }
+
+  disCharge() {
+    player.endgame.overcharge.charged.eternal.delete(this.id);
+  }
+
   onPurchased() {
     if (this.id === 3 && Alpha.isRunning && Alpha.currentStage === 14) {
       Alpha.advanceLayer();
       Alpha.quotes.infinityChallTimeBoost.show();
     }
   }
+}
+
+export function tryChargeAllEternityUpgrades() {
+  if (player.endgame.overcharge.chargesLeft.eternal < 6) return;
+  const upgrades = [
+    EternityUpgrade.idMultEP,
+    EternityUpgrade.idMultEternities,
+    EternityUpgrade.idMultICRecords,
+    EternityUpgrade.tdMultAchs,
+    EternityUpgrade.tdMultTheorems,
+    EternityUpgrade.tdMultRealTime
+  ];
+  for (const upgrade of upgrades) {
+    if (upgrade.canCharge) {
+      upgrade.charge();
+    }
+  }
+}
+
+export function disChargeAllEternityUpgrades() {
+  const upgrades = [
+    EternityUpgrade.idMultEP,
+    EternityUpgrade.idMultEternities,
+    EternityUpgrade.idMultICRecords,
+    EternityUpgrade.tdMultAchs,
+    EternityUpgrade.tdMultTheorems,
+    EternityUpgrade.tdMultRealTime
+  ];
+  for (const upgrade of upgrades) {
+    if (upgrade.isCharged) {
+      upgrade.disCharge();
+    }
+  }
+  player.endgame.overcharge.discharge.eternal = false;
+  EventHub.dispatch(GAME_EVENT.ETERNITY_UPGRADES_DISCHARGED);
 }
 
 class EPMultiplierState extends GameMechanicState {

@@ -36,6 +36,8 @@ export default {
       doomedParticles: new Decimal(0),
       showEndgame: false,
       showDivine: false,
+      inCursedCore: false,
+      isFlipped: false
     };
   },
   methods: {
@@ -52,8 +54,10 @@ export default {
       this.celestialPoints.copyFrom(Currency.celestialPoints);
       this.doomedParticles.copyFrom(Currency.doomedParticles);
       this.showEndgame = PlayerProgress.endgameUnlocked();
-      this.showDivine = DivinityMilestone.divineDimensions.isReached;
-    },
+      this.showDivine = DivinityMilestone.divineDimensions.isReached && !Slabdrill.isCursed;
+      this.inCursedCore = player.celestials.slabdrill.core.isActive;
+      this.isFlipped = player.universes.current === 2;
+    }
   },
 };
 </script>
@@ -64,15 +68,19 @@ export default {
     class="c-prestige-button-container"
   >
     <div
-      v-if="showEndgame"
+      v-if="showEndgame && !inCursedCore"
     >
       You have <span class="cp-text">{{ format(celestialPoints, 2) }}</span> {{ pluralize("Celestial Point", celestialPoints) }}.
       You have <span class="dp-text">{{ format(doomedParticles, 2) }}</span> {{ pluralize("Doomed Particle", doomedParticles) }}.
     <br>
     </div>
-    <span>You have <span class="c-game-header__antimatter">{{ format(antimatter, 2, 1) }}</span> antimatter.</span>
+    <span>
+      You have
+      <span class="c-game-header__antimatter">{{ format(antimatter, 2, 1) }}</span>
+      {{ isFlipped ? "matter" : "antimatter" }}.
+    </span>
     <div
-      v-if="hasRealityButton"
+      v-if="hasRealityButton && !inCursedCore"
       class="c-reality-container"
     >
       <RealityCurrencyHeader />
@@ -89,12 +97,12 @@ export default {
         :is-header="true"
       />
     </div>
-    <div v-else>
-      You are getting {{ format(antimatterPerSec, 2) }} antimatter per second.
+    <div v-else-if="!inCursedCore">
+      You are getting {{ format(antimatterPerSec, 2) }} {{ isFlipped ? "matter" : "antimatter" }} per second.
       <br>
       <HeaderTickspeedInfo />
     </div>
-    <div v-if="showDivine">
+    <div v-if="showDivine && !inCursedCore">
       <DivinityContainer />
     </div>
   </div>

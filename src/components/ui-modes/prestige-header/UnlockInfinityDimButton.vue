@@ -8,6 +8,7 @@ export default {
       hasIPUnlock: true,
       amRequirement: new Decimal(0),
       ipRequirement: 0,
+      isFlipped: false
     };
   },
   computed: {
@@ -19,9 +20,10 @@ export default {
       const amDisplay = format(this.amRequirement);
       const ipDisplay = format(this.ipRequirement);
       if (this.hasIPUnlock) {
-        return `Reach ${ipDisplay} Infinity Points and ${amDisplay} antimatter to unlock ${dimensionText}`;
+        return `Reach ${ipDisplay} Infinity Points and ${amDisplay} ${this.isFlipped ? "matter" : "antimatter"} to
+          unlock ${dimensionText}`;
       }
-      return `Reach ${amDisplay} antimatter to unlock ${dimensionText}`;
+      return `Reach ${amDisplay} ${this.isFlipped ? "matter" : "antimatter"} to unlock ${dimensionText}`;
     },
     buttonClassObject() {
       return {
@@ -41,6 +43,7 @@ export default {
       this.hasIPUnlock = nextDimension.hasIPUnlock;
       this.amRequirement = nextDimension.amRequirement;
       this.ipRequirement = nextDimension.ipRequirement;
+      this.isFlipped = player.universes.current === 2;
     },
     tryUnlockNextInfinityDimension() {
       InfinityDimensions.unlockNext();

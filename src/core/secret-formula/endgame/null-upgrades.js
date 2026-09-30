@@ -26,7 +26,7 @@ export const nullUpgrades = {
     costIncrease: 10,
     maxUpgrades: Number.MAX_VALUE,
     effect: value => Decimal.pow10(Math.pow(value, 2)),
-    description: () => "Multiply all Antimatter Dimensions",
+    description: () => `Multiply all ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions`,
     isDisabled: effect => effect.eq(0),
     formatEffect: value => `${formatX(value, 2)}`,
     noLabel: false

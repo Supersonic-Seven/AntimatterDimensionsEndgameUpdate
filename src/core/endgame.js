@@ -47,10 +47,14 @@ function giveEndgameRewards() {
 export const Endgame = {
   hotkeyReset() {
     if (!Pelle.isDoomed || player.antimatter.lt(DC.E9E15)) return false;
+    if (Slabdrill.isCursed) return false;
+    if (Slabdrill.isDestroyed && !player.celestials.slabdrill.hasBoughtNinthDimension) return;
     this.newEndgame();
     return true;
   },
-  resetNoReward() {
+  resetNoReward(override = false) {
+    if (Slabdrill.isCursed && !override) return;
+    if (Slabdrill.isDestroyed && !player.celestials.slabdrill.hasBoughtNinthDimension && !override) return;
     GameEnd.creditsClosed = false;
     GameEnd.creditsEverClosed = false;
     player.isGameEnd = false;
@@ -93,9 +97,13 @@ export const Endgame = {
     }
     if (Effarig.isRunning && Effarig.currentStage === EFFARIG_STAGES.ENDGAME) {
       player.disablePostReality = false;
+      player.endgame.overcharge.allowComplex = true;
     }
     if (player.endgame.overcharge.discharge.infinite) {
       disChargeAllBreakUpgrades();
+    }
+    if (player.endgame.overcharge.discharge.eternal) {
+      disChargeAllEternityUpgrades();
     }
     this.resetStuff();
 
@@ -114,10 +122,10 @@ export const Endgame = {
     EventHub.dispatch(GAME_EVENT.ENDGAME_RESET_AFTER);
 
     GameEnd.removeAdditionalEnd = true;
-    // Without the delay, this causes the saving (and its notification) to occur during the credits rollback
-    setTimeout(() => GameStorage.save(), 10000);
   },
   newEndgame() {
+    if (Slabdrill.isCursed) return;
+    if (Slabdrill.isDestroyed && !player.celestials.slabdrill.hasBoughtNinthDimension) return;
     GameEnd.creditsClosed = false;
     GameEnd.creditsEverClosed = false;
     player.isGameEnd = false;
@@ -165,6 +173,7 @@ export const Endgame = {
     }
     if (Effarig.isRunning && Effarig.currentStage === EFFARIG_STAGES.ENDGAME) {
       player.disablePostReality = false;
+      player.endgame.overcharge.allowComplex = true;
       if (!EffarigUnlock.endgame.isUnlocked) {
         EffarigUnlock.endgame.unlock();
       }
@@ -172,6 +181,9 @@ export const Endgame = {
     }
     if (player.endgame.overcharge.discharge.infinite) {
       disChargeAllBreakUpgrades();
+    }
+    if (player.endgame.overcharge.discharge.eternal) {
+      disChargeAllEternityUpgrades();
     }
     this.resetStuff();
 
@@ -194,7 +206,9 @@ export const Endgame = {
     GameEnd.removeAdditionalEnd = true;
     GameEnd.additionalEnd = 15;
     // Without the delay, this causes the saving (and its notification) to occur during the credits rollback
-    setTimeout(() => GameStorage.save(), 10000);
+    if (!PlayerProgress.endgameUnlocked()) {
+      setTimeout(() => GameStorage.save(), 10000);
+    }
   },
   // Reset the game, but carry over some post-completion stats. We also call this when starting a speedrun, so make sure
   // any stats which are updated due to completion happen in startNewGame() instead of in here
@@ -322,7 +336,7 @@ export const Endgame = {
     if (!ExpansionPack.vPack.isBought) {
       player.reality.autoAutoClean = false;
     }
-    player.reality.perkPoints = EndgameUpgrade(6).isBought ? 1e7 : 0;
+    player.reality.perkPoints = EndgameUpgrade(6).isBought ? DC.E7 : DC.D0;
     player.reality.unlockedEC = 0;
     player.reality.autoEC = true;
     player.reality.lastAutoEC = 0;
@@ -364,7 +378,7 @@ export const Endgame = {
       player.celestials.teresa.quoteBits = 0;
       player.celestials.teresa.quotes = [];
     }
-    player.celestials.teresa.unlockBits = 0;
+    player.celestials.teresa.unlockBits = Achievement(217).isUnlocked ? 63 : 0;
     player.celestials.teresa.run = false;
     if (!EndgameUpgrade(10).isBought) {
       player.celestials.teresa.bestRunAM = DC.D1;
@@ -568,7 +582,7 @@ export const Endgame = {
     player.celestials.pelle.records.totalInfinityPoints = DC.D0;
     player.celestials.pelle.records.totalEternityPoints = DC.D0;
     player.celestials.pelle.rebuyables.antimatterDimensionMult = 0;
-    player.celestials.pelle.rebuyables.timeSpeedMult = 0;      
+    player.celestials.pelle.rebuyables.timeSpeedMult = 0;
     player.celestials.pelle.rebuyables.glyphLevels = 0;
     player.celestials.pelle.rebuyables.infConversion = 0;
     player.celestials.pelle.rebuyables.galaxyPower = 0;
@@ -791,9 +805,15 @@ export const Endgame = {
       NormalChallenges.completeAll();
     }
     if ((RealityUpgrade(10).isBought || EndgameMastery(42).isBought) && !player.disablePostReality) applyRUPG10();
+    if (TeresaUnlocks.startEU.canBeApplied) {
+      for (const id of [1, 2, 3, 4, 5, 6]) player.eternityUpgrades.add(id);
+    } else if (RealityUpgrade(14).isBought && !player.disablePostReality) {
+      applyEU1();
+    }
     tryChargeAll();
     tryChargeAllPerkUpgrades();
     tryChargeAllBreakUpgrades();
+    tryChargeAllEternityUpgrades();
     AutomatorBackend.restart();
   }
 };
@@ -827,4 +847,99 @@ export function divinityReset() {
   }
   player.records.bestDoomedAntimatterThisDivinity = DC.E1;
   if (player.celestials.pelle.divinities === 1) Pelle.quotes.divinity.show();
+  // Remove next update
+  if (player.celestials.pelle.divinities === 22) {
+    Modal.message.show(`You have reached the end of balanced content. You may go beyond this point,
+      but content may be unbalanced and/or unimplemented.`, {}, 3);
+  }
 }
+
+export const NewGame = {
+  restartGame() {
+    // Hide the game for an additional five seconds while the functions trigger
+    player.endgame.creditsTick = 13015000;
+
+    // This is where we "confirm" a speedrun as completed and store all its information into the previous run prop
+    // before resetting everything.
+    /*const speedrun = player.speedrun;
+    if (speedrun.isActive) {
+      player.speedrun.previousRuns[player.records.fullGameCompletions + 1] = {
+        isSegmented: speedrun.isSegmented,
+        usedSTD: speedrun.usedSTD,
+        startDate: speedrun.startDate,
+        name: speedrun.name,
+        offlineTimeUsed: speedrun.offlineTimeUsed,
+        records: [...speedrun.records],
+        achievementTimes: JSON.parse(JSON.stringify(speedrun.achievementTimes)),
+        seedSelection: speedrun.seedSelection,
+        initialSeed: speedrun.initialSeed,
+      };
+
+      // For the sake of keeping a bounded savefile size, we only keep a queue of the last 100 full runs. The earliest
+      // this will feasibly become an issue from nonstop speedruns is around 2030; I guess we can revisit it at that
+      // point if we really need to, but I suspect this limit should be high enough
+      const prevRunIndices = Object.keys(speedrun.previousRuns).map(k => Number(k));
+      if (prevRunIndices.length > 100) player.speedrun.previousRuns[prevRunIndices.min()] = undefined;
+    }*/
+
+    // Modify beaten-game quantities before doing a carryover reset
+    setTimeout(() => player.endgame.fullCompletions++, 4000);
+    setTimeout(() => this.restartWithCarryover(), 4000);
+
+    // Without the delay, this causes the saving (and its notification) to occur during the credits rollback
+    setTimeout(() => GameStorage.save(), 10000);
+  },
+
+  // Reset the game, but carry over some post-completion stats. We also call this when starting a speedrun, so make sure
+  // any stats which are updated due to completion happen in startNewGame() instead of in here
+  restartWithCarryover() {
+    const backUpOptions = JSON.stringify(player.options);
+    // This can't be JSONed as it contains sets
+    const secretUnlocks = player.secretUnlocks;
+    const secretAchievements = JSON.stringify(player.secretAchievementBits);
+    // We don't backup the whole player.reality.automator object because it contains "state",
+    // which could lead to some edge cases where it starts when it shouldn't (ie before it's unlocked)
+    // It's easier to do something like this to avoid it entirely.
+    const automatorConstants = JSON.stringify(player.reality.automator.constants);
+    const automatorConstantSort = JSON.stringify(player.reality.automator.constantSortOrder);
+    const automatorScripts = JSON.stringify(player.reality.automator.scripts);
+    const endgameCompletions = player.endgame.fullCompletions;
+    const fullCompletions = player.records.fullGameCompletions;
+    const fullTimePlayed = player.records.previousRunRealTime + player.records.realTimePlayed;
+    const glyphCosmetics = JSON.stringify(player.reality.glyphs.cosmetics);
+    const speedrunRecords = JSON.stringify(player.speedrun.previousRuns);
+    const hasSpeedrun = player.speedrun.isUnlocked;
+    const presets = JSON.stringify(player.timestudy.presets);
+    const companions = JSON.stringify(Glyphs.allGlyphs.filter(g => g.type === "companion"));
+    Modal.hideAll();
+    Quote.clearAll();
+    GameStorage.hardReset();
+    player.options = JSON.parse(backUpOptions);
+    // We need to force this one to be true because otherwise the player will be unable to select their glyphs
+    // until they can auto-reality
+    player.options.confirmations.glyphSelection = true;
+    player.secretUnlocks = secretUnlocks;
+    player.secretAchievementBits = JSON.parse(secretAchievements);
+    player.reality.automator.constants = JSON.parse(automatorConstants);
+    player.reality.automator.constantSortOrder = JSON.parse(automatorConstantSort);
+    player.reality.automator.scripts = JSON.parse(automatorScripts);
+    player.endgame.fullCompletions = endgameCompletions;
+    player.records.fullGameCompletions = fullCompletions;
+    player.records.previousRunRealTime = fullTimePlayed;
+    ui.view.newUI = player.options.newUI;
+    ui.view.news = player.options.news.enabled;
+    player.reality.glyphs.cosmetics = JSON.parse(glyphCosmetics);
+    player.speedrun.previousRuns = JSON.parse(speedrunRecords);
+    player.speedrun.isUnlocked = hasSpeedrun;
+    player.timestudy.presets = JSON.parse(presets);
+    JSON.parse(companions).forEach(g => {
+      Glyphs.addToInventory(g);
+    });
+    Themes.find(Theme.currentName()).set();
+    Notations.all.find(n => n.name === player.options.notation).setAsCurrent();
+    ADNotations.Settings.exponentCommas.min = 10 ** player.options.notationDigits.comma;
+    ADNotations.Settings.exponentCommas.max = 10 ** player.options.notationDigits.notation;
+    player.lastUpdate = Date.now();
+    Tab.dimensions.antimatter.show(true);
+  }
+};

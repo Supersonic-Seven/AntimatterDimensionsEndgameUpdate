@@ -42,7 +42,7 @@ export default {
         this.cappedResources = AlchemyResources.all.countWhere(r => r.amount >= 25000);
         this.canEnterPelle = this.completedRows === this.totalRows &&
           this.cappedResources === this.totalAlchemyResources && !Alpha.isRunning && !LHC.voidRunning && !LHC.nullifiedVoidRunning &&
-          !player.endgame.overcharge.isRunning;
+          !Slabdrill.isCursed && !player.endgame.overcharge.isRunning && !player.compression.active && player.universes.current === 0;
       }
       this.hasStrike = PelleStrikes.all.some(s => s.hasStrike);
       this.hasGalaxyGenerator = PelleRifts.recursion.milestones[2].canBeApplied || GalaxyGenerator.spentGalaxies.gt(0);

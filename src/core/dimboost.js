@@ -34,6 +34,8 @@ export class DimBoost {
     if (GlyphAlteration.isAdded("effarig")) boost = boost.pow(getSecondaryGlyphEffect("effarigforgotten"));
     if (Alpha.isRunning) boost = boost.pow(AlphaUnlocks.fourthDimboost.effects.nerf.effectOrDefault(1));
     if (!player.disablePostReality) boost = boost.pow(AlphaUnlocks.fourthDimboost.effects.buff.effectOrDefault(1));
+    if (SlabdrillUnlocks.dimboost.isUnlocked) boost = boost.times(Slabdrill.slabPowers.dbMult());
+    if (SlabdrillUnlocks.dimboost.isUnlocked) boost = boost.sub(1).div(100).add(1);
     return boost;
   }
 
@@ -53,6 +55,7 @@ export class DimBoost {
   }
 
   static get maxDimensionsUnlockable() {
+    if (Slabdrill.isCursed) return Math.max(Math.min(Math.floor((player.celestials.slabdrill.goodbyeTick - 30000) / 1000), 8), 1);
     return NormalChallenge(10).isRunning ? 6 : 8;
   }
 
@@ -94,7 +97,8 @@ export class DimBoost {
     if (DimBoost.purchasedBoosts.gte(this.maxBoosts)) {
       if (Ra.isRunning) return "Locked (Ra's Reality)";
       if (InfinityChallenge(1).isRunning) return "Locked (Infinity Challenge 1)";
-      if (NormalChallenge(8).isRunning) return "Locked (8th Antimatter Dimension Autobuyer Challenge)";
+      if (NormalChallenge(8).isRunning) return `Locked (8th ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimension
+        Autobuyer Challenge)`;
     }
     return null;
   }
@@ -122,10 +126,12 @@ export class DimBoost {
       logBase = logBase.times(InfinityUpgrade.resetBoost.chargedEffect.effectOrDefault(1));
       let naturalBase = (8 / tier) * 15;
       let logarithm = Decimal.pow10(logBase.div(naturalBase));
+      logarithm = logarithm.pow(NormalChallenge(4).chargedEffect);
       if (targetResets.lt(5)) return new DimBoostRequirement(tier, logarithm);
       return new DimBoostRequirement(tier, Decimal.pow(logarithm, targetResets.sub(4)));
     }
     let amount = DC.D20;
+    if (Slabdrill.isCursed) amount = DC.D60;
     let discount = Effects.sum(
       TimeStudy(211),
       TimeStudy(222)
@@ -133,7 +139,9 @@ export class DimBoost {
     if (!player.disablePostReality) discount += AlphaUnlocks.fifthDimboost.effects.buff.effectOrDefault(0);
     let multi = 1;
     if (Alpha.isRunning) multi *= AlphaUnlocks.fifthDimboost.effects.nerf.effectOrDefault(1);
-    if (tier === 6 && NormalChallenge(10).isRunning) {
+    if (Slabdrill.isCursed) {
+      amount = amount.add(targetResets.sub(1).mul(DC.D20.sub(discount).times(multi)).round());
+    } else if (tier === 6 && NormalChallenge(10).isRunning) {
       amount = amount.add(targetResets.sub(3).mul(DC.D20.sub(discount).times(multi)).round());
     } else if (tier === 8) {
       amount = amount.add(targetResets.sub(5).mul(DC.D15.sub(discount).times(multi)).round());
@@ -150,7 +158,11 @@ export class DimBoost {
     amount = Decimal.round(amount);
 
     let costAtSoftcap = DC.D20;
-    if (this.maxDimensionsUnlockable === 6 && NormalChallenge(10).isRunning) {
+    if (Slabdrill.isCursed) {
+      costAtSoftcap = costAtSoftcap.add(DC.E100.sub(1).mul(DC.D20.sub(Effects.sum(TimeStudy(211), TimeStudy(222)) +
+        (!player.disablePostReality ? AlphaUnlocks.fifthDimboost.effects.buff.effectOrDefault(0) : 0)).times(
+        Alpha.isRunning ? AlphaUnlocks.fifthDimboost.effects.nerf.effectOrDefault(1) : 1)).round());
+    } else if (this.maxDimensionsUnlockable === 6 && NormalChallenge(10).isRunning) {
       costAtSoftcap = costAtSoftcap.add(DC.E100.sub(3).mul(DC.D20.sub(Effects.sum(TimeStudy(211), TimeStudy(222)) +
         (!player.disablePostReality ? AlphaUnlocks.fifthDimboost.effects.buff.effectOrDefault(0) : 0)).times(
         Alpha.isRunning ? AlphaUnlocks.fifthDimboost.effects.nerf.effectOrDefault(1) : 1)).round());
@@ -168,16 +180,18 @@ export class DimBoost {
     costAtSoftcap = Decimal.round(costAtSoftcap);
 
     if (amount.gt(costAtSoftcap)) {
-      const inc = NormalChallenge(10).isRunning
+      const inc = Slabdrill.isCursed
         ? DC.D20.sub(discount).times(multi).times(InfinityUpgrade.resetBoost.chargedEffect.effectOrDefault(1))
-        : DC.D15.sub(discount).times(multi).times(InfinityUpgrade.resetBoost.chargedEffect.effectOrDefault(1));
+        : (NormalChallenge(10).isRunning
+          ? DC.D20.sub(discount).times(multi).times(InfinityUpgrade.resetBoost.chargedEffect.effectOrDefault(1))
+          : DC.D15.sub(discount).times(multi).times(InfinityUpgrade.resetBoost.chargedEffect.effectOrDefault(1)));
       let aboveCap = amount.sub(20);
       aboveCap = aboveCap.div(inc);
-      aboveCap = aboveCap.add(NormalChallenge(10).isRunning ? 3 : 5);
+      aboveCap = aboveCap.add(Slabdrill.isCursed ? 1 : (NormalChallenge(10).isRunning ? 3 : 5));
       aboveCap = aboveCap.div(DC.E100);
       aboveCap = Decimal.sqr(aboveCap);
       aboveCap = aboveCap.times(DC.E100);
-      aboveCap = aboveCap.sub(NormalChallenge(10).isRunning ? 3 : 5);
+      aboveCap = aboveCap.sub(Slabdrill.isCursed ? 1 : (NormalChallenge(10).isRunning ? 3 : 5));
       aboveCap = aboveCap.times(inc);
       aboveCap = aboveCap.add(20);
       amount = Decimal.round(aboveCap);
@@ -194,7 +208,7 @@ export class DimBoost {
     let newUnlock = "";
     if (!allNDUnlocked && boosts.lt(DimBoost.maxDimensionsUnlockable - 4)) {
       newUnlock = `unlock the ${formatInt(boosts.add(5))}th Dimension`;
-    } else if (boosts.eq(4) && !NormalChallenge(10).isRunning && !EternityChallenge(3).isRunning) {
+    } else if (boosts.eq(4) && !NormalChallenge(10).isRunning && !EternityChallenge(3).isRunning && !Slabdrill.isCursed) {
       newUnlock = "unlock Sacrifice";
     }
 
@@ -202,6 +216,7 @@ export class DimBoost {
     let dimensionRange = `to the 1st Dimension`;
     if (boosts.gt(0)) dimensionRange = `to Dimensions 1-${Decimal.min(boosts.add(1), 8)}`;
     if (boosts.gte(DimBoost.maxDimensionsUnlockable - 1)) dimensionRange = `to all Dimensions`;
+    if (boosts.gte(DimBoost.maxDimensionsUnlockable - 1) && Slabdrill.isCursed) dimensionRange = `to your Dimension`;
     const formattedPowText = Ascensions.dbA.isUnlocked ? `and a +${formatPow(DimBoost.exponentialPower, 2, 3)} power to all Dimensions` : "";
 
     let boostEffects;
@@ -211,10 +226,11 @@ export class DimBoost {
 
     if (boostEffects === "") return "Dimension Boosts are currently useless";
     const areDimensionsKept = (Perk.antimatterNoReset.isBought || Achievement(111).canBeApplied) &&
-      (!player.disablePostReality || (LHC.voidRunning && player.endgame.largeHadronCollider.void.nullified) || (Alpha.isRunning && Alpha.currentStage >= 12) || (LHC.voidRunning && NullUpgrade.limerick1.isBought)) &&
+      (!player.disablePostReality || (LHC.voidRunning && player.endgame.largeHadronCollider.void.nullified) || (Alpha.isRunning && Alpha.currentStage >= 12)
+      || (LHC.voidRunning && NullUpgrade.limerick1.isBought) || SlabdrillUnlocks.eternityChallengeTen.isUnlocked) &&
       ((!Pelle.isDoomed || PelleAchievementUpgrade.achievement111.canBeApplied) || PelleUpgrade.dimBoostResetsNothing.isBought);
     if (areDimensionsKept) return boostEffects[0].toUpperCase() + boostEffects.substring(1);
-    return `Reset your Dimensions to ${boostEffects}`;
+    return `Reset your ${Slabdrill.isCursed ? "Dimension" : "Dimensions"} to ${boostEffects}`;
   }
 
   static get purchasedBoosts() {
@@ -269,21 +285,25 @@ export class DimBoost {
       logBase = logBase.times(InfinityUpgrade.resetBoost.chargedEffect.effectOrDefault(1));
       let naturalBase = (8 / tier) * 15;
       let logarithm = Decimal.pow10(logBase.div(naturalBase));
+      logarithm = logarithm.pow(NormalChallenge(4).chargedEffect);
       calcBoosts = ad.max(1).log(logarithm);
-      calcBoosts = calcBoosts.add(NormalChallenge(10).isRunning ? 2 : 4);
+      calcBoosts = calcBoosts.add(Slabdrill.isCursed ? 0 : (NormalChallenge(10).isRunning ? 2 : 4));
       if (calcBoosts.floor().lte(DimBoost.purchasedBoosts)) return DC.D0;
       calcBoosts = calcBoosts.sub(DimBoost.purchasedBoosts);
       const boosts = Decimal.min(DC.BEMAX, calcBoosts.floor());
       return boosts;
     }
     let amount = DC.D20;
+    if (Slabdrill.isCursed) amount = DC.D60;
     let discount = Effects.sum(
       TimeStudy(211),
       TimeStudy(222)
     );
     if (!player.disablePostReality) discount += AlphaUnlocks.fifthDimboost.effects.buff.effectOrDefault(0);
     let multiplierPerDB;
-    if (tier === 6) {
+    if (Slabdrill.isCursed) {
+      multiplierPerDB = DC.D20.sub(discount);
+    } else if (tier === 6) {
       multiplierPerDB = DC.D20.sub(discount);
     } else if (tier === 8) {
       multiplierPerDB = DC.D15.sub(discount);
@@ -302,8 +322,8 @@ export class DimBoost {
     if (EternityChallenge(5).isRunning) {
       const ad = AntimatterDimension(tier).totalAmount;
       let estimateTotalAmount = Decimal.floor(Decimal.cbrt(ad.div(InfinityUpgrade.resetBoost.chargedEffect.effectOrDefault(1)))).add(1);
-      const freeBoost = NormalChallenge(10).isRunning ? new Decimal(2) : new Decimal(4);
-      const divisor1 = NormalChallenge(10).isRunning ? new Decimal(20) : new Decimal(15);
+      const freeBoost = Slabdrill.isCursed ? new Decimal(0) : (NormalChallenge(10).isRunning ? new Decimal(2) : new Decimal(4));
+      const divisor1 = Slabdrill.isCursed ? new Decimal(20) : (NormalChallenge(10).isRunning ? new Decimal(20) : new Decimal(15));
       const divisor2 = Effects.sum(TimeStudy(211), TimeStudy(222)) + (player.disablePostReality ? 0 : AlphaUnlocks.fifthDimboost.effects.buff.effectOrDefault(0));
       const multi = divisor1.sub(divisor2).times(Alpha.isRunning ? AlphaUnlocks.fifthDimboost.effects.nerf.effectOrDefault(1) : 1);
       const extraEffect = InfinityChallenge(5).isCompleted ? new Decimal(1) : new Decimal(0);
@@ -326,7 +346,7 @@ export class DimBoost {
       }
       calcBoosts = calcBoosts.sub(1);
     } else {
-      calcBoosts = calcBoosts.add(NormalChallenge(10).isRunning ? 2 : 4);
+      calcBoosts = calcBoosts.add(Slabdrill.isCursed ? 0 : (NormalChallenge(10).isRunning ? 2 : 4));
       // Dimension boosts 1-4 dont use 8th dims, 1-2 dont use 6th dims, so add those extras afterwards.
     }
 
@@ -359,7 +379,7 @@ export function softReset(tempBulk, forcedADReset = false, forcedAMReset = false
     ? PelleUpgrade.dimBoostResetsNothing.canBeApplied
     : (Perk.antimatterNoReset.canBeApplied && (!player.disablePostReality || (LHC.voidRunning && player.endgame.largeHadronCollider.void.nullified)));
   if (forcedADReset || !canKeepDimensions) {
-    AntimatterDimensions.reset();
+    AntimatterDimensions.resetUpToNine();
     player.sacrificed = DC.D0;
     resetTickspeed();
   }
@@ -367,7 +387,8 @@ export function softReset(tempBulk, forcedADReset = false, forcedAMReset = false
   const canKeepAntimatter = Pelle.isDoomed
     ? (PelleUpgrade.dimBoostResetsNothing.canBeApplied || PelleAchievementUpgrade.achievement111.canBeApplied)
     : (Achievement(111).isUnlocked || Perk.antimatterNoReset.canBeApplied) &&
-      (!player.disablePostReality || (LHC.voidRunning && player.endgame.largeHadronCollider.void.nullified) || (Alpha.isRunning && Alpha.currentStage >= 12) || (LHC.voidRunning && NullUpgrade.limerick1.isBought));
+      (!player.disablePostReality || (LHC.voidRunning && player.endgame.largeHadronCollider.void.nullified) || (Alpha.isRunning && Alpha.currentStage >= 12)
+      || (LHC.voidRunning && NullUpgrade.limerick1.isBought) || SlabdrillUnlocks.eternityChallengeTen.isUnlocked);
   if (!forcedAMReset && canKeepAntimatter) {
     Currency.antimatter.bumpTo(Currency.antimatter.startingValue);
   } else {
@@ -404,6 +425,11 @@ export function requestDimensionBoost(bulk) {
   Tutorial.turnOffEffect(TUTORIAL_STATE.DIMBOOST);
   if (BreakInfinityUpgrade.autobuyMaxDimboosts.isBought && bulk) maxBuyDimBoosts();
   else softReset(1);
+  if (Slabdrill.isCursed && Slabdrill.currentStage === 0) {
+    secondSoftCelestialReset();
+    Slabdrill.advanceLayer();
+    Slabdrill.quotes.dimboost.show();
+  }
   if (Alpha.isRunning && DimBoost.purchasedBoosts.gte(4) && Alpha.currentStage === 0) {
     Alpha.advanceLayer();
     Alpha.quotes.fourthDB.show();

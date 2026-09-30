@@ -55,7 +55,7 @@ export const eternityMilestones = {
   },
   autobuyMaxGalaxies: {
     eternities: 9,
-    reward: "Unlock the buy max Antimatter Galaxies Autobuyer mode"
+    reward: () => `Unlock the buy max ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxies Autobuyer mode`
   },
   unlockReplicanti: {
     eternities: 10,
@@ -117,12 +117,12 @@ export const eternityMilestones = {
   },
   unlockAllND: {
     eternities: 30,
-    reward: "Start with all Antimatter Dimensions available for purchase"
+    reward: () => `Start with all ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions available for purchase`
   },
   replicantiNoReset: {
     eternities: 40,
-    reward: `Replicanti Galaxies no longer reset Antimatter, Antimatter Dimensions,
-      Tickspeed, Dimensional Sacrifice, or Dimension Boosts`,
+    reward: () => `Replicanti Galaxies no longer reset ${player.universes.current === 2 ? "Matter" : "Antimatter"},
+      ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions, Tickspeed, Dimensional Sacrifice, or Dimension Boosts`,
     pelleUseless: true
   },
   autobuyerReplicantiChance: {

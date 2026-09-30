@@ -1052,6 +1052,15 @@ button:focus {
   animation: a-universes--transient-glow-hover 10s infinite;
 }
 
+.o-tab-btn--universes__tangible {
+  background-color: var(--color-prestige--accent);
+  animation: a-universes--tangible-glow-primary 10s infinite;
+}
+
+.o-tab-btn--universes__tangible:hover {
+  animation: a-universes--tangible-glow-hover 10s infinite;
+}
+
 @keyframes a-universes-glow-primary {
   0% { color: #2196f3; border-color: #2196f3; }
   33% { color: #673ab7; border-color: #673ab7; }
@@ -1102,6 +1111,30 @@ button:focus {
   0% { border-top-color: #64dd17; }
   50% { border-top-color: #64ddad; }
   100% { border-top-color: #64dd17; }
+}
+
+@keyframes a-universes--tangible-glow-primary {
+  0% { color: #df5050; border-color: #df5050; }
+  50% { color: #505050; border-color: #505050; }
+  100% { color: #df5050; border-color: #df5050; }
+}
+
+@keyframes a-universes--tangible-glow-hover {
+  0% { background: #df5050; }
+  50% { background: #505050; }
+  100% { background: #df5050; }
+}
+
+@keyframes a-universes--tangible-glow-border-left {
+  0% { border-left-color: #df5050; }
+  50% { border-left-color: #505050; }
+  100% { border-left-color: #df5050; }
+}
+
+@keyframes a-universes--tangible-glow-border-top {
+  0% { border-top-color: #df5050; }
+  50% { border-top-color: #505050; }
+  100% { border-top-color: #df5050; }
 }
 
 /* #endregion tab buttons */
@@ -2085,7 +2118,6 @@ br {
   width: 100%;
   /* stylelint-disable-next-line unit-allowed-list */
   height: 100vh;
-  position: relative;
 }
 
 .c-game-tab {
@@ -6239,6 +6271,221 @@ properly on certain themes. */
 
 /* #endregion Dilation */
 
+/* #region Compression */
+
+.l-compression-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* #region c-compression-tab */
+
+.c-compression-tab__hawking-radiation {
+  font-size: 3.5rem;
+  color: black;
+}
+
+.c-compression-tab__thermal-radiation {
+  font-size: 3.5rem;
+  color: black;
+}
+
+.c-compression-tab__thermal-radiation-income {
+  font-size: 2.5rem;
+  color: black;
+}
+
+.c-compression-tab__wave-threshold {
+  font-size: 2.5rem;
+  color: black;
+}
+
+.c-compression-tab__waves {
+  font-size: 2.5rem;
+  color: black;
+}
+
+.t-metro .c-compression-tab__hawking-radiation,
+.s-base--dark .c-compression-tab__hawking-radiation,
+.t-s8 .c-compression-tab__hawking-radiation {
+  color: blue;
+}
+
+.t-dark .c-compression-tab__hawking-radiation,
+.t-s6 .c-compression-tab__hawking-radiation,
+.t-s10 .c-compression-tab__hawking-radiation {
+  text-shadow: 0 0 0.7rem blue;
+}
+
+.t-metro .c-compression-tab__hawking-radiation,
+.t-metro .c-compression-tab__thermal-radiation,
+.t-metro .c-compression-tab__thermal-radiation-income,
+.t-metro .c-compression-tab__wave-threshold,
+.t-metro .c-compression-tab__waves,
+.t-s8 .c-compression-tab__hawking-radiation,
+.t-s8 .c-compression-tab__thermal-radiation,
+.t-s8 .c-compression-tab__thermal-radiation-income,
+.t-s8 .c-compression-tab__wave-threshold,
+.t-s8 .c-compression-tab__waves {
+  text-shadow: 0 0 0.1rem rgba(0, 0, 0, 50%), -0.1rem 0.1rem 0.1rem black;
+}
+
+.t-metro .c-compression-tab__thermal-radiation,
+.t-metro .c-compression-tab__thermal-radiation-income,
+.t-metro .c-compression-tab__wave-threshold,
+.t-metro .c-compression-tab__waves,
+.s-base--dark .c-compression-tab__thermal-radiation,
+.s-base--dark .c-compression-tab__thermal-radiation-income,
+.s-base--dark .c-compression-tab__wave-threshold,
+.s-base--dark .c-compression-tab__waves,
+.t-s8 .c-compression-tab__thermal-radiation,
+.t-s8 .c-compression-tab__thermal-radiation-income,
+.t-s8 .c-compression-tab__wave-threshold,
+.t-s8 .c-compression-tab__waves {
+  color: #64ddad;
+}
+
+.t-dark .c-compression-tab__thermal-radiation,
+.t-dark .c-compression-tab__thermal-radiation-income,
+.t-dark .c-compression-tab__wave-threshold,
+.t-dark .c-compression-tab__waves,
+.t-s6 .c-compression-tab__thermal-radiation,
+.t-s6 .c-compression-tab__thermal-radiation-income,
+.t-s6 .c-compression-tab__wave-threshold,
+.t-s6 .c-compression-tab__waves,
+.t-s10 .c-compression-tab__thermal-radiation,
+.t-s10 .c-compression-tab__thermal-radiation-income,
+.t-s10 .c-compression-tab__wave-threshold,
+.t-s10 .c-compression-tab__waves {
+  text-shadow: 0 0 0.7rem #64ddad;
+}
+
+/* #endregion c-compression-tab */
+
+/* #region o-compression-btn */
+
+.o-compression-btn {
+  width: 19rem;
+  height: 9rem;
+  font-family: Typewriter, serif;
+  font-size: 1.12rem;
+  font-weight: bold;
+  border: var(--var-border-width, 0.2rem) solid blue;
+  border-radius: var(--var-border-radius, 0.4rem);
+  padding: 1rem;
+  transition-duration: 0.2s;
+}
+
+.o-compression-btn--locked {
+  color: #181818;
+  background-color: #5f5f5f;
+  border-color: #3e8a0f;
+}
+
+.o-compression-btn--unlocked {
+  color: blue;
+  background-color: black;
+  animation: a-compression-btn-glow 10s infinite;
+  cursor: pointer;
+}
+
+.o-compression-btn--unlocked:hover {
+  background-color: white;
+}
+
+.t-dark .o-compression-btn--unlocked {
+  color: blue;
+  background-color: black;
+}
+
+.t-dark .o-compression-btn--unlocked:hover,
+.t-s6 .o-compression-btn--unlocked:hover,
+.t-s10 .o-compression-btn--unlocked:hover {
+  color: blue;
+  background-color: white;
+}
+
+.t-s4 .o-compression-btn {
+  animation: a-compression-btn-glow--cancer 10s infinite;
+}
+
+.o-compression-btn--locked:hover {
+  color: #1d1d1d;
+  background-color: #660000;
+}
+
+.s-base--metro .o-compression-btn--locked,
+.t-s1 .o-compression-btn--locked {
+  color: black;
+  background-color: #9e9e9e;
+  border: none;
+  box-shadow: 0.1rem 0.1rem 0.1rem 0 black;
+}
+
+.s-base--metro .o-compression-btn--locked:hover {
+  background-color: #ef5350;
+}
+
+.t-s1 .o-compression-btn--locked:hover {
+  background-color: #d72621;
+}
+
+.t-s6 .o-compression-btn--locked,
+.t-s10 .o-compression-btn--locked {
+  color: gray;
+  background-color: black;
+}
+
+.t-dark .o-compression-btn--locked {
+  color: black;
+  background-color: #23292a;
+}
+
+.t-dark .o-compression-btn--locked:hover,
+.t-s6 .o-compression-btn--locked:hover,
+.t-s10 .o-compression-btn--locked:hover {
+  color: black;
+  background-color: #b84b5f;
+  border-color: #b84b5f;
+}
+
+@keyframes a-compression-btn-glow {
+  0% { box-shadow: inset 0.5rem  0       2rem; }
+  25% { box-shadow: inset 0       0.5rem  2rem; }
+  50% { box-shadow: inset -0.5rem 0       2rem; }
+  75% { box-shadow: inset 0       -0.5rem 2rem; }
+  100% { box-shadow: inset 0.5rem  0       2rem; }
+}
+
+@keyframes a-compression-btn-glow--cancer {
+  0% { box-shadow: inset  0.5px -0.5rem 2rem; }
+  10% { box-shadow: inset -0.5px  0.5rem 2rem; }
+  20% { box-shadow: inset  0.5px -0.5rem 2rem; }
+  22% { box-shadow: inset -0.5px  0.5rem 2rem; }
+  25% { box-shadow: inset  0.5px -0.5rem 2rem; }
+  29% { box-shadow: inset -0.5px  0.5rem 2rem; }
+  39% { box-shadow: inset  0.5px -0.5rem 2rem; }
+  44% { box-shadow: inset -0.5px  0.5rem 2rem; }
+  53% { box-shadow: inset  0.5px -0.5rem 2rem; }
+  57% { box-shadow: inset -0.5px  0.5rem 2rem; }
+  63% { box-shadow: inset  0.5px -0.5rem 2rem; }
+  69% { box-shadow: inset -0.5px  0.5rem 2rem; }
+  71% { box-shadow: inset  0.5px -0.5rem 2rem; }
+  74% { box-shadow: inset -0.5px  0.5rem 2rem; }
+  75% { box-shadow: inset  0.5px -0.5rem 2rem; }
+  84% { box-shadow: inset -0.5px  0.5rem 2rem; }
+  88% { box-shadow: inset  0.5px -0.5rem 2rem; }
+  92% { box-shadow: inset -0.5px  0.5rem 2rem; }
+  93% { box-shadow: inset  0.5px -0.5rem 2rem; }
+  95% { box-shadow: inset -0.5px  0.5rem 2rem; }
+  100% { box-shadow: inset  0.5px -0.5rem 2rem; }
+}
+
+/* #endregion o-compression-btn */
+
+/* #endregion Compression */
+
 /* #region Hadrons */
 
 .o-hadron-light {
@@ -6930,6 +7177,61 @@ properly on certain themes. */
 }
 
 /* #endregion Endgame Milestones */
+
+/* #region Slabdrill Milestones */
+
+.o-slabdrill-milestone__reward {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 36rem;
+  height: 36rem;
+  margin: 1rem 1rem;
+  font-family: Typewriter, serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--color-slabdrill--base);
+  border: 0.1rem solid var(--color-slabdrill--base);
+  border-radius: var(--var-border-radius, 0.4rem);
+  transition-duration: 0.2s;
+  background-color: #401050;
+  cursor: pointer;
+  animation: a-time-study 7s infinite;
+}
+
+.o-slabdrill-milestone__reward:hover {
+  background-color: black;
+}
+
+.o-slabdrill-milestone__default {
+  position: absolute;
+  font-family: Typewriter, serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--color-slabdrill--base);
+  transition-duration: 0.2s;
+  opacity: 1;
+}
+
+.o-slabdrill-milestone__reward:hover .o-slabdrill-milestone__default {
+  opacity: 0;
+}
+
+.o-slabdrill-milestone__text {
+  font-family: Typewriter, serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--color-slabdrill--base);
+  transition-duration: 0.2s;
+  opacity: 0;
+}
+
+.o-slabdrill-milestone__reward:hover .o-slabdrill-milestone__text {
+  opacity: 1;
+}
+
+/* #endregion Slabdrill Milestones */
 
 /* #region Stars */
 
@@ -12124,6 +12426,28 @@ kbd {
   color: black;
   background: var(--color-alpha--base);
   border: var(--var-border-width, 0.2rem) solid var(--color-alpha--base);
+  border-radius: var(--var-border-radius, 0.5rem);
+}
+
+.o-expansion-pack--slabdrill {
+  color: var(--color-slabdrill--base);
+  background: black;
+  border: var(--var-border-width, 0.2rem) solid var(--color-slabdrill--base);
+  border-radius: var(--var-border-radius, 0.5rem);
+}
+
+.o-expansion-pack--slabdrill:hover {
+  color: black;
+  background: var(--color-slabdrill--base);
+  border: var(--var-border-width, 0.2rem) solid var(--color-slabdrill--base);
+  border-radius: var(--var-border-radius, 0.5rem);
+  cursor: pointer;
+}
+
+.o-expansion-pack--slabdrill--bought {
+  color: black;
+  background: var(--color-slabdrill--base);
+  border: var(--var-border-width, 0.2rem) solid var(--color-slabdrill--base);
   border-radius: var(--var-border-radius, 0.5rem);
 }
 

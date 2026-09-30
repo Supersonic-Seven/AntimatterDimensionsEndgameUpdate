@@ -25,11 +25,12 @@ class InfinityChallengeState extends GameMechanicState {
   }
 
   get unlockAM() {
-    return this.config.unlockAM;
+    return this.config.unlockAM();
   }
 
   get isUnlocked() {
-    return player.records.thisEternity.maxAM.gte(this.unlockAM) || (Achievement(133).isUnlocked && !Pelle.isDoomed && !player.disablePostReality) ||
+    return player.records.thisEternity.maxAM.gte(this.unlockAM) ||
+      (Achievement(133).isUnlocked && !Pelle.isDoomed && (!player.disablePostReality || SlabdrillUnlocks.eternityChallengeTen.isUnlocked)) ||
       (PelleUpgrade.keepInfinityChallenges.canBeApplied && Pelle.cel.records.totalAntimatter.gte(this.unlockAM));
   }
 
@@ -70,6 +71,10 @@ class InfinityChallengeState extends GameMechanicState {
       Alpha.advanceLayer();
       Alpha.quotes.allInfinityChalls.show();
     }
+    if (this.id === 4 && Slabdrill.isCursed && Slabdrill.currentStage === 4) {
+      Slabdrill.advanceLayer();
+      Slabdrill.quotes.infinityChallengeFour.show();
+    }
   }
 
   get isEffectActive() {
@@ -88,7 +93,7 @@ class InfinityChallengeState extends GameMechanicState {
   }
 
   get goal() {
-    return this.config.goal;
+    return this.config.goal();
   }
 
   updateChallengeTime() {
@@ -151,6 +156,7 @@ export const InfinityChallenges = {
     // Disable the popup if the user will automatically complete the IC.
     if (EternityMilestone.autoIC.isReached) return;
     if (InfinityChallenges.nextIC === undefined) return;
+    if (player.celestials.slabdrill.core.isActive) return;
     for (const ic of InfinityChallenges.all) {
       if (ic.isUnlocked || ic.isCompleted) continue;
       if (value.lt(ic.unlockAM)) break;

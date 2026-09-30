@@ -22,6 +22,7 @@ import { ra } from "./ra";
 import { resurgenceUpgrades } from "./resurgence-upgrades";
 import { pelleRifts } from "./rifts";
 import { singularityMilestones } from "./singularity-milestones";
+import { slabdrillUnlocks } from "./slabdrill";
 import { pelleStrikes } from "./strikes";
 import { teresa } from "./teresa";
 import { quotes } from "./quotes";
@@ -67,6 +68,9 @@ export const celestials = {
   ra,
   resurgenceUpgrades,
   singularityMilestones,
+  slabdrill: {
+    unlocks: slabdrillUnlocks
+  },
   teresa,
   quotes,
   v,

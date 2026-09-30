@@ -41,7 +41,7 @@ export default {
       this.isUnlocked = this.autobuyer.isUnlocked;
       this.isHiddenSacrifice = this.isSacrifice && Achievement(118).canBeApplied &&
         (!player.disablePostReality || (Alpha.isRunning && Alpha.currentStage >= 12) ||
-        (LHC.voidRunning && NullUpgrade.limerick1.isBought));
+        (LHC.voidRunning && NullUpgrade.limerick1.isBought) || SlabdrillUnlocks.eternityChallengeTen.isUnlocked);
       this.annihilationMode = player.auto.annihilation.mode;
     },
     modeToggle() {

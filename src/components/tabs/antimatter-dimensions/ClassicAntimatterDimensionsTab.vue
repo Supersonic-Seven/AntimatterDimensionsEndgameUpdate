@@ -65,7 +65,7 @@ export default {
     <TickspeedRow />
     <div class="l-dimensions-container">
       <AntimatterDimensionRow
-        v-for="tier in 8"
+        v-for="tier in 9"
         :key="tier"
         :tier="tier"
       />

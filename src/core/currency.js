@@ -234,6 +234,12 @@ Currency.antimatter = new class extends DecimalCurrency {
     if (LHC.voidRunning) {
       player.endgame.largeHadronCollider.void.highestAntimatter = player.endgame.largeHadronCollider.void.highestAntimatter.max(value);
     }
+    if (player.universes.current === 1) {
+      player.universes.highestTransientAntimatter = player.universes.highestTransientAntimatter.max(value);
+    }
+    if (player.universes.current === 2) {
+      player.universes.highestTangibleMatter = player.universes.highestTangibleMatter.max(value);
+    }
   }
 
   add(amount) {
@@ -488,9 +494,12 @@ Currency.realityMachines = new class extends DecimalCurrency {
   }
 }();
 
-Currency.perkPoints = new class extends NumberCurrency {
+Currency.perkPoints = new class extends DecimalCurrency {
   get value() { return player.reality.perkPoints; }
-  set value(value) { player.reality.perkPoints = value; }
+  set value(value) {
+    const newValue = new Decimal(value);
+    player.reality.perkPoints = newValue;
+  }
 }();
 
 Currency.relicShards = new class extends DecimalCurrency {
@@ -763,7 +772,7 @@ Currency.divineEnergy = new class extends DecimalCurrency {
 Currency.nullMatter = new class extends DecimalCurrency {
   get value() { return player.endgame.largeHadronCollider.void.nullMatter; }
   set value(value) {
-    const newValue = Decimal.min(value, DC.NUMMAX);
+    const newValue = DualityUpgrade(26).isBought ? new Decimal(value) : Decimal.min(value, DC.NUMMAX);
     player.endgame.largeHadronCollider.void.nullMatter = newValue;
   }
 }();
@@ -838,5 +847,61 @@ Currency.nebulae = new class extends DecimalCurrency {
   reset() {
     super.reset();
     player.records.bestSupernova.maxNeb = this.startingValue;
+  }
+}();
+
+Currency.serpentinePower = new class extends DecimalCurrency {
+  get value() { return player.celestials.slabdrill.serpentinePower; }
+  set value(value) {
+    const newValue = new Decimal(value);
+    player.celestials.slabdrill.serpentinePower = newValue;
+  }
+}();
+
+Currency.thermalRadiation = new class extends DecimalCurrency {
+  get value() { return player.compression.thermalRadiation; }
+  set value(value) {
+    const newValue = new Decimal(value);
+    player.compression.thermalRadiation = newValue;
+  }
+}();
+
+Currency.hawkingRadiation = new class extends DecimalCurrency {
+  get value() { return player.compression.hawkingRadiation; }
+  set value(value) {
+    const newValue = new Decimal(value);
+    player.compression.hawkingRadiation = newValue;
+  }
+}();
+
+Currency.relativisticParticles = new class extends DecimalCurrency {
+  get value() { return player.universes.relativisticParticles; }
+  set value(value) {
+    const newValue = new Decimal(value);
+    player.universes.relativisticParticles = newValue;
+  }
+}();
+
+Currency.ephemeralLight = new class extends DecimalCurrency {
+  get value() { return player.universes.ephemeralLight; }
+  set value(value) {
+    const newValue = new Decimal(value);
+    player.universes.ephemeralLight = newValue;
+  }
+}();
+
+Currency.molecularMass = new class extends DecimalCurrency {
+  get value() { return player.universes.molecularMass; }
+  set value(value) {
+    const newValue = new Decimal(value);
+    player.universes.molecularMass = newValue;
+  }
+}();
+
+Currency.stellarAugmenters = new class extends DecimalCurrency {
+  get value() { return player.universes.stellarAugmenters; }
+  set value(value) {
+    const newValue = new Decimal(value);
+    player.universes.stellarAugmenters = newValue;
   }
 }();

@@ -9,8 +9,8 @@ export const alchemyResources = {
     tier: 1,
     uiOrder: 1,
     unlockedAt: 2,
-    description: "provides a power to Antimatter Dimensions",
-    formatEffect: value => `Antimatter Dimension multipliers ${formatPow(value, 4, 4)}`,
+    description: () => `provides a power to ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions`,
+    formatEffect: value => `${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimension multipliers ${formatPow(value, 4, 4)}`,
     destroyed: () => !PelleAlchemyUpgrade.alchemyPower.isBought
   },
   "infinity": {
@@ -147,7 +147,7 @@ export const alchemyResources = {
     uiOrder: 5,
     unlockedAt: 11,
     description: "provides an additional power for very large multipliers",
-    formatEffect: value => `All Antimatter Dimension multipliers are ${formatPow(1.05, 2, 2)}
+    formatEffect: value => `All ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimension multipliers are ${formatPow(1.05, 2, 2)}
       if they are above ${format(value)} `,
     reagents: [
       {
@@ -320,8 +320,8 @@ export const alchemyResources = {
     tier: 4,
     uiOrder: 2,
     unlockedAt: 17,
-    description: "multiplies Antimatter Dimensions based on Reality Machines",
-    formatEffect: value => `Multiply Antimatter Dimensions by Reality Machines${formatPow(value, 2, 2)}`,
+    description: () => `multiplies ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions based on Reality Machines`,
+    formatEffect: value => `Multiply ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions by Reality Machines${formatPow(value, 2, 2)}`,
     reagents: [
       {
         resource: ALCHEMY_RESOURCE.DIMENSIONALITY,

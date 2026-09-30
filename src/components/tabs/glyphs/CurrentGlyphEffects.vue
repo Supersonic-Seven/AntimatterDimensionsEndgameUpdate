@@ -59,6 +59,12 @@ export default {
           + `Level is capped at ${formatInt(Pelle.glyphMaxLevel)}`
         : "";
     },
+    slabbyGlyphText() {
+      return Slabdrill.isCursed
+        ? `Glyph Rarity is set to ${formatPercents(Math.clamp((Slabdrill.currentStage - 4) * 20, 0, 100) / 100)} and
+          Level is capped at ${formatInt(Decimal.floor(Decimal.pow(Slabdrill.power, 0.2)))}`
+        : "";
+    },
     showChaosText() {
       return this.pelleChaosEffect.isUnlocked && !this.noEffects;
     },
@@ -87,7 +93,7 @@ export default {
       this.logTotalSacrifice = GameCache.logTotalGlyphSacrifice.value;
 
       this.pelleChaosEffect = Pelle.specialGlyphEffect;
-      this.maxSpecialGlyphs = (Achievement(196).isUnlocked && !player.disablePostReality) ? 2 : 1;
+      this.maxSpecialGlyphs = Slabdrill.isCursed ? 0 : ((Achievement(196).isUnlocked && !player.disablePostReality) ? 2 : 1);
     },
     glyphsChanged() {
       this.effects = getActiveGlyphEffects();
@@ -101,6 +107,9 @@ export default {
   <div class="c-current-glyph-effects l-current-glyph-effects">
     <div class="pelle-current-glyph-effects">
       {{ pelleGlyphText }}
+    </div>
+    <div class="slabdrill-current-glyph-effects">
+      {{ slabbyGlyphText }}
     </div>
     <div class="c-current-glyph-effects__header">
       Currently active Glyph effects:

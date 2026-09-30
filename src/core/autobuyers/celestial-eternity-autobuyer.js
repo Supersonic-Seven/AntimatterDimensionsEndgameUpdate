@@ -102,7 +102,7 @@ export class CelestialEternityAutobuyerState extends IntervaledAutobuyerState {
 
   tick() {
     super.tick();
-    if (this.willInfinity) celestialEternityResetRequest(true);
+    if (this.willEternity) celestialEternityResetRequest(true);
   }
 
   reset() {

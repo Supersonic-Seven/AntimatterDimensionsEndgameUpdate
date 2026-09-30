@@ -15,7 +15,8 @@ export default {
       creditsClosed: false,
       requirementText: null,
       hasTutorial: false,
-      hasSurge: false
+      hasSurge: false,
+      isFlipped: false
     };
   },
   computed: {
@@ -44,7 +45,7 @@ export default {
       };
     },
     dimBoostName() {
-      if (Ascensions.dbA.isUnlocked) return "Dimension Surge";
+      if (this.hasSurge) return "Dimension Surge";
       return "Dimension Boost";
     },
     imaginaryText() {
@@ -65,6 +66,7 @@ export default {
       if (this.isDoomed) this.requirementText = formatHybridLarge(this.purchasedBoosts, 3);
       this.hasTutorial = Tutorial.isActive(TUTORIAL_STATE.DIMBOOST);
       this.hasSurge = Ascensions.dbA.isUnlocked;
+      this.isFlipped = player.universes.current === 2;
     },
     dimensionBoost(bulk) {
       if (!DimBoost.requirement.isSatisfied || !DimBoost.canBeBought) return;
@@ -77,7 +79,7 @@ export default {
 <template>
   <div class="reset-container dimboost">
     <h4>{{ dimBoostName }} ({{ boostCountText }})</h4>
-    <span>Requires: {{ formatHybridLarge(requirement.amount, 3) }} {{ dimName }} Antimatter D</span>
+    <span>Requires: {{ formatHybridLarge(requirement.amount, 3) }} {{ dimName }} {{ isFlipped ? "Matter" : "Antimatter" }} D</span>
     <span v-if="hasSurge">{{ imaginaryText }}</span>
     <button
       :class="classObject"

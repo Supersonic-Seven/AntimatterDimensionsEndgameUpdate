@@ -331,17 +331,18 @@ export function getGlyphLevelInputs() {
   // - Each additional 400 scaled requires another +800 on top of the already-existing gap for base
   // This is applied twice in a stacking way, using regular instability first and then again with hyperinstability
   // if the newly reduced level is still above the second threshold
-  const instabilitySoftcap = (level, begin, rate) => {
+  const instabilitySoftcap = (level, begin, rate, mag) => {
     if (level.lt(begin)) return level;
     const excess = level.sub(begin).div(rate);
-    return Decimal.sqrt(excess.times(4).add(1)).sub(1).times(rate).times(0.5).add(begin);
+    return Decimal.pow(excess.times(4).add(1), 1 / mag).sub(1).times(rate).times(0.5).add(begin);
   };
-  scaledLevel = instabilitySoftcap(scaledLevel, staticFactors.instability, 500 * EndgameMastery(274).effectOrDefault(1));
-  scaledLevel = instabilitySoftcap(scaledLevel, staticFactors.hyperInstability, 400 * EndgameMastery(274).effectOrDefault(1));
-  scaledLevel = instabilitySoftcap(scaledLevel, staticFactors.extremeInstability, ((EndgameUpgrade(13).isBought && !player.disablePostReality) ? 5 : 1) * EndgameMastery(274).effectOrDefault(1));
-  scaledLevel = instabilitySoftcap(scaledLevel, staticFactors.immenseInstability, 1 * EndgameMastery(274).effectOrDefault(1));
-  scaledLevel = instabilitySoftcap(scaledLevel, staticFactors.extensiveInstability, 0.1 * EndgameMastery(274).effectOrDefault(1));
-  scaledLevel = instabilitySoftcap(scaledLevel, staticFactors.prodigiousInstability, ((DivinityMilestone.finalRebirth.isReached && !player.disablePostReality) ? 0.001 : 0.00001) * EndgameMastery(274).effectOrDefault(1));
+  scaledLevel = instabilitySoftcap(scaledLevel, staticFactors.instability, 500 * EndgameMastery(274).effectOrDefault(1), 2);
+  scaledLevel = instabilitySoftcap(scaledLevel, staticFactors.hyperInstability, 400 * EndgameMastery(274).effectOrDefault(1), 2);
+  scaledLevel = instabilitySoftcap(scaledLevel, staticFactors.extremeInstability, ((EndgameUpgrade(13).isBought && !player.disablePostReality) ? 5 : 1) * EndgameMastery(274).effectOrDefault(1), 2);
+  scaledLevel = instabilitySoftcap(scaledLevel, staticFactors.immenseInstability, 1 * EndgameMastery(274).effectOrDefault(1), 2);
+  scaledLevel = instabilitySoftcap(scaledLevel, staticFactors.extensiveInstability, 0.1 * EndgameMastery(274).effectOrDefault(1), 2);
+  scaledLevel = instabilitySoftcap(scaledLevel, staticFactors.prodigiousInstability, ((DivinityMilestone.finalRebirth.isReached && !player.disablePostReality) ? 0.001 : 0.00001) * EndgameMastery(274).effectOrDefault(1), 2);
+  scaledLevel = instabilitySoftcap(scaledLevel, staticFactors.ultimateInstability, 1024, 1024);
 
   const scalePenalty = scaledLevel.gt(0) ? baseLevel.div(scaledLevel) : DC.D1;
   const incAfterInstability = staticFactors.realityUpgrades + staticFactors.achievements;
@@ -377,6 +378,7 @@ export function staticGlyphWeights() {
   const immenseInstability = Glyphs.immenseInstabilityThreshold;
   const extensiveInstability = Glyphs.extensiveInstabilityThreshold;
   const prodigiousInstability = Glyphs.prodigiousInstabilityThreshold;
+  const ultimateInstability = Glyphs.ultimateInstabilityThreshold;
   const realityUpgrades = [Array.range(1, 5).every(x => RealityUpgrade(x).boughtAmount > 0)]
     .concat(Array.range(1, 4).map(x => Array.range(1, 5).every(y => RealityUpgrade(5 * x + y).isBought)))
     .filter(x => x)
@@ -390,6 +392,7 @@ export function staticGlyphWeights() {
     immenseInstability,
     extensiveInstability,
     prodigiousInstability,
+    ultimateInstability,
     realityUpgrades,
     achievements
   };

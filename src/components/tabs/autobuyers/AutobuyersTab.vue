@@ -41,9 +41,11 @@ export default {
   data() {
     return {
       hasInfinity: false,
+      tickBought: false,
       hasContinuum: false,
       displayADAutobuyersIndividually: false,
       hasInstant: false,
+      isFlipped: false
     };
   },
   computed: {
@@ -59,7 +61,9 @@ export default {
   methods: {
     update() {
       this.hasInfinity = PlayerProgress.infinityUnlocked();
+      this.tickBought = Autobuyer.tickspeed.isBought;
       this.hasContinuum = Laitela.continuumActive;
+      this.isFlipped = player.universes.current === 2;
       this.checkADAutoStatus();
     },
     checkADAutoStatus() {
@@ -94,7 +98,7 @@ export default {
     </div>
     <b>Autobuyers with no displayed bulk have unlimited bulk by default.</b>
     <b>
-      Antimatter Dimension Autobuyers can have their bulk upgraded once interval is below {{ formatInt(100) }} ms.
+      {{ isFlipped ? "Matter" : "Antimatter" }} Dimension Autobuyers can have their bulk upgraded once interval is below {{ formatInt(100) }} ms.
     </b>
     <b v-if="hasInstant">Autobuyers with "Instant" interval will trigger every game tick ({{ gameTickLength }}).</b>
     <EndgameAutobuyerBox class="c-endgame-pos" />
@@ -109,7 +113,7 @@ export default {
     <DimensionBoostAutobuyerBox />
     <BulkSingularityAutobuyerBox />
     <CelestialTickspeedAutobuyerBox />
-    <TickspeedAutobuyerBox v-if="!hasContinuum" />
+    <TickspeedAutobuyerBox v-if="!hasContinuum || !tickBought" />
     <template v-if="displayADAutobuyersIndividually">
       <DimensionAutobuyerBox
         v-for="tier in 8"

@@ -1,11 +1,17 @@
 export function effectiveBaseGalaxies() {
   let alternation = Decimal.max(0, Replicanti.amount.add(1).log10().div(1e6)).times(AlchemyResource.alternation.effectValue).add(1);
   let galaxies = player.galaxies;
+  if (Slabdrill.isCursed && SlabdrillUnlocks.timeStudy181.isUnlocked) {
+    galaxies = galaxies.min(100).add(galaxies.sub(100).max(0).div(10));
+  }
   if (!player.disablePostReality && Alpha.currentStage >= 3) galaxies = galaxies.times(alternation);
   let generatedGalaxies = GalaxyGenerator.galaxies;
   if (!player.disablePostReality && Alpha.currentStage >= 3) generatedGalaxies = generatedGalaxies.times(alternation);
   // Note that this already includes the "50% more" active path effect
   let replicantiGalaxies = Replicanti.galaxies.bought;
+  if (Slabdrill.isCursed && SlabdrillUnlocks.timeStudy181.isUnlocked) {
+    replicantiGalaxies = replicantiGalaxies.min(100).add(replicantiGalaxies.sub(100).max(0).div(10));
+  }
   replicantiGalaxies = replicantiGalaxies.times(1 + Effects.sum(
     TimeStudy(132),
     TimeStudy(133)
@@ -19,13 +25,43 @@ export function effectiveBaseGalaxies() {
   replicantiGalaxies = replicantiGalaxies.add(nonActivePathReplicantiGalaxies.times(Effects.sum(EternityChallenge(8).reward)));
   if (!player.disablePostReality && Alpha.currentStage >= 3) replicantiGalaxies = replicantiGalaxies.times(alternation);
   let freeGalaxies = player.dilation.totalTachyonGalaxies;
+  if (Slabdrill.isCursed && SlabdrillUnlocks.timeStudy181.isUnlocked) {
+    freeGalaxies = freeGalaxies.min(100).add(freeGalaxies.sub(100).max(0).div(10));
+  }
   freeGalaxies = freeGalaxies.times(alternation);
   let extraGalaxies = GalacticPower.freeGalaxies;
   if (!player.disablePostReality && Alpha.currentStage >= 3) extraGalaxies = extraGalaxies.times(alternation);
   return GalacticPowers.galacticAscension.isUnlocked ?
     Decimal.max(galaxies.max(1).times(generatedGalaxies.max(1)).times(replicantiGalaxies.max(1)).times(
-    freeGalaxies.max(1)).times(extraGalaxies.max(1)), 0) : Decimal.max(galaxies.add(generatedGalaxies).add(
-    replicantiGalaxies).add(freeGalaxies).add(extraGalaxies), 0);
+    freeGalaxies.max(1)).times(extraGalaxies.max(1)), 0).div(galacticInstability()) : Decimal.max(
+      galaxies.add(generatedGalaxies).add(replicantiGalaxies).add(freeGalaxies).add(extraGalaxies), 0).div(
+      galacticInstability());
+}
+
+export function actualBaseGalaxiesBeforeOverflow() {
+  return GalacticPowers.galacticAscension.isUnlocked
+    ? Replicanti.galaxies.total.max(1).times(player.galaxies.max(1)).times(player.dilation.totalTachyonGalaxies.max(1)).times(
+      GalaxyGenerator.galaxies.max(1)).times(GalacticPower.freeGalaxies.max(1))
+    : Replicanti.galaxies.total.add(player.galaxies).add(player.dilation.totalTachyonGalaxies).add(GalaxyGenerator.galaxies).add(
+      GalacticPower.freeGalaxies);
+}
+
+export function galacticInstability() {
+  const withoutGeneration = GalacticPowers.galacticAscension.isUnlocked
+    ? Replicanti.galaxies.total.max(1).times(player.galaxies.max(1)).times(player.dilation.totalTachyonGalaxies.max(1)).times(
+      GalacticPower.freeGalaxies.max(1))
+    : Replicanti.galaxies.total.add(player.galaxies).add(player.dilation.totalTachyonGalaxies).add(GalacticPower.freeGalaxies);
+  return withoutGeneration.div(DC.NUMMAX).max(1).pow(2/3);
+}
+
+export function actualBaseGalaxies() {
+  return actualBaseGalaxiesBeforeOverflow().div(galacticInstability());
+}
+
+export function actualBaseGalaxiesWithoutGeneration() {
+  return GalacticPowers.galacticAscension.isUnlocked
+    ? actualBaseGalaxies().div(GalaxyGenerator.galaxies.max(1))
+    : actualBaseGalaxies().sub(GalaxyGenerator.galaxies);
 }
 
 export function getTickSpeedMultiplier() {
@@ -60,6 +96,8 @@ export function getTickSpeedMultiplier() {
     }
     const perGalaxy = new Decimal(0.02).times(effects);
     if (Pelle.isDoomed && !PelleDestructionUpgrade.disableGalaxyNerf.canBeApplied) galaxies = galaxies.times(0.5);
+    if (Slabdrill.isCursed) galaxies = galaxies.times(0.5);
+    if (SlabdrillUnlocks.galaxy.isUnlocked) galaxies = galaxies.times(Slabdrill.slabPowers.galMult());
 
     galaxies = galaxies.times(Pelle.specialGlyphEffect.power);
     return DC.D0_01.clampMin(baseMultiplier.sub(galaxies.times(perGalaxy)));
@@ -80,6 +118,11 @@ export function getTickSpeedMultiplier() {
   galaxies = galaxies.times(Pelle.specialGlyphEffect.power);
   if (Alpha.isRunning) galaxies = galaxies.times(AlphaUnlocks.firstGalaxy.effects.nerf.effectOrDefault(1));
   if (Alpha.isRunning && Alpha.currentStage >= 6) galaxies = galaxies.times(2);
+  if (Slabdrill.isCursed) galaxies = galaxies.times(0.5);
+  if (SlabdrillUnlocks.galaxy.isUnlocked) galaxies = galaxies.times(Slabdrill.slabPowers.galMult());
+  if (Slabdrill.isCursed) galaxies = galaxies.timesEffectOf(EternityChallenge(5).reward);
+  if (Slabdrill.isCursed) galaxies = galaxies.timesEffectsOf(TimeStudy(223), TimeStudy(224));
+  galaxies = galaxies.times(NormalChallenge(5).chargedEffect);
   const perGalaxy = DC.D0_965;
   return perGalaxy.pow(galaxies.sub(2)).times(baseMultiplier);
 }
@@ -139,13 +182,14 @@ export function resetTickspeed() {
 export const Tickspeed = {
 
   get isUnlocked() {
-    return AntimatterDimension(2).bought.gt(0) || EternityMilestone.unlockAllND.isReached ||
-      PlayerProgress.realityUnlocked();
+    return (AntimatterDimension(2).bought.gt(0) || EternityMilestone.unlockAllND.isReached ||
+      PlayerProgress.realityUnlocked() || Slabdrill.isCursed) && !Slabdrill.coreActive;
   },
 
   get isAvailableForPurchase() {
     return this.isUnlocked &&
       !EternityChallenge(9).isRunning &&
+      player.universes.current !== 1 &&
       !Laitela.continuumActive &&
       (player.break || this.cost.lt(DC.NUMMAX));
   },
@@ -162,9 +206,12 @@ export const Tickspeed = {
     let tickspeed = Effarig.isRunning
       ? Effarig.tickspeed
       : this.baseValue.powEffectOf(DilationUpgrade.tickspeedPower);
+    if (SlabdrillUnlocks.infinity.isUnlocked) tickspeed = tickspeed.pow(0.42);
+    if (SlabdrillUnlocks.replicanti.isUnlocked) tickspeed = tickspeed.pow(0.42);
     tickspeed = (player.dilation.active || (PelleStrikes.dilation.hasStrike && !PelleStrikes.dilation.isDestroyed())) ? dilatedValueOf(tickspeed) : tickspeed;
+    tickspeed = player.compression.active ? compressedMultiplier(tickspeed) : tickspeed;
     if (player.endgame.overcharge.isRunning) {
-      tickspeed = dilateMultiplier(tickspeed, Math.pow(0.72, player.endgame.overcharge.level));
+      tickspeed = dilateMultiplier(tickspeed, Ascension.overchargePenalty);
     }
     return tickspeed;
   },
@@ -176,14 +223,14 @@ export const Tickspeed = {
   get costScale() {
     return new ExponentialCostScaling({
       baseCost: 1000,
-      baseIncrease: 10,
+      baseIncrease: Slabdrill.isCursed ? (InfinityChallenge(5).isRunning ? 1000 : 2) : 10,
       costScale: Player.tickSpeedMultDecrease,
       scalingCostThreshold: Number.MAX_VALUE
     });
   },
 
   get continuumValue() {
-    if (!this.isUnlocked) return DC.D0;
+    if (!this.isUnlocked || player.universes.current === 1) return DC.D0;
     return this.costScale.getContinuumValue(Currency.antimatter.value, 1).times(Laitela.matterExtraPurchaseFactor);
   },
 
@@ -201,7 +248,7 @@ export const Tickspeed = {
     let boughtTickspeed;
     if (Laitela.continuumActive) boughtTickspeed = this.continuumValue;
     else boughtTickspeed = player.totalTickBought;
-    return new Decimal(boughtTickspeed).add(player.totalTickGained);
+    return CMilestones.tickspeedEqualizer(boughtTickspeed, player.totalTickGained);
   },
 
   get perSecond() {
@@ -231,6 +278,7 @@ export const FreeTickspeed = {
     if (Enslaved.has(ENSLAVED_UNLOCKS.FREE_TICKSPEED_SOFTCAP) && !player.disablePostReality) {
       softcap += 100000;
     }
+    if (SlabdrillUnlocks.eternityChallengeTen.isUnlocked) softcap /= 10;
     return softcap;
   },
 
@@ -255,7 +303,8 @@ export const FreeTickspeed = {
     // so, for example, if the cost is 1 that means it's actually exp(priceToCap) * tickmult.
     const desiredCost = logShards.sub(priceToCap).div(logTickmult);
     const costFormulaCoefficient = new Decimal(FreeTickspeed.GROWTH_RATE).div(exponentIncrease).div(logTickmult).times(
-      Decimal.pow(Effects.product(EndgameMastery(103)), 2));
+      Decimal.pow(Effects.product(EndgameMastery(103)), 2)).times(Decimal.pow(
+      SlabdrillUnlocks.eternityChallengeTen.isUnlocked ? 10 : 1, 2));
     // In the following we're implicitly subtracting softcap from bought,
     // so, for example, if bought is 1 that means it's actually softcap + 1.
     // The first term (the big one) is the asymptotically more important term (since FreeTickspeed.GROWTH_EXP > 1),

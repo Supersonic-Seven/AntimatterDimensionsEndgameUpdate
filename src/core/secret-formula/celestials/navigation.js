@@ -421,7 +421,7 @@ export const celestialNavigation = {
           return [
             "Effarig's Infinity",
             `Reach ${format(am, 2)} / ${format(Number.MAX_VALUE, 2)}`,
-            "Antimatter inside Effarig's Reality."
+            `${player.universes.current === 2 ? "Matter" : "Antimatter"} inside Effarig's Reality.`
           ];
         },
         angle: 0,
@@ -726,8 +726,9 @@ export const celestialNavigation = {
           const galaxies = player.requirementChecks.infinity.noAD8 ? player.galaxies : 0;
           return [
             "V's unlock Achievement",
-            `Reach ${formatInt(galaxies)} / ${formatInt(goal)} Antimatter Galaxies without buying`,
-            "8th Antimatter Dimensions in your current Infinity"
+            `Reach ${formatInt(galaxies)} / ${formatInt(goal)} ${player.universes.current === 2 ? "Matter" : "Antimatter"}
+              Galaxies without buying`,
+            `8th ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions in your current Infinity`
           ];
         },
         angle: 135,
@@ -1673,10 +1674,7 @@ export const celestialNavigation = {
       const upgrade = DarkMatterDimension(4).unlockUpgrade;
       if (upgrade.canBeBought || upgrade.isBought) return 1;
       if (upgrade.isAvailableForPurchase) return upgrade.currency.value / upgrade.cost;
-      return (GalacticPowers.galacticAscension.isUnlocked ? Replicanti.galaxies.total.max(1).times(player.galaxies.max(1)).times(
-        player.dilation.totalTachyonGalaxies.max(1)).times(GalacticPower.freeGalaxies.max(1)) :
-        Replicanti.galaxies.total.add(player.galaxies).add(player.dilation.totalTachyonGalaxies).add(
-        GalacticPower.freeGalaxies)).div(80000).toNumber();
+      return actualBaseGalaxiesWithoutGeneration().div(80000).toNumber();
     },
     node: {
       clickAction: () => Tab.celestials.laitela.show(true),
@@ -1706,9 +1704,7 @@ export const celestialNavigation = {
             / ${format(upgrade.cost, 1)}`
           ];
 
-          const allGalaxies = GalacticPowers.galacticAscension.isUnlocked ? Replicanti.galaxies.total.max(1).times(
-            player.galaxies.max(1)).times(player.dilation.totalTachyonGalaxies.max(1)).times(GalacticPower.freeGalaxies.max(1)) :
-            Replicanti.galaxies.total.add(player.galaxies).add(player.dilation.totalTachyonGalaxies).add(GalacticPower.freeGalaxies);
+          const allGalaxies = actualBaseGalaxiesWithoutGeneration();
           return [
             dmdText,
             `Have ${format(80000)} total Galaxies`,
@@ -1966,7 +1962,7 @@ export const celestialNavigation = {
               PellePerkUpgrade.all.length + PelleAlchemyUpgrade.all.length) - (PelleAchievementUpgrade.all.filter(u => u.canBeApplied).length +
               PelleDestructionUpgrade.all.filter(u => u.canBeApplied).length + PelleRealityUpgrade.all.filter(u => u.canBeApplied).length +
               PelleImaginaryUpgrade.all.filter(u => u.canBeApplied).length + PelleCelestialUpgrade.all.filter(u => u.canBeApplied).length +
-              PellePerkUpgrade.all.filter(u => u.canBeApplied).length + PelleAchievementUpgrade.all.filter(u => u.canBeApplied).length);
+              PellePerkUpgrade.all.filter(u => u.canBeApplied).length + PelleAlchemyUpgrade.all.filter(u => u.canBeApplied).length);
             pelleString = "Pelle's Doomed Reality is still intact";
             progressString = `${formatInt(remainingNerfs)} nerfs remain`;
           } else if (Achievement(204).isUnlocked && !ImaginaryUpgrade(30).isAvailableForPurchase) {
@@ -2133,12 +2129,12 @@ export const celestialNavigation = {
   "slab-unlock": {
     visible: () => PlayerProgress.celestialEternityUnlocked(),
     complete: () => {
-      if (false) return 1;
+      if (Slabdrill.isCursed) return 1;
       if (CelestialEternityPlusUpgrade.oldStoneSlabAndSteelDrill.isBought) return 0.999;
       return Decimal.clampMax(0.998, Currency.celestialEternityPoints.value.add(1).pLog10().div(4000)).toNumber();
     },
     node: {
-      clickAction: () => false ? Tab.celestials.slabdrill.show(true) : Tab.cdexpansion.subtabs[3].show(true),
+      clickAction: () => Slabdrill.isCursed ? Tab.celestials.slabdrill.show(true) : Tab.cdexpansion.subtabs[3].show(true),
       incompleteClass: "c-celestial-nav__test-incomplete",
       symbol: "⁹δ",
       symbolOffset: "1.6",
@@ -2155,7 +2151,7 @@ export const celestialNavigation = {
               "Cursed Reality"
             ];
           }
-          if (false && complete === 0.999) {
+          if (player.celestials.slabdrill.isWarping && complete === 0.999) {
             return [
               "Curse Your Reality"
             ];

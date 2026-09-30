@@ -235,6 +235,10 @@ export const Quotes = {
     GameDatabase.celestials.quotes.alpha,
     config => new CelQuotes(config, "alpha")
   ),
+  slabdrill: mapGameDataToObject(
+    GameDatabase.celestials.quotes.slabdrill,
+    config => new CelQuotes(config, "slabdrill")
+  ),
   elemental: mapGameDataToObject(
     GameDatabase.celestials.quotes.elemental,
     config => new CelQuotes(config, "elemental")

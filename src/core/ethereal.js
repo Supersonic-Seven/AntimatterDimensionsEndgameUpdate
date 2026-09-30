@@ -9,6 +9,7 @@ export const Ethereal = {
     return Decimal.pow(this.cosmicSector, this.cosmicSector);
   },
   get sectorBoost() {
+    if (Slabdrill.isCursed && SlabdrillUnlocks.replicanti.isUnlocked) return Decimal.pow(2, this.cosmicSector - 1);
     if (player.disablePostReality && !Alpha.isRunning) return DC.D1;
     if (Alpha.isRunning) return Decimal.pow(2, this.cosmicSector - 1);
     return Decimal.pow(2, Math.pow(this.cosmicSector - 1, 2));
@@ -41,7 +42,7 @@ export const Ethereal = {
     return player.endgame.ethereal.starPower;
   },
   get allStarBoost() {
-    return Decimal.max(this.starPower.pow(0.2), 1);
+    return Decimal.max(this.starPower.pow(0.2), 1).times(DivinityMilestone.powerBurst.isReached ? 1000 : 1);
   },
   get nextGeneration() {
     let arr = [];
@@ -98,6 +99,7 @@ export const EtherealStars = mapGameDataToObject(
 );
 
 export function getEtherealPowerGainPerSecond() {
+  if (Slabdrill.isCursed && SlabdrillUnlocks.replicanti.isUnlocked) return Slabdrill.power;
   const cpFactor = Decimal.pow(Decimal.log10(player.endgame.celestialPoints.add(1)).div(100), 10);
   const singFactor = Decimal.pow(Decimal.log10(player.celestials.laitela.singularities.add(1)).div(20000), 3);
   const rmFactor = Decimal.pow(Decimal.log10(Decimal.log10(player.reality.realityMachines.add(1)).add(1)).div(5), 75);

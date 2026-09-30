@@ -19,7 +19,7 @@ class AlchemyResourceState extends GameMechanicState {
   }
 
   get description() {
-    return this.config.description;
+    return typeof this.config.description === "function" ? this.config.description() : this.config.description;
   }
 
   get isBaseResource() {
@@ -79,6 +79,9 @@ class AlchemyResourceState extends GameMechanicState {
   }
 
   get effectValue() {
+    if (SlabdrillUnlocks.dilation.isUnlocked && (this.config.id <= 4 || this.config.id === 10)) {
+      return this.config.effect(this.amount);
+    }
     if (player.disablePostReality) return this.config.effect(0);
     // Disable Exponential alchemy effect in V reality.
     if (V.isRunning && this.config.id === 14) return 0;
@@ -116,6 +119,7 @@ class BasicAlchemyResourceState extends AlchemyResourceState {
   }
 
   get cap() {
+    if (SlabdrillUnlocks.dilation.isUnlocked) return Slabdrill.power.div(1e12).toNumber();
     return Math.clampMax(Ra.alchemyResourceCap, this.highestRefinementValue);
   }
 }

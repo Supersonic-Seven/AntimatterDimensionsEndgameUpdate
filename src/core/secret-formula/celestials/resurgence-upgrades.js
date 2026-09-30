@@ -3,13 +3,13 @@ export const resurgenceUpgrades = {
     name: "Boundless Surge",
     id: "ipSurge",
     cost: new Decimal(10000),
-    description: "Infinity Points are equal to Antimatter, multiply Antimatter Production by pending IP"
+    description: () => `Infinity Points are equal to ${player.universes.current === 2 ? "Matter" : "Antimatter"}, multiply ${player.universes.current === 2 ? "Matter" : "Antimatter"} Production by pending IP`
   },
   epSurge: {
     name: "Eternal Surge",
     id: "epSurge",
     cost: new Decimal(1e6),
-    description: "Eternity Points are equal to Antimatter, multiply Antimatter Production by pending EP"
+    description: () => `Eternity Points are equal to ${player.universes.current === 2 ? "Matter" : "Antimatter"}, multiply ${player.universes.current === 2 ? "Matter" : "Antimatter"} Production by pending EP`
   },
   realSurge: {
     name: "Cosmic Outflow",
@@ -109,7 +109,7 @@ export const resurgenceUpgrades = {
     name: "Spacetime Warp II",
     id: "synergy2",
     cost: new Decimal("1e2400"),
-    description: "Celestial Dimensions gain a power based on total Antimatter generated outside Pelle",
+    description: () => `Celestial Dimensions gain a power based on total ${player.universes.current === 2 ? "Matter" : "Antimatter"} generated outside Pelle`,
     effect: () => Decimal.log10(Decimal.log10(Decimal.log10(player.records.totalAntimatterOutsideDoom).add(1)).add(1)).div(15).add(1),
     formatEffect: value => formatPow(value, 2, 3)
   },
@@ -133,7 +133,7 @@ export const resurgenceUpgrades = {
     name: "Spacetime Warp V",
     id: "synergy5",
     cost: new Decimal("1e2850"),
-    description: "Antimatter Production is empowered based on Tickspeed",
+    description: () => `${player.universes.current === 2 ? "Matter" : "Antimatter"} Production is empowered based on Tickspeed`,
     effect: () => Decimal.log10(Decimal.log10(Tickspeed.perSecond).add(1)).add(1),
     formatEffect: value => formatPow(value, 2, 3)
   },

@@ -15,6 +15,18 @@ export class ResurgenceUpgradeState extends SetPurchasableMechanicState {
 
   onPurchased() {
     this.config.onPurchased?.();
+    if (this.config.id === "unl1") {
+      TabNotification.extendMasteries.tryTrigger();
+    }
+    if (this.config.id === "unl2") {
+      TabNotification.extendSingularityMilestones.tryTrigger();
+    }
+    if (this.config.id === "unl3") {
+      TabNotification.extendGalacticPowers.tryTrigger();
+    }
+    if (this.config.id === "unl4") {
+      TabNotification.ascension.tryTrigger();
+    }
   }
 
   get isEffectActive() {

@@ -88,7 +88,7 @@ export const v = {
       // This achievement has internally negated values since the check is always greater than
       values: [-5, -4, -3, -2, -1, 0],
       condition: () => V.isRunning && TimeStudy.reality.isBought,
-      currentValue: () => new Decimal(-Glyphs.activeWithoutCompanion.length),
+      currentValue: () => new Decimal(-player.requirementChecks.reality.maxGlyphs),
       formatRecord: x => (x.gte(-5) ? formatInt(x.neg()) : "Not reached"),
       shardReduction: () => 0,
       maxShardReduction: () => 0,
@@ -100,9 +100,7 @@ export const v = {
       description: value => `Have ${formatInt(value)} total Galaxies from all types.`,
       values: [4000, 4300, 4600, 4900, 5200, 5500],
       condition: () => V.isRunning,
-      currentValue: () => GalacticPowers.galacticAscension.isUnlocked ? Replicanti.galaxies.total.max(1).times(player.galaxies.max(1)).times(
-        player.dilation.totalTachyonGalaxies.max(1)).times(GalacticPower.freeGalaxies.max(1)) : Replicanti.galaxies.total.add(player.galaxies).add(
-        player.dilation.totalTachyonGalaxies).add(GalacticPower.freeGalaxies),
+      currentValue: () => actualBaseGalaxiesWithoutGeneration(),
       formatRecord: x => formatHybridLarge(x, 3),
       shardReduction: tiers => Math.floor(300 * tiers),
       maxShardReduction: goal => goal - 4000,
@@ -125,7 +123,7 @@ export const v = {
     {
       id: 3,
       name: "Young Boy",
-      description: value => `Get ${format(Decimal.pow10(value))} Antimatter in Eternity Challenge 12 without
+      description: value => `Get ${format(Decimal.pow10(value))} ${player.universes.current === 2 ? "Matter" : "Antimatter"} in Eternity Challenge 12 without
         unlocking Time Dilation.`,
       values: [400e6, 450e6, 500e6, 600e6, 700e6, 800e6],
       condition: () => V.isRunning && EternityChallenge(12).isRunning && !PlayerProgress.dilationUnlocked(),
@@ -228,7 +226,7 @@ export const v = {
     },
     adPow: {
       id: 2,
-      reward: "Antimatter Dimension power based on total Space Theorems.",
+      reward: () => `${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimension power based on total Space Theorems.`,
       description: () => `Have ${formatInt(5)} V-Achievements`,
       effect: () => player.disablePostReality ? 1 : 1 + Math.sqrt(V.spaceTheorems) / 80,
       format: x => formatPow(x, 3, 3),
@@ -270,7 +268,7 @@ export const v = {
                 Unlock Ra, Celestial of the Forgotten.`;
       },
       description: () => `Have ${formatInt(36)} V-Achievements`,
-      effect: 2,
+      effect: () => player.disablePostReality ? 0 : 2,
       requirement: () => V.spaceTheorems >= 36,
       pelleDisabled: () => !PelleCelestialUpgrade.vMilestones3.canBeApplied
     }

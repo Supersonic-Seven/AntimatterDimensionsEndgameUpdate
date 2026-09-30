@@ -33,7 +33,7 @@ export default {
       // the inside outwards, we show the goals in that priority as well. It only makes sense to check cel6 and not the
       // others because pre-cel3 completion it'll default to e4000 and cel4/5 don't have meaningful single goals
       const inSpecialRun = (Player.isInAntimatterChallenge || EternityChallenge.isRunning || player.dilation.active ||
-        Laitela.isRunning) && !Pelle.isDoomed && !player.antimatter.gte(DC.E9E15);
+        player.compression.active || Laitela.isRunning) && !Pelle.isDoomed && !player.antimatter.gte(DC.E9E15);
       if (inSpecialRun) {
         if (Player.isInAntimatterChallenge) {
           setProgress(Currency.antimatter.value, Player.antimatterChallenge.goal, "Percentage to Challenge goal");
@@ -55,6 +55,12 @@ export default {
             setProgress(Currency.antimatter.value, getTachyonReq(), "Percentage to gain more TP in Dilation");
           } else {
             setProgress(Currency.infinityPoints.value, Player.eternityGoal, "Percentage to Eternity in Dilation");
+          }
+        } else if (player.compression.active) {
+          if (player.antimatter.gte(DC.NUMMAX)) {
+            setProgress(Currency.antimatter.value, getHawkingRadiationReq(), "Percentage to gain more HR in Compression");
+          } else {
+            setProgress(Currency.antimatter.value, Player.infinityGoal, "Percentage to Infinity");
           }
         } else {
           // Lai'tela destabilization; since the progress bar is logarithmically-scaled, we need to pow10 the arguments
@@ -178,7 +184,7 @@ export default {
         }
       } else if (PlayerProgress.celestialEternityUnlocked()) {
         // Show all other goals from the top down, starting at features in the highest prestige layer
-        setProgress(Currency.celestialEternityPoints.value, DC.E4000, false
+        setProgress(Currency.celestialEternityPoints.value, DC.E4000, player.celestials.slabdrill.isWarping
           ? "Percentage to Cursed Reality" : "Percentage to Pelle's Domain");
       } else if (player.endgame.celDimExpansion.isBroken) {
         setProgress(Currency.celestialInfinityPoints.value, DC.NUMMAX, "Percentage to Celestial Eternity");

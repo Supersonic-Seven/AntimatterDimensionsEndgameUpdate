@@ -6,7 +6,7 @@ export class GalaxyAutobuyerState extends UpgradeableAutobuyerState {
   }
 
   get name() {
-    return `Antimatter Galaxy`;
+    return `${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxy`;
   }
 
   get isUnlocked() {

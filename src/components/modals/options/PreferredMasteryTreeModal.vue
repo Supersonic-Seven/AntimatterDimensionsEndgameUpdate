@@ -9,7 +9,8 @@ export default {
   data() {
     return {
       compressionPath: null,
-      currencyPath: null
+      currencyPath: null,
+      entanglementPath: null
     };
   },
   computed: {
@@ -29,20 +30,33 @@ export default {
         "iM": ENDGAME_MASTERY_PATH.IMAGINARY_MACHINES
       };
     },
+    entanglementOptions() {
+      return {
+        "Endgame Entanglement": ENDGAME_MASTERY_PATH.ENDGAME_ENTANGLEMENT,
+        "Celestial Entanglement": ENDGAME_MASTERY_PATH.CELESTIAL_ENTANGLEMENT,
+        "Divine Entanglement": ENDGAME_MASTERY_PATH.DIVINE_ENTANGLEMENT
+      };
+    },
     usePriority() {
       return EndgameMastery.preferredPaths.compression.usePriority;
     },
     useOtherPriority() {
       return EndgameMastery.preferredPaths.currency.usePriority;
     },
+    useThirdPriority() {
+      return EndgameMastery.preferredPaths.entanglement.usePriority;
+    },
   },
   created() {
     this.compressionPath = [...EndgameMastery.preferredPaths.compression.path];
     this.currencyPath = [...EndgameMastery.preferredPaths.currency.path];
+    this.entanglementPath = [...EndgameMastery.preferredPaths.entanglement.path];
   },
   methods: {
     isPreferred(name) {
-      return this.compressionPath.indexOf(this.compressionOptions[name]) + 1 || this.currencyPath.indexOf(this.currencyOptions[name]) + 1;
+      return this.compressionPath.indexOf(this.compressionOptions[name]) + 1 ||
+        this.currencyPath.indexOf(this.currencyOptions[name]) + 1 ||
+        this.entanglementPath.indexOf(this.entanglementOptions[name]) + 1;
     },
     select(name) {
       if (this.compressionOptions[name]) {
@@ -55,10 +69,16 @@ export default {
         if (!this.currencyPath.includes(this.currencyOptions[name]))
           this.currencyPath.push(this.currencyOptions[name]);
       }
+      if (this.entanglementOptions[name]) {
+        if (!this.useThirdPriority || this.entanglementPath.length > 1) this.entanglementPath.shift();
+        if (!this.entanglementPath.includes(this.entanglementOptions[name]))
+          this.entanglementPath.push(this.entanglementOptions[name]);
+      }
     },
     confirmPrefs() {
       EndgameMastery.preferredPaths.compression.path = this.compressionPath;
       EndgameMastery.preferredPaths.currency.path = this.currencyPath;
+      EndgameMastery.preferredPaths.entanglement.path = this.entanglementPath;
     },
     classList(name) {
       const pref = this.isPreferred(name);
@@ -70,7 +90,10 @@ export default {
         "IP": "infinity-points",
         "EP": "eternity-points",
         "RM": "reality-machines",
-        "iM": "imaginary-machines"
+        "iM": "imaginary-machines",
+        "Endgame Entanglement": "endgame-entanglement",
+        "Celestial Entanglement": "celestial-entanglement",
+        "Divine Entanglement": "divine-entanglement"
       };
       return [
         "o-endgame-mastery-selection-btn",
@@ -108,6 +131,26 @@ export default {
     <div class="l-modal-split-preferences">
       <button
         v-for="(id, name) in currencyOptions"
+        :key="name"
+        :class="classList(name)"
+        @click="select(name)"
+      >
+        <div
+          v-if="isPreferred(name)"
+          class="l-dim-path-priority o-dim-path-priority"
+        >
+          {{ isPreferred(name) }}
+        </div>
+        <div>
+          {{ name }}
+        </div>
+      </button>
+    </div>
+    <br>
+    <h2>Entanglement Split Preference</h2>
+    <div class="l-modal-split-preferences">
+      <button
+        v-for="(id, name) in entanglementOptions"
         :key="name"
         :class="classList(name)"
         @click="select(name)"

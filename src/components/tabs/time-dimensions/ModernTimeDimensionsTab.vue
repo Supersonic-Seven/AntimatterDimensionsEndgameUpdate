@@ -100,7 +100,7 @@ export default {
         <span v-if="isEndgameUnlocked">
           Your Time Dimension Compression Magnitude is
           <span class="c-time-dim-compression-description__accent">{{ format(timeDimCompressionMagnitude, 2, 3) }}</span>,
-          which raises all Time Dimension Multipliers to the power of
+          which raises all Time Dimension Multipliers' Exponents to the power of
           <span class="c-time-dim-compression-description__accent">{{ format(timeDimOverflow, 2, 3) }}</span>
           while above
           <span>{{ formatPostBreak(timeDimStart, 2, 1) }}</span>.
@@ -112,7 +112,7 @@ export default {
         <span v-if="hasSecond">
           Your Time Dimension Compression^2 Magnitude is
           <span class="c-time-dim-compression-description__accent">{{ format(timeDimCompressionMagnitude2, 2, 3) }}</span>,
-          which raises all Time Dimension Multipliers to the power of
+          which raises all Time Dimension Multipliers' Exponents to the power of
           <span class="c-time-dim-compression-description__accent">{{ format(timeDimOverflow2, 2, 3) }}</span>
           while above
           <span>{{ formatPostBreak(timeDimStart2, 2, 1) }}</span>.

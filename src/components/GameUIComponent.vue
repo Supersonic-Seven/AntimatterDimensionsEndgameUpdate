@@ -11,6 +11,11 @@ import S12UiFixed from "@/components/ui-modes/s12/S12UiFixed";
 
 export default {
   name: "GameUIComponent",
+  data() {
+    return {
+      inCursedCore: false
+    };
+  },
   components: {
     ...TabComponents,
     ClassicUi,
@@ -41,6 +46,17 @@ export default {
     },
     themeCss() {
       return `stylesheets/theme-${this.view.theme}.css`;
+    },
+    gameUI() {
+      return {
+        "c-game-ui": true,
+        "c-game-ui-default": !this.inCursedCore
+      };
+    }
+  },
+  methods: {
+    update() {
+      this.inCursedCore = player.celestials.slabdrill.core.isActive;
     }
   }
 };
@@ -55,7 +71,7 @@ export default {
   >
     <div
       id="ui"
-      class="c-game-ui"
+      :class="gameUI"
     >
       <component :is="uiLayout">
         <component
@@ -82,5 +98,9 @@ export default {
   display: flex;
   position: relative;
   justify-content: center;
+}
+
+.c-game-ui-default {
+  position: relative;
 }
 </style>
