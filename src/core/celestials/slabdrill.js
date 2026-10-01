@@ -38,7 +38,7 @@ export const Slabdrill = {
   },
   get huntChance() {
     return Decimal.pow10(-this.cores).times(Decimal.pow10(this.currentStage)).times(
-      player.antimatter.max(10).log10().log10().pow(3).add(1)).div(1000).times(
+      player.antimatter.max(10).log10().log10().pow(3).add(1)).div(10000).times(
       SlabdrillUnlocks.dilation.isUnlocked ? 16 : 1).times(
       SlabdrillUnlocks.reality.isUnlocked ? Slabdrill.slabPowers.chaosCores().times(66) : 1).toNumber();
   },
