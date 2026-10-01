@@ -20,7 +20,7 @@ export default {
       mainUnlock: false,
       canUnlockCelestial: false,
       totalUnlocks: 0,
-      pp: 0,
+      pp: new Decimal(0),
       showReduction: false,
       runRecords: [],
       runGlyphs: [],
@@ -105,7 +105,7 @@ export default {
       this.mainUnlock = VUnlocks.vAchievementUnlock.isUnlocked;
       this.canUnlockCelestial = V.canUnlockCelestial;
       this.totalUnlocks = V.spaceTheorems;
-      this.pp = Currency.perkPoints.value;
+      this.pp.copyFrom(Currency.perkPoints.value);
       this.showReduction = VUnlocks.shardReduction.isUnlocked;
       this.runRecords = cloneDeep(player.celestials.v.runRecords);
       this.runGlyphs = cloneDeep(player.celestials.v.runGlyphs.map(gList => Glyphs.copyForRecords(gList)));
@@ -277,7 +277,7 @@ export default {
                 <div class="l-v-goal-reduction-spacer" />
                 <button
                   class="o-primary-btn l-v-reduction"
-                  :class="{ 'o-primary-btn--disabled': !hex.canBeReduced || pp < hex.reductionCost }"
+                  :class="{ 'o-primary-btn--disabled': !hex.canBeReduced || pp.lt(hex.reductionCost) }"
                   :ach-tooltip="reductionTooltip(hex)"
                   @click="reduceGoals(hex)"
                 >
