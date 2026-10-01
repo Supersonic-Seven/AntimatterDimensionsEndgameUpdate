@@ -13,7 +13,7 @@ export default {
   },
   computed: {
     gainText() {
-      if (this.tachyonGain.lte(0)) return `not gain anything`;
+      if (this.hawkingRadiationGain.lte(0)) return `not gain anything`;
       return `gain ${quantify("Hawking Radiation", this.hawkingRadiationGain, 2, 1)}`;
     }
   },
