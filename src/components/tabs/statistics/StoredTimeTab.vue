@@ -131,7 +131,7 @@ export default {
       this.storedTime = Slabdrill.isCursed ? 0 : player.storedTime;
       this.fluxUnlocked = player.flux.isUnlocked;
       this.fluxLevel = player.flux.level;
-      this.fluxTime = player.flux.fluxTime;
+      this.fluxTime = Slabdrill.isCursed ? 0 : player.flux.fluxTime;
       this.maxFlux = player.flux.maxUnlockedFlux;
     },
     spendOneMin() {
