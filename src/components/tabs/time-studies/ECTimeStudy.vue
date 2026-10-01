@@ -89,7 +89,7 @@ export default {
       <br>
       Requirement:
       <br v-if="needsFirstLinebreak">
-      <span v-if="config.secondary.path()">Use only the {{ config.secondary.path() }} path</span>
+      <span v-if="config.secondary.path">Use only the {{ config.secondary.path() }} path</span>
       <span v-else>
         {{ formatValue(requirement.current) }}/{{ formatValue(requirement.total) }}
         <br v-if="needsSecondLinebreak">
