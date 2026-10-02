@@ -829,7 +829,11 @@ export function gameLoop(passedDiff, options = {}) {
   }
 
   if (Slabdrill.isCursed && player.celestials.slabdrill.goodbyeTick >= 50000) {
-    player.celestials.slabdrill.goodbyeTick += realDiff;
+    if (AntimatterDimension(9).amount.eq(0)) {
+      player.celestials.slabdrill.goodbyeTick = Math.min(player.celestials.slabdrill.goodbyeTick + realDiff, 120000);
+    } else {
+      player.celestials.slabdrill.goodbyeTick += realDiff;
+    }
   }
 
   if (player.celestials.slabdrill.goodbyeTick >= 1000 && player.celestials.slabdrill.goodbyeTick < 2000 &&
