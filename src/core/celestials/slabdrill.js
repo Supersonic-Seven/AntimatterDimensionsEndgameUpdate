@@ -98,7 +98,7 @@ export const Slabdrill = {
   advanceLayer() {
     player.celestials.slabdrill.stage++;
   },
-  enterCore() {
+  enterCore(coreJump = false) {
     player.celestials.slabdrill.records = matchOnlyDeepmerge(player, player.celestials.slabdrill.records, "eternityChalls");
     finishProcessReality({ reset: true });
     let cache = Object.keys(GameCache);
@@ -107,7 +107,7 @@ export const Slabdrill = {
     }
     player.celestials.slabdrill.core.isActive = true;
     player.break = true;
-    Tab.dimensions.antimatter.show(true);
+    Tab.dimensions.antimatter.show(!coreJump);
   },
   exitCore() {
     player.celestials.slabdrill.core.isActive = false;

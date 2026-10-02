@@ -368,7 +368,7 @@ export const normalTimeStudies = [
       : "Multiplier to Infinity Points, which decays over this Infinity"),
     effect: () => ((Perk.studyActiveEP.isBought && !player.disablePostReality)
       ? DC.E45
-      : DC.E45.divide(thisInfinityMult(Alpha.isRunning
+      : DC.E45.divide(thisInfinityMult(Alpha.isRunning || Slabdrill.isCursed
         ? Time.thisInfinityRealTime.totalSeconds
         : Time.thisInfinity.totalSeconds)).clampMin(1)),
     formatEffect: value => ((Perk.studyActiveEP.isBought && !player.disablePostReality) ? undefined : formatX(value, 2, 1))

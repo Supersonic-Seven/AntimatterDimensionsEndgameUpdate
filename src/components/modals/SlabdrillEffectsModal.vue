@@ -14,12 +14,13 @@ export default {
         `All rewards, effects, upgrades, enhancements, buffs, nerfs, and features unlocked or gained after reaching
           Reality for the first time are disabled`,
         "You only have access to the 1st Antimatter Dimension",
+        `Your Antimatter Dimension production is divided by ${formatInt(1666)} times your current Antimatter Exponent`,
         `1st Antimatter Dimension cost scaling is reduced to ${formatX(100)} and Tickspeed cost scaling is reduced to ${formatX(2)}`,
         `The Buy 10 Antimatter Dimension multiplier is multiplied by ${formatX(20)}`,
         `Dimension Boosts require 1st Antimatter Dimensions, start at ${formatInt(60)}, and have a cost scaling of ${formatInt(20)}`,
         `Antimatter Galaxies require 1st Antimatter Dimensions, start at ${formatInt(650)}, and have a
           cost scaling of ${formatInt(450)}`,
-        `Antimatter Galaxies are ${formatPercents(0.5)} weaker`,
+        `All Galaxies are ${formatPercents(0.5)} weaker`,
         `Dimensional Sacrifice is disabled until completing Infinity Challenge ${formatInt(2)}, after which point it affects
           the 1st Antimatter Dimension`,
         "All Infinity Upgrades that previously affected multiple Dimensions now only affect the 1st Antimatter Dimension",
@@ -38,12 +39,18 @@ export default {
         `The effect of Time Study ${formatInt(161)} is buffed`,
         `The effects of Time Studies ${formatInt(72)} and ${formatInt(73)} are nerfed`,
         `The effect of Time Study ${formatInt(83)} reaches its cap quicker`,
+        `The initial goal and goal increase of every Eternity Challenge is changed`,
         `The effects of Eternity Challenges ${formatInt(3)}, ${formatInt(5)} and ${formatInt(7)} are changed`,
         `The reward of Eternity Challenge ${formatInt(5)} is changed`,
         `The rewards of Eternity Challenges ${formatInt(8)} and ${formatInt(9)} are buffed`,
         `The effects of the Replicanti Multiplier to Time Dimensions and the Time Theorem Generation Dilation Upgrades are nerfed`,
-        `The effects of the Dilated Time to Antimatter Dimensions and the Dilated Time to Infinity Points Dilation Upgrades are buffed`,
+        `The effects of the Dilated Time to Antimatter Dimensions, the Dilated Time to Infinity Points Dilation Upgrades, and
+          the Time Theorem Generation Dilation Upgrades are buffed`,
+        `The effect of the Replicanti Multiplier to Time Dimensions Dilation Upgrade is nerfed`,
+        `Eternity Point gain is softcapped at ${format(DC.E2000)}, and the softcap gets stronger at ${format(DC.E2500)} and
+          ${format(DC.E3000)} EP`,
         `The effect of Achievement ${formatInt(105)} is capped at ${formatX(DC.E20000)}`,
+        `Stored Time is destroyed`,
         `Universal Entropy is corrupted`
       ];
     }

@@ -139,7 +139,7 @@ export function getDimensionFinalMultiplierUncached(tier) {
   if (tier === 9) {
     multiplier = multiplier.timesEffectsOf(DualityUpgrade(30));
   }
-  if (tier === 9 && Slabdrill.isCursed) multiplier = multiplier.pow(Math.max(((player.celestials.slabdrill.goodbyeTick - 300000) / 30000) + 1, 1));
+  if (tier === 9 && Slabdrill.isCursed) multiplier = multiplier.pow(Math.max(((player.celestials.slabdrill.goodbyeTick - 120000) / 30000) + 1, 1));
 
   return multiplier;
 }
