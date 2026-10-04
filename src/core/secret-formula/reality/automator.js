@@ -663,6 +663,44 @@ export const automator = {
         "celestial teresa start nowait"
       ]
     },
+    {
+      id: 21,
+      isUnlocked: () => PlayerProgress.realityUnlocked(),
+      keyword: "GLYPH LOAD",
+      category: 2,
+      syntax: `<b>glyph</b> [nowait] <b>load id</b> <u>selector</u><br>
+        <b>glyph</b> [nowait] <b>load name</b> <u>name</u>`,
+      description: `Loads a saved Glyph Preset, equipping matching Glyphs from your inventory.`,
+      sections: [
+        {
+          name: "INPUTS",
+          items: [
+            {
+              header: "<i>nowait</i>",
+              description: `
+                If present, the Automator will equip as many matching Glyphs as possible and immediately advance
+                to the next line. By default (without "nowait"), this command will repeat on this line indefinitely
+                until all Glyphs in the preset are successfully equipped.
+              `
+            },
+            {
+              header: "<i>selector</i>",
+              description: `
+                Finds and loads the specified Glyph preset by its slot number (1 through 7), ordered from left to right.`
+            },
+            {
+              header: "<i>name</i>",
+              description: "Finds and loads the specified Glyph preset by its assigned nickname (case-sensitive)."
+            },
+          ]
+        }
+      ],
+      examples: [
+        `glyph load id 1`,
+        `glyph load name Push`,
+        `glyph nowait load id 2`,
+      ]
+    },
   ],
   otherAutomatorPoints: [
     {

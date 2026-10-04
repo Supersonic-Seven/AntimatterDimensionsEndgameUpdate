@@ -62,6 +62,7 @@ CodeMirror.defineSimpleMode("automato", {
     commentRule,
     { regex: /studies\s+/ui, token: "keyword", next: "studiesArgs" },
     { regex: /celestial\s+/ui, token: "keyword", next: "celestialArgs" },
+    { regex: /glyphs?\s+/ui, token: "keyword", next: "glyphArgs" },
     { regex: /blob\s\s/ui, token: "blob" },
     {
       // eslint-disable-next-line max-len
@@ -138,6 +139,30 @@ CodeMirror.defineSimpleMode("automato", {
     { sol: true, next: "start" },
     { regex: /nowait(\s+|$)/ui, token: "property", next: "commandDone" },
     { regex: /\S+/ui, token: "error" },
+  ],
+  glyphArgs: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /nowait(\s+|$)/ui, token: "property" },
+    { regex: /load(\s+|$)/ui, token: "variable-2", next: "glyphLoad" },
+    { regex: /\S+/ui, token: "error" },
+  ],
+  glyphLoad: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /id(\s+|$)/ui, token: "variable-2", next: "glyphLoadId" },
+    { regex: /name(\s+|$)/ui, token: "variable-2", next: "glyphLoadPreset" },
+    { regex: /\S+/ui, token: "error" },
+  ],
+  glyphLoadId: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /\d/ui, token: "qualifier", next: "commandDone" },
+  ],
+  glyphLoadPreset: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /(\/(?!\/)|[^\s#/])+/ui, token: "qualifier", next: "commandDone" },
   ],
   prestige: [
     commentRule,

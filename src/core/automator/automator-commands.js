@@ -1203,4 +1203,74 @@ export const AutomatorCommands = [
       };
     }
   },
+  {
+    id: "glyphLoad",
+    rule: $ => () => {
+      $.CONSUME(T.Glyph);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.CONSUME(T.Load);
+      $.OR([
+        { ALT: () => $.CONSUME1(T.Id) },
+        { ALT: () => $.CONSUME1(T.Name) },
+      ]);
+    },
+    validate: (ctx, V) => {
+      ctx.startLine = ctx.Glyph[0].startLine;
+      const maxSlots = player.reality.glyphs.sets.length;
+
+      if (ctx.Id) {
+        const split = idSplitter.exec(ctx.Id[0].image);
+        if (!split || ctx.Id[0].isInsertedInRecovery) {
+          V.addError(ctx, "Missing preset id",
+            "Provide the id of a saved Glyph preset slot from the Glyphs tab");
+          return false;
+        }
+
+        const id = parseInt(split[1], 10);
+        if (id < 1 || id > maxSlots) {
+          V.addError(ctx.Id[0], `Could not find a Glyph preset with an id of ${id}`,
+            `Type in a valid id (1 - ${maxSlots}) for your Glyph preset`);
+          return false;
+        }
+        ctx.$presetIndex = id;
+        return true;
+      }
+
+      if (ctx.Name) {
+        const split = presetSplitter.exec(ctx.Name[0].image);
+        if (!split || ctx.Name[0].isInsertedInRecovery) {
+          V.addError(ctx, "Missing preset name",
+            "Provide the name of a saved Glyph preset from the Glyphs tab");
+          return false;
+        }
+
+        const presetIndex = player.reality.glyphs.sets.findIndex(e => e.name === split[1]) + 1;
+        if (presetIndex === 0) {
+          V.addError(ctx.Name[0], `Could not find Glyph preset named ${split[1]} (Note: Names are case-sensitive)`,
+            "Check to make sure you typed in the correct name for your Glyph preset");
+          return false;
+        }
+        ctx.$presetIndex = presetIndex;
+        return true;
+      }
+      return false;
+    },
+    compile: ctx => {
+      const presetIndex = ctx.$presetIndex;
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        const result = Glyphs.loadPreset(presetIndex - 1);
+        AutomatorData.logCommandEvent(`Loaded Glyph preset ${result.name}`, ctx.startLine);
+        return nowait || result.success
+          ? AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION
+          : AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: ctx.Name ? "NAME" : "ID",
+      singleTextInput: ctx.Name ? player.reality.glyphs.sets[ctx.$presetIndex - 1].name : ctx.$presetIndex,
+      nowait: ctx.Nowait !== undefined,
+      ...automatorBlocksMap["GLYPH LOAD"]
+    })
+  },
 ];
