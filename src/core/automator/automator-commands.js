@@ -1132,5 +1132,75 @@ export const AutomatorCommands = [
     blockify: () => ({
       ...automatorBlocksMap.STOP,
     })
-  }
+  },
+  {
+    id: "celestialStart",
+    rule: $ => () => {
+      $.CONSUME(T.Celestial);
+      $.OR([
+        { ALT: () => $.CONSUME(T.Teresa) },
+        { ALT: () => $.CONSUME(T.Effarig) },
+        { ALT: () => $.CONSUME(T.Enslaved) },
+        { ALT: () => $.CONSUME(T.V) },
+        { ALT: () => $.CONSUME(T.Ra) },
+        { ALT: () => $.CONSUME(T.Laitela) },
+        { ALT: () => $.CONSUME(T.Pelle) },
+      ]);
+      $.CONSUME(T.Start);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Celestial[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const CELESTIAL_MAP = {
+        teresa: { name: "Teresa's", obj: Teresa, isUnlocked: () => TeresaUnlocks.run.isUnlocked },
+        effarig: { name: "Effarig's", obj: Effarig, isUnlocked: () => EffarigUnlock.run.isUnlocked },
+        enslaved: { name: "The Nameless Ones'", obj: Enslaved, isUnlocked: () => Enslaved.isUnlocked },
+        v: { name: "V's", obj: V, isUnlocked: () => VUnlocks.vAchievementUnlock.isUnlocked },
+        ra: { name: "Ra's", obj: Ra, isUnlocked: () => (Ra.isUnlocked ?? VUnlocks.raUnlock.isUnlocked) },
+        laitela: { name: "Lai'tela's", obj: Laitela, isUnlocked: () => Laitela.isUnlocked },
+        pelle: { name: "Pelle's", obj: Pelle, isUnlocked: () => Pelle.isUnlocked },
+      };
+      const targetKey = (ctx.Teresa && "teresa") || (ctx.Effarig && "effarig") || (ctx.Enslaved && "enslaved") || (ctx.V && "v") || (ctx.Ra && "ra") || (ctx.Laitela && "laitela") || (ctx.Pelle && "pelle");
+      const cel = CELESTIAL_MAP[targetKey];
+      const nowait = Boolean(ctx.Nowait);
+      return () => {
+        if (!cel) return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        const isRunning = cel.obj.isRunning ?? cel.obj.isDoomed;
+        if (isRunning) {
+          AutomatorData.logCommandEvent(
+            `Celestial Start ignored: already in ${cel.name} Reality`,
+            ctx.startLine
+          );
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        }
+        if (!cel.isUnlocked()) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(
+              `Celestial Start skipped: ${cel.name} Reality is not unlocked (NOWAIT)`,
+              ctx.startLine
+            );
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        beginProcessReality(getRealityProps(true));
+        cel.obj.initializeRun();
+        AutomatorData.logCommandEvent(`Entered ${cel.name} Reality`, ctx.startLine);
+        return AutomatorBackend.state.forceRestart
+          ? AUTOMATOR_COMMAND_STATUS.RESTART
+          : AUTOMATOR_COMMAND_STATUS.NEXT_TICK_NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => {
+      const name = (ctx.Teresa && "TERESA") || (ctx.Effarig && "EFFARIG") || (ctx.Enslaved && "ENSLAVED") || (ctx.V && "V") || (ctx.Ra && "RA") || (ctx.Laitela && "LAITELA") || (ctx.Pelle && "PELLE") || "";
+      return {
+        singleSelectionInput: name,
+        nowait: ctx.Nowait !== undefined,
+        ...automatorBlocksMap.START
+      };
+    }
+  },
 ];

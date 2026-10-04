@@ -378,6 +378,15 @@ createKeyword("XHighest", /x[ \t]+highest/i, {
   $autocomplete: "x highest",
 });
 
+createKeyword("Celestial", /celestial/i);
+createKeyword("Teresa", /teresa/i);
+createKeyword("Effarig", /effarig/i);
+createKeyword("Enslaved", /enslaved/i);
+createKeyword("V", /v/i); 
+createKeyword("Ra", /ra/i); 
+createKeyword("Laitela", /laitela/i); 
+createKeyword("Pelle", /pelle/i); 
+
 // We allow ECLiteral to consume lots of digits because that makes error reporting more
 // clear (it's nice to say ec123 is an invalid ec)
 const ECLiteral = createToken({

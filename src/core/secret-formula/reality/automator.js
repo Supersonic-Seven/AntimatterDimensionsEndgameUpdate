@@ -632,6 +632,37 @@ export const automator = {
         }`
       ]
     },
+    {
+      id: 20,
+      isUnlocked: () => TeresaUnlocks.run.isUnlocked,
+      keyword: "CELESTIAL",
+      category: 1,
+      syntax: "<b>celestial</b> <u>name</u> <b>start</b> [nowait]",
+      description: `Performs a Reality reset and enters the specified Celestial's Reality.
+        If you are already within the specified Celestial Reality,
+        running this command again will do nothing and continue onward.`,
+      sections: [
+        {
+          name: "INPUTS",
+          items: [
+            {
+              header: "<i>name</i>",
+              description: "The name of the Celestial to enter."
+            },
+            {
+              header: "<i>nowait</i>",
+              description: `If present, the Automator will move on to the next command if entering
+                the Celestial Reality is not possible (eg. if it is not yet unlocked). By default,
+                the Automator will repeatedly attempt this command until it succeeds.`
+            }
+          ]
+        }
+      ],
+      examples: [
+        "celestial teresa start",
+        "celestial teresa start nowait"
+      ]
+    },
   ],
   otherAutomatorPoints: [
     {

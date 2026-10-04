@@ -61,6 +61,7 @@ CodeMirror.defineSimpleMode("automato", {
   start: [
     commentRule,
     { regex: /studies\s+/ui, token: "keyword", next: "studiesArgs" },
+    { regex: /celestial\s+/ui, token: "keyword", next: "celestialArgs" },
     { regex: /blob\s\s/ui, token: "blob" },
     {
       // eslint-disable-next-line max-len
@@ -119,6 +120,24 @@ CodeMirror.defineSimpleMode("automato", {
     commentRule,
     { sol: true, next: "start" },
     { regex: /(\/(?!\/)|[^\s#/])+/ui, token: "qualifier", next: "commandDone" },
+  ],
+  celestialArgs: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /(teresa|effarig|enslaved|v|ra|laitela|pelle)(\s+|$)/ui, token: "variable-2", next: "celestialAction" },
+    { regex: /\S+/ui, token: "error" },
+  ],
+  celestialAction: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /start(\s+|$)/ui, token: "keyword", next: "celestialModifiers" },
+    { regex: /\S+/ui, token: "error" },
+  ],
+  celestialModifiers: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /nowait(\s+|$)/ui, token: "property", next: "commandDone" },
+    { regex: /\S+/ui, token: "error" },
   ],
   prestige: [
     commentRule,
