@@ -554,6 +554,8 @@ export const automator = {
           <b>pending glyph level</b> - Glyph Level gained on Reality (0 if not available)<br>
           <b>pending remnants</b> - Remnants gained on Armageddon (0 if not available)<br>
           <b>reality resources</b> (or <b>realityresources</b>) - Current Reality Alchemy Resource amount<br>
+          <b>rift1</b> - <b>rift5</b> - Current fill percentage of Rift 1 to 5 (0 to 100)<br>
+          <b>rift milestones</b> - Total Pelle Rift milestones unlocked<br>
           <b>dt</b> - Current Dilated Time amount <br>
           <b>tp</b> - Current Tachyon Particle amount<br>
           <b>rg</b> - Current Replicanti Galaxy amount (does not use scientific)<br>
@@ -825,6 +827,39 @@ export const automator = {
         "alchemy on",
         "alchemy off nowait",
         "alchemy reset",
+      ]
+    },
+    {
+      id: 26,
+      isUnlocked: () => Pelle.isUnlocked,
+      keyword: "RIFT",
+      category: 2,
+      syntax: "<b>rift</b> [nowait] <u>id</u> <b>on</b>|<b>off</b>",
+      description: `Toggles a Pelle Rift on or off to fill it with its respective resource.`,
+      sections: [
+        {
+          name: "INPUTS",
+          items: [
+            {
+              header: "<i>nowait</i>",
+              description: `If present, moves to the next command immediately even if the Rift cannot be activated
+                (e.g. if it is not unlocked yet, already maxed, or 2 other Rifts are already active).`
+            },
+            {
+              header: "<i>id</i>",
+              description: "The Rift number (1 through 5) to toggle."
+            },
+            {
+              header: "<i>on</i> | <i>off</i>",
+              description: "Turns filling the specified Rift on or off."
+            },
+          ]
+        }
+      ],
+      examples: [
+        "rift 1 on",
+        "rift nowait 5 on",
+        "rift 2 off",
       ]
     },
   ],

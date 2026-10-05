@@ -64,6 +64,7 @@ CodeMirror.defineSimpleMode("automato", {
     { regex: /celestial\s+/ui, token: "keyword", next: "celestialArgs" },
     { regex: /glyphs?\s+/ui, token: "keyword", next: "glyphArgs" },
     { regex: /alchemy\s+/ui, token: "keyword", next: "alchemyArgs" },
+    { regex: /rifts?\s+/ui, token: "keyword", next: "riftArgs" },
     { regex: /blob\s\s/ui, token: "blob" },
     {
       // eslint-disable-next-line max-len
@@ -193,6 +194,25 @@ CodeMirror.defineSimpleMode("automato", {
     { regex: /nowait(\s+|$)/ui, token: "property", next: "commandDone" },
     { regex: /\S+/ui, token: "error" },
   ],
+  riftArgs: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /nowait(\s+|$)/ui, token: "property" },
+    { regex: /[1-5](\s+|$)/ui, token: "number", next: "riftAction" },
+    { regex: /\S+/ui, token: "error" },
+  ],
+  riftAction: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /(on|off)(\s+|$)/ui, token: "property", next: "riftModifiers" },
+    { regex: /\S+/ui, token: "error" },
+  ],
+  riftModifiers: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /nowait(\s+|$)/ui, token: "property", next: "commandDone" },
+    { regex: /\S+/ui, token: "error" },
+  ],
   prestige: [
     commentRule,
     { sol: true, next: "start" },
@@ -241,6 +261,8 @@ CodeMirror.defineSimpleMode("automato", {
       token: "variable-2",
     },
     { regex: /reality[ \t]*resources?(\s|$)/ui, token: "variable-2" },
+    { regex: /(rifts?[1-5]|rifts?[ \t]+[1-5][ \t]+(percentage|fill|percent))(\s|$)/ui, token: "variable-2" },
+    { regex: /(total[ \t]+)?rifts?[ \t]+milestones?(\s|$)/ui, token: "variable-2" },
     { regex: / sec(onds ?) ?| min(utes ?) ?| hours ?/ui, token: "variable-2" },
     { regex: /([0-9]+:[0-5][0-9]:[0-5][0-9]|[0-5]?[0-9]:[0-5][0-9]|t[1-4])/ui, token: "number" },
     { regex: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/ui, token: "number" },

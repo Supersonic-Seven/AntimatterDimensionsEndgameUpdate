@@ -1511,4 +1511,83 @@ export const AutomatorCommands = [
       ...automatorBlocksMap.ALCHEMY
     })
   },
+  {
+    id: "rift",
+    rule: $ => () => {
+      $.CONSUME(T.Rift);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.CONSUME(T.NumberLiteral);
+      $.OR([
+        { ALT: () => $.CONSUME(T.On) },
+        { ALT: () => $.CONSUME(T.Off) },
+      ]);
+      $.OPTION1(() => $.CONSUME1(T.Nowait));
+    },
+    validate: (ctx, V) => {
+      ctx.startLine = ctx.Rift[0].startLine;
+      if (!ctx.NumberLiteral || ctx.NumberLiteral[0].isInsertedInRecovery) {
+        V.addError(ctx, "Missing Rift number",
+          "Specify which Rift (1 - 5) is being referred to");
+        return false;
+      }
+      const riftId = parseInt(ctx.NumberLiteral[0].image, 10);
+      if (isNaN(riftId) || riftId < 1 || riftId > 5) {
+        V.addError(ctx.NumberLiteral[0], `Invalid Rift ID ${ctx.NumberLiteral[0].image}`,
+          "Rift ID must be an integer between 1 and 5");
+        return false;
+      }
+      ctx.$riftId = riftId;
+      return true;
+    },
+    compile: ctx => {
+      const riftId = ctx.$riftId;
+      const isOn = Boolean(ctx.On);
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        if (!Pelle.isUnlocked) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Rift command skipped: Pelle is not unlocked (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        const rift = PelleRifts.all[riftId - 1];
+        if (!rift || !rift.canBeApplied) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Rift ${riftId} skipped: not unlocked yet (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        if (isOn) {
+          if (rift.isMaxed || Pelle.hasGalaxyGenerator) {
+            AutomatorData.logCommandEvent(`Rift ${riftId} is already maxed`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          if (rift.isActive) {
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          const success = rift.setActive(true);
+          if (success) {
+            AutomatorData.logCommandEvent(`Turned Rift ${riftId} (${rift.name}) ON`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Rift ${riftId} could not be activated: 2 Rifts already active (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        rift.setActive(false);
+        AutomatorData.logCommandEvent(`Turned Rift ${riftId} (${rift.name}) OFF`, ctx.startLine);
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleTextInput: ctx.$riftId,
+      singleSelectionInput: ctx.On ? "ON" : "OFF",
+      nowait: ctx.Nowait !== undefined,
+      ...(automatorBlocksMap?.RIFT || {})
+    })
+  },
 ];

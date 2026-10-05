@@ -231,6 +231,22 @@ for (let i = 1; i <= 12; ++i) {
   });
 }
 
+for (let i = 1; i <= 5; ++i) {
+  const id = i;
+  createInCategory(AutomatorCurrency, `Rift${i}`, new RegExp(`rifts?${i}\\b|rifts?[ \\t]+${i}[ \\t]+(percentage|fill|percent)`, "i"), {
+    $autocomplete: `rift${i}`,
+    // eslint-disable-next-line no-loop-func
+    $getter: () => new Decimal(PelleRifts.all[id - 1]?.percentage ?? 0).times(100),
+    $unlocked: () => Pelle.isUnlocked,
+  });
+}
+
+createInCategory(AutomatorCurrency, "RiftMilestones", /(total[ \t]+)?rifts?[ \t]+milestones?/i, {
+  $autocomplete: "rift milestones",
+  $getter: () => new Decimal(PelleRifts.totalMilestones?.() ?? 0),
+  $unlocked: () => Pelle.isUnlocked,
+});
+
 // $prestigeLevel is used by things that wait for a prestige event. Something waiting for
 // eternity will be triggered by something waiting for reality, for example.
 createInCategory(PrestigeEvent, "Infinity", /infinity/i, {
@@ -401,6 +417,7 @@ createKeyword("Equip", /equip/i);
 createKeyword("Cursed", /cursed/i);
 createKeyword("Alchemy", /alchemy/i);
 createKeyword("Reset", /reset/i);
+createKeyword("Rift", /rifts?/i);
 
 // We allow ECLiteral to consume lots of digits because that makes error reporting more
 // clear (it's nice to say ec123 is an invalid ec)

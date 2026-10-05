@@ -141,6 +141,19 @@ class RiftState extends GameMechanicState {
     else this.rift.active = !this.rift.active;
   }
 
+  setActive(active) {
+    if (Boolean(this.isActive) === Boolean(active)) return true;
+    if (!active) {
+      this.rift.active = false;
+      return true;
+    }
+    if (this.isMaxed || Pelle.hasGalaxyGenerator) return false;
+    const activeCount = PelleRifts.all.filter(r => r.isActive).length;
+    if (activeCount >= 2) return false;
+    this.rift.active = true;
+    return true;
+  }
+
   checkMilestoneStates() {
     this.milestones.forEach(x => x.checkMilestoneState());
   }
