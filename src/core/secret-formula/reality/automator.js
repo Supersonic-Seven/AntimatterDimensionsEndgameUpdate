@@ -556,6 +556,7 @@ export const automator = {
           <b>reality resources</b> (or <b>realityresources</b>) - Current Reality Alchemy Resource amount<br>
           <b>rift1</b> - <b>rift5</b> - Current fill percentage of Rift 1 to 5 (0 to 100)<br>
           <b>rift milestones</b> - Total Pelle Rift milestones unlocked<br>
+          <b>poured rm</b> (or <b>pouredrm</b>) - Current Reality Machines poured into Teresa<br>
           <b>dt</b> - Current Dilated Time amount <br>
           <b>tp</b> - Current Tachyon Particle amount<br>
           <b>rg</b> - Current Replicanti Galaxy amount (does not use scientific)<br>
@@ -860,6 +861,43 @@ export const automator = {
         "rift 1 on",
         "rift nowait 5 on",
         "rift 2 off",
+      ]
+    },
+    {
+      id: 27,
+      isUnlocked: () => Teresa.isUnlocked,
+      keyword: "CELESTIAL POUR",
+      category: 2,
+      syntax: "<b>celestial teresa pour</b> [nowait] <b>on</b>|<b>off</b>",
+      description: `Toggles pouring Reality Machines into Teresa's container.`,
+      sections: [
+        {
+          name: "MODIFIERS",
+          items: [
+            {
+              header: "<i>nowait</i>",
+              description: `If present, advances to the next command immediately even if Teresa is not unlocked
+                or there are no Reality Machines to pour.`
+            }
+          ]
+        }
+      ],
+      examples: [
+        "celestial teresa pour on",
+        "celestial teresa pour off",
+        "celestial teresa pour on nowait",
+      ]
+    },
+    {
+      id: 28,
+      isUnlocked: () => ExpansionPack.teresaPack.isBought && !player.disablePostReality,
+      keyword: "AUTO POUR",
+      category: 2,
+      syntax: "<b>auto</b> [nowait] <b>pour</b> <b>on</b>|<b>off</b>",
+      description: `Toggles automatic pouring of Reality Machines into Teresa's container.`,
+      examples: [
+        "auto pour on",
+        "auto pour off",
       ]
     },
   ],

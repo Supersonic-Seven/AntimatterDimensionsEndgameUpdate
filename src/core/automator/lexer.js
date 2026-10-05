@@ -246,6 +246,11 @@ createInCategory(AutomatorCurrency, "RiftMilestones", /(total[ \t]+)?rifts?[ \t]
   $getter: () => new Decimal(PelleRifts.totalMilestones?.() ?? 0),
   $unlocked: () => Pelle.isUnlocked,
 });
+createInCategory(AutomatorCurrency, "PouredRM", /poured[ \t]*rm/i, {
+  $autocomplete: "poured RM",
+  $getter: () => new Decimal(player.celestials.teresa.pouredAmount),
+  $unlocked: () => Teresa.isUnlocked,
+});
 
 // $prestigeLevel is used by things that wait for a prestige event. Something waiting for
 // eternity will be triggered by something waiting for reality, for example.
@@ -418,6 +423,7 @@ createKeyword("Cursed", /cursed/i);
 createKeyword("Alchemy", /alchemy/i);
 createKeyword("Reset", /reset/i);
 createKeyword("Rift", /rifts?/i);
+createKeyword("Pour", /pour/i);
 
 // We allow ECLiteral to consume lots of digits because that makes error reporting more
 // clear (it's nice to say ec123 is an invalid ec)

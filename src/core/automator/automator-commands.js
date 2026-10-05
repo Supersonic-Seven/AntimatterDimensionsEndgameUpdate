@@ -1590,4 +1590,98 @@ export const AutomatorCommands = [
       ...(automatorBlocksMap?.RIFT || {})
     })
   },
+  {
+    id: "teresaPour",
+    rule: $ => () => {
+      $.CONSUME(T.Celestial);
+      $.CONSUME(T.Teresa);
+      $.CONSUME(T.Pour);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.OR([
+        { ALT: () => $.CONSUME(T.On) },
+        { ALT: () => $.CONSUME(T.Off) },
+      ]);
+      $.OPTION1(() => $.CONSUME1(T.Nowait));
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Celestial[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const isOn = Boolean(ctx.On);
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        if (!Teresa.isUnlocked) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Teresa Pour skipped: Teresa is not unlocked (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        if (isOn) {
+          if (Teresa.pouredAmount.gte(Teresa.pouredAmountCap)) {
+            AutomatorData.logCommandEvent(`Teresa Pour skipped: already capped`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          if (Currency.realityMachines.value.lte(0)) {
+            if (nowait) {
+              AutomatorData.logCommandEvent(`Teresa Pour skipped: no Reality Machines (NOWAIT)`, ctx.startLine);
+              return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            }
+            return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+          }
+          Teresa.setPour(true);
+          AutomatorData.logCommandEvent(`Teresa Pour started (ON)`, ctx.startLine);
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        }
+        Teresa.setPour(false);
+        AutomatorData.logCommandEvent(`Teresa Pour stopped (OFF)`, ctx.startLine);
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: ctx.On ? "ON" : "OFF",
+      nowait: ctx.Nowait !== undefined,
+      ...(automatorBlocksMap?.["TERESA POUR"] || {})
+    })
+  },
+  {
+    id: "autoPour",
+    rule: $ => () => {
+      $.CONSUME(T.Auto);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.CONSUME(T.Pour);
+      $.OR([
+        { ALT: () => $.CONSUME(T.On) },
+        { ALT: () => $.CONSUME(T.Off) },
+      ]);
+      $.OPTION1(() => $.CONSUME1(T.Nowait));
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Auto[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const isOn = Boolean(ctx.On);
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        const isUnlocked = ExpansionPack.teresaPack.isBought && !player.disablePostReality;
+        if (!isUnlocked) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Auto Pour skipped: not unlocked yet (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        player.celestials.teresa.autoPour = isOn;
+        AutomatorData.logCommandEvent(`Auto Pour turned ${isOn ? "ON" : "OFF"}`, ctx.startLine);
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: ctx.On ? "ON" : "OFF",
+      nowait: ctx.Nowait !== undefined,
+      ...(automatorBlocksMap?.["AUTO POUR"] || {})
+    })
+  },
 ];

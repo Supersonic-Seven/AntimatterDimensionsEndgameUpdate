@@ -5,6 +5,43 @@ import { Quotes } from "./quotes";
 
 export const Teresa = {
   timePoured: new Decimal(0),
+  lastTick: 0,
+  isPouring: false,
+  pourAccumulator: 0,
+  pourTime: 0,
+  setPour(on) {
+    const target = Boolean(on);
+    if (this.isPouring === target) return;
+    this.isPouring = target;
+    if (target) {
+      this.lastTick = Date.now();
+    } else {
+      this.pourTime = 0;
+      this.timePoured = new Decimal(0);
+    }
+  },
+  tickPour() {
+    if (!this.isPouring) return;
+    if (typeof EndgameUpgrade !== "undefined" && EndgameUpgrade(10).isLockingMechanics) {
+      this.setPour(false);
+      return;
+    }
+    if (this.pouredAmount.gte(this.pouredAmountCap) || Currency.realityMachines.value.lte(0)) {
+      this.setPour(false);
+      return;
+    }
+
+    const now = Date.now();
+    if (!this.lastTick) this.lastTick = now;
+    const diff = Math.clamp((now - this.lastTick) / 1000, 0, 0.1);
+    this.lastTick = now;
+    if (diff <= 0) return;
+
+    this.pourTime += diff;
+    this.timePoured = new Decimal(this.pourTime);
+
+    this.pourRM(diff);
+  },
   lastUnlock: "effarig",
   get pouredAmountCap() {
     return (ExpansionPack.teresaPack.isBought && !player.disablePostReality) ? DC.BEMAX : new Decimal(1e24);
@@ -256,4 +293,4 @@ EventHub.logic.on(GAME_EVENT.TAB_CHANGED, () => {
   if (Tab.celestials.teresa.isOpen) Teresa.quotes.initial.show();
 });
 
-EventHub.logic.on(GAME_EVENT.GAME_LOAD, () => Teresa.checkForUnlocks());
+EventHub.logic.on(GAME_EVENT.GAME_TICK_AFTER, () => Teresa.tickPour());
