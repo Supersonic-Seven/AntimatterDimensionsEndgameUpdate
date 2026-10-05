@@ -63,6 +63,7 @@ CodeMirror.defineSimpleMode("automato", {
     { regex: /studies\s+/ui, token: "keyword", next: "studiesArgs" },
     { regex: /celestial\s+/ui, token: "keyword", next: "celestialArgs" },
     { regex: /glyphs?\s+/ui, token: "keyword", next: "glyphArgs" },
+    { regex: /alchemy\s+/ui, token: "keyword", next: "alchemyArgs" },
     { regex: /blob\s\s/ui, token: "blob" },
     {
       // eslint-disable-next-line max-len
@@ -153,7 +154,7 @@ CodeMirror.defineSimpleMode("automato", {
   glyphTarget: [
     commentRule,
     { sol: true, next: "start" },
-    { regex: /cursed(\s+|$)/ui, token: "property", next: "commandDone" },
+    { regex: /(cursed|reality)(\s+|$)/ui, token: "property", next: "commandDone" },
     { regex: /\S+/ui, token: "error" },
   ],
   glyphUnequip: [
@@ -178,6 +179,19 @@ CodeMirror.defineSimpleMode("automato", {
     commentRule,
     { sol: true, next: "start" },
     { regex: /(\/(?!\/)|[^\s#/])+/ui, token: "qualifier", next: "commandDone" },
+  ],
+  alchemyArgs: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /(on|off)(\s+|$)/ui, token: "property", next: "alchemyModifiers" },
+    { regex: /reset(\s+|$)/ui, token: "variable-2", next: "commandDone" },
+    { regex: /\S+/ui, token: "error" },
+  ],
+  alchemyModifiers: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /nowait(\s+|$)/ui, token: "property", next: "commandDone" },
+    { regex: /\S+/ui, token: "error" },
   ],
   prestige: [
     commentRule,
@@ -226,6 +240,7 @@ CodeMirror.defineSimpleMode("automato", {
       regex: /(rm|remnants|rs|rg|dt|tp|tt|space theorems|(banked )?infinities|eternities|realities|rep(licanti)?)(\s|$)/ui,
       token: "variable-2",
     },
+    { regex: /reality[ \t]*resources?(\s|$)/ui, token: "variable-2" },
     { regex: / sec(onds ?) ?| min(utes ?) ?| hours ?/ui, token: "variable-2" },
     { regex: /([0-9]+:[0-5][0-9]:[0-5][0-9]|[0-5]?[0-9]:[0-5][0-9]|t[1-4])/ui, token: "number" },
     { regex: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/ui, token: "number" },

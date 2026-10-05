@@ -553,6 +553,7 @@ export const automator = {
           <b>pending rs</b> - RS gained on Armageddon (0 if not available)<br>
           <b>pending glyph level</b> - Glyph Level gained on Reality (0 if not available)<br>
           <b>pending remnants</b> - Remnants gained on Armageddon (0 if not available)<br>
+          <b>reality resources</b> (or <b>realityresources</b>) - Current Reality Alchemy Resource amount<br>
           <b>dt</b> - Current Dilated Time amount <br>
           <b>tp</b> - Current Tachyon Particle amount<br>
           <b>rg</b> - Current Replicanti Galaxy amount (does not use scientific)<br>
@@ -742,12 +743,13 @@ export const automator = {
       ]
     },
     {
-      id: 24,
+      id: 23,
       isUnlocked: () => PlayerProgress.realityUnlocked(),
       keyword: "GLYPH CREATE",
       category: 2,
-      syntax: "<b>glyph</b> [nowait] <b>create cursed</b>",
-      description: `Spawns a Cursed Glyph and places it into your inventory if there is free space available.`,
+      syntax: `<b>glyph</b> [nowait] <b>create cursed</b><br>
+        <b>glyph</b> [nowait] <b>create reality</b>`,
+      description: `Spawns a Cursed Glyph (requires Hard V), or consumes all Reality Resources to create a Reality Glyph.`,
       sections: [
         {
           name: "MODIFIERS",
@@ -755,18 +757,19 @@ export const automator = {
             {
               header: "<i>nowait</i>",
               description: `If present, advances to the next command immediately even if the inventory is full
-                or the maximum number of Cursed Glyphs has already been reached.`
+                or creation conditions are not met.`
             }
           ]
         }
       ],
       examples: [
         "glyph create cursed",
-        "glyph nowait create cursed"
+        "glyph create reality",
+        "glyph nowait create reality",
       ]
     },
     {
-      id: 25,
+      id: 24,
       isUnlocked: () => PlayerProgress.realityUnlocked(),
       keyword: "GLYPH EQUIP",
       category: 2,
@@ -787,6 +790,41 @@ export const automator = {
       examples: [
         "glyph equip cursed",
         "glyph nowait equip cursed"
+      ]
+    },
+    {
+      id: 25,
+      isUnlocked: () => Ra.pets.effarig.level >= 2,
+      keyword: "ALCHEMY",
+      category: 2,
+      syntax: `<b>alchemy on</b> [nowait]<br>
+        <b>alchemy off</b> [nowait]<br>
+        <b>alchemy reset</b>`,
+      description: `Turns all unlocked Glyph Alchemy reactions on or off, or force-resets all Alchemy resources to 0.`,
+      sections: [
+        {
+          name: "SETTINGS",
+          items: [
+            {
+              header: "<i>on</i> | <i>off</i>",
+              description: `Turns all unlocked Alchemy reactions on or off.`
+            },
+            {
+              header: "<i>reset</i>",
+              description: `Resets all Alchemy resources to zero.`
+            },
+            {
+              header: "<i>nowait</i>",
+              description: `Usable with on/off only. Advances to the next line immediately even if no reactions
+                are currently unlocked.`
+            }
+          ]
+        }
+      ],
+      examples: [
+        "alchemy on",
+        "alchemy off nowait",
+        "alchemy reset",
       ]
     },
   ],

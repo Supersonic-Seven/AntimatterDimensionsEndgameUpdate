@@ -1245,7 +1245,10 @@ export const AutomatorCommands = [
     },
     validate: (ctx, V) => {
       ctx.startLine = ctx.Glyph[0].startLine;
-      const maxSlots = player.reality.glyphs.sets.length;
+      while (player.reality.glyphs.sets.length < 70) {
+        player.reality.glyphs.sets.push({ name: "", glyphs: [] });
+      }
+      const maxSlots = 70;
 
       if (ctx.Id) {
         const split = idSplitter.exec(ctx.Id[0].image);
@@ -1351,11 +1354,14 @@ export const AutomatorCommands = [
       $.CONSUME(T.Glyph);
       $.OPTION(() => $.CONSUME(T.Nowait));
       $.CONSUME(T.Create);
-      $.CONSUME(T.Cursed);
+      $.OR([
+        { ALT: () => $.CONSUME(T.Cursed) },
+        { ALT: () => $.CONSUME(T.Reality) },
+      ]);
     },
     validate: (ctx, VVal) => {
       ctx.startLine = ctx.Glyph[0].startLine;
-      if (!V.isFlipped) {
+      if (ctx.Cursed && !V.isFlipped) {
         VVal.addError(ctx.Cursed[0], "Cursed Glyphs are not unlocked yet",
           "Unlock Hard V to create Cursed Glyphs");
         return false;
@@ -1364,34 +1370,53 @@ export const AutomatorCommands = [
     },
     compile: ctx => {
       const nowait = ctx.Nowait !== undefined;
+      const isCursed = Boolean(ctx.Cursed);
+      const isReality = Boolean(ctx.Reality);
       return () => {
-        if (!V.isFlipped) {
+        if (isCursed) {
+          if (!V.isFlipped) {
+            if (nowait) {
+              AutomatorData.logCommandEvent(`Cursed Glyph creation skipped: Hard V is not unlocked (NOWAIT)`, ctx.startLine);
+              return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            }
+            return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+          }
+          const cursedCount = Glyphs.allGlyphs.filter(g => g && g.type === "cursed").length;
+          const maxCount = Math.max(Glyphs.activeSlotCount, 5);
+          if (cursedCount >= maxCount) {
+            AutomatorData.logCommandEvent(`Cursed Glyph creation skipped: already at cap (${maxCount})`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          if (GameCache.glyphInventorySpace.value === 0) {
+            if (nowait) {
+              AutomatorData.logCommandEvent(`Cursed Glyph creation skipped: inventory full (NOWAIT)`, ctx.startLine);
+              return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            }
+            return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+          }
+          Glyphs.giveCursedGlyph();
+          AutomatorData.logCommandEvent(`Created a Cursed Glyph`, ctx.startLine);
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        }
+
+        if (isReality) {
+          const res = AlchemyResources.createRealityGlyph();
+          if (res.success) {
+            AutomatorData.logCommandEvent(`Created a level ${formatInt(res.level)} Reality Glyph`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
           if (nowait) {
-            AutomatorData.logCommandEvent(`Cursed Glyph creation skipped: Hard V is not unlocked (NOWAIT)`, ctx.startLine);
+            AutomatorData.logCommandEvent(`Reality Glyph creation skipped: ${res.message} (NOWAIT)`, ctx.startLine);
             return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
           }
           return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
         }
 
-        const cursedCount = Glyphs.allGlyphs.filter(g => g && g.type === "cursed").length;
-        const maxCount = Math.max(Glyphs.activeSlotCount, 5);
-        if (cursedCount >= maxCount) {
-          AutomatorData.logCommandEvent(`Cursed Glyph creation skipped: already at cap (${maxCount})`, ctx.startLine);
-          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
-        }
-        if (GameCache.glyphInventorySpace.value === 0) {
-          if (nowait) {
-            AutomatorData.logCommandEvent(`Cursed Glyph creation skipped: inventory full (NOWAIT)`, ctx.startLine);
-            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
-          }
-          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
-        }
-        Glyphs.giveCursedGlyph();
-        AutomatorData.logCommandEvent(`Created a Cursed Glyph`, ctx.startLine);
         return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
       };
     },
     blockify: ctx => ({
+      singleSelectionInput: ctx.Cursed ? "CURSED" : "REALITY",
       nowait: ctx.Nowait !== undefined,
       ...automatorBlocksMap["GLYPH CREATE"]
     })
@@ -1435,6 +1460,55 @@ export const AutomatorCommands = [
     blockify: ctx => ({
       nowait: ctx.Nowait !== undefined,
       ...automatorBlocksMap["GLYPH EQUIP"]
+    })
+  },
+  {
+    id: "alchemyAction",
+    rule: $ => () => {
+      $.CONSUME(T.Alchemy);
+      $.OR([
+        {
+          ALT: () => {
+            $.OR1([
+              { ALT: () => $.CONSUME(T.On) },
+              { ALT: () => $.CONSUME(T.Off) },
+            ]);
+            $.OPTION(() => $.CONSUME(T.Nowait));
+          }
+        },
+        {
+          ALT: () => $.CONSUME(T.Reset)
+        }
+      ]);
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Alchemy[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const isOn = Boolean(ctx.On);
+      const isOff = Boolean(ctx.Off);
+      const isReset = Boolean(ctx.Reset);
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        if (isReset) {
+          AlchemyResources.reset();
+          AutomatorData.logCommandEvent(`Reset all Alchemy resources`, ctx.startLine);
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        }
+        const hasReactions = AlchemyResources.all.some(res => !res.isBaseResource && res.isUnlocked);
+        if (!hasReactions && !nowait) {
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        AlchemyResources.setAllReactions(isOn);
+        AutomatorData.logCommandEvent(`Turned all Alchemy reactions ${isOn ? "ON" : "OFF"}`, ctx.startLine);
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: ctx.Reset ? "RESET" : (ctx.On ? "ON" : "OFF"),
+      nowait: ctx.Nowait !== undefined,
+      ...automatorBlocksMap.ALCHEMY
     })
   },
 ];

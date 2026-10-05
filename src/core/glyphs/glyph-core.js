@@ -181,6 +181,9 @@ export const Glyphs = {
     }
   },
   refresh() {
+    while (player.reality.glyphs.sets.length < 70) {
+      player.reality.glyphs.sets.push({ name: "", glyphs: [] });
+    }
     this.refreshActive();
     this.inventory = new Array(this.totalSlots).fill(null);
     // Glyphs could previously end up occupying the same inventory slot (Stacking)

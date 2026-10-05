@@ -242,8 +242,50 @@ export const AlchemyResource = mapGameDataToObject(
 
 export const AlchemyResources = {
   all: AlchemyResource.all,
-  base: AlchemyResource.all.filter(r => r.isBaseResource)
+  base: AlchemyResource.all.filter(r => r.isBaseResource),
+
+  setAllReactions(isActive) {
+    if (Pelle.isDoomed) return;
+    const reactions = AlchemyReactions.all.compact().filter(r => r.product.isUnlocked);
+    for (const reaction of reactions) {
+      reaction.isActive = isActive;
+    }
+    GameUI.update();
+  },
+
+  reset() {
+    for (const res of AlchemyResources.all) {
+      res.amount = 0;
+    }
+    GameUI.update();
+  },
+
+  createRealityGlyph() {
+    if (Pelle.isDoomed && !PelleAlchemyUpgrade.alchemyReality.canBeApplied) {
+      return { success: false, message: "Cannot create Reality Glyphs while Doomed" };
+    }
+    const level = Decimal.floor(AlchemyResource.reality.amount);
+    if (level.lte(0)) {
+      return { success: false, message: "Reality resource amount is zero" };
+    }
+    if (GameCache.glyphInventorySpace.value === 0) {
+      Modal.message.show("No available inventory space; Sacrifice some Glyphs to free up space.",
+        { closeEvent: GAME_EVENT.GLYPHS_CHANGED });
+      return { success: false, message: "No inventory space" };
+    }
+
+    Glyphs.addToInventory(GlyphGenerator.realityGlyph(level));
+    if (!ExpansionPack.effarigPack.isBought || player.disablePostReality) {
+      AlchemyResource.reality.amount = 0;
+    }
+    player.reality.glyphs.createdRealityGlyph = true;
+    EventHub.dispatch(GAME_EVENT.GLYPHS_CHANGED);
+    GameUI.notify.success(`Created a level ${formatInt(level)} Reality Glyph!`);
+    return { success: true, level };
+  }
 };
+
+export const Alchemy = AlchemyResources;
 
 export const AlchemyReactions = (function() {
   // For convenience and readability, stuff is named differently in GameDatabase

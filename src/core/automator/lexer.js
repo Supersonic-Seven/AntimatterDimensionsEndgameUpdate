@@ -128,6 +128,11 @@ createInCategory(AutomatorCurrency, "remnants", /remnants/i, {
   $autocomplete: "remnants",
   $getter: () => new Decimal(Currency.remnants.value)
 });
+createInCategory(AutomatorCurrency, "RealityResources", /reality[ \t]*resources?/i, {
+  $autocomplete: "reality resources",
+  $getter: () => new Decimal(AlchemyResource.reality.amount),
+  $unlocked: () => Ra.pets.effarig.level >= 25 || AlchemyResource.reality.amount > 0,
+});
 
 createInCategory(AutomatorCurrency, "PendingIP", /pending[ \t]+ip/i, {
   $autocomplete: "pending IP",
@@ -351,7 +356,7 @@ createKeyword("Pause", /pause/i);
 // So, we consume the label at the same time as we consume the preset. In order to report
 // errors, we also match just the word name. And, we have to not match comments.
 createKeyword("Name", /name([ \t]+(\/(?!\/)|[^\n#/])*)?/i);
-createKeyword("Id", /id\b([ \t]+\d)?/i);
+createKeyword("Id", /id\b([ \t]+\d+)?/i);
 createKeyword("Purchase", /purchase/i);
 createKeyword("Respec", /respec/i);
 createKeyword("Restart", /restart/i);
@@ -394,6 +399,8 @@ createKeyword("Over", /over/i);
 createKeyword("Create", /create/i);
 createKeyword("Equip", /equip/i);
 createKeyword("Cursed", /cursed/i);
+createKeyword("Alchemy", /alchemy/i);
+createKeyword("Reset", /reset/i);
 
 // We allow ECLiteral to consume lots of digits because that makes error reporting more
 // clear (it's nice to say ec123 is an invalid ec)
