@@ -446,6 +446,35 @@ export const AutomatorCommands = [
     }
   },
   {
+    id: "realityOver",
+    rule: $ => () => {
+      $.CONSUME(T.Reality);
+      $.CONSUME(T.Over);
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Reality[0].startLine;
+      return true;
+    },
+    compile: ctx => () => {
+      if (GameEnd.creditsClosed) return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      if (Slabdrill.isCursed) {
+        Slabdrill.enterCore();
+        Slabdrill.exitCore();
+      } else if (Alpha.isRunning) {
+        Alpha.escapeTheMatrix();
+      } else {
+        beginProcessReality(getRealityProps(true));
+      }
+      AutomatorData.logCommandEvent(`Current Reality restarted via REALITY OVER`, ctx.startLine);
+      return AutomatorBackend.state.forceRestart
+        ? AUTOMATOR_COMMAND_STATUS.RESTART
+        : AUTOMATOR_COMMAND_STATUS.NEXT_TICK_NEXT_INSTRUCTION;
+    },
+    blockify: () => ({
+      ...automatorBlocksMap["REALITY OVER"]
+    })
+  },
+  {
     id: "prestige",
     rule: $ => () => {
       $.CONSUME(T.PrestigeEvent);
@@ -1271,6 +1300,49 @@ export const AutomatorCommands = [
       singleTextInput: ctx.Name ? player.reality.glyphs.sets[ctx.$presetIndex - 1].name : ctx.$presetIndex,
       nowait: ctx.Nowait !== undefined,
       ...automatorBlocksMap["GLYPH LOAD"]
+    })
+  },
+  {
+    id: "glyphUnequip",
+    rule: $ => () => {
+      $.CONSUME(T.Glyph);
+      $.CONSUME(T.Unequip);
+      $.OR([
+        { ALT: () => $.CONSUME(T.On) },
+        { ALT: () => $.CONSUME(T.Off) },
+        { ALT: () => $.CONSUME(T.Main) },
+        { ALT: () => $.CONSUME(T.Protected) },
+      ]);
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Glyph[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const isOn = Boolean(ctx.On);
+      const isOff = Boolean(ctx.Off);
+      const isMain = Boolean(ctx.Main);
+      const isProtected = Boolean(ctx.Protected);
+      return () => {
+        if (isOn || isOff) {
+          player.reality.respec = isOn;
+          AutomatorData.logCommandEvent(
+            `Unequip Glyphs on Reality set to ${isOn ? "ON" : "OFF"}`,
+            ctx.startLine
+          );
+        } else if (isMain || isProtected) {
+          player.options.respecIntoProtected = isProtected;
+          AutomatorData.logCommandEvent(
+            `Unequip destination set to ${isProtected ? "PROTECTED slots" : "MAIN inventory"}`,
+            ctx.startLine
+          );
+        }
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: ctx.On ? "ON" : (ctx.Off ? "OFF" : (ctx.Main ? "MAIN" : "PROTECTED")),
+      ...automatorBlocksMap["GLYPH UNEQUIP"]
     })
   },
 ];

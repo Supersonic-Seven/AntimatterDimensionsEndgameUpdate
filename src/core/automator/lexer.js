@@ -387,6 +387,10 @@ createKeyword("Ra", /ra/i);
 createKeyword("Laitela", /laitela/i); 
 createKeyword("Pelle", /pelle/i); 
 createKeyword("Glyph", /glyphs?/i);
+createKeyword("Unequip", /unequip/i);
+createKeyword("Main", /main/i);
+createKeyword("Protected", /protected/i);
+createKeyword("Over", /over/i);
 
 // We allow ECLiteral to consume lots of digits because that makes error reporting more
 // clear (it's nice to say ec123 is an invalid ec)

@@ -701,6 +701,48 @@ export const automator = {
         `glyph nowait load id 2`,
       ]
     },
+    {
+      id: 22,
+      isUnlocked: () => PlayerProgress.realityUnlocked(),
+      keyword: "GLYPH UNEQUIP",
+      category: 2,
+      syntax: `<b>glyph unequip</b> <u>setting</u>`,
+      description: `Controls whether equipped Glyphs will be unequipped on the next Reality, or configures
+        the inventory destination where unequipped Glyphs will be sent.`,
+      sections: [
+        {
+          name: "SETTINGS",
+          items: [
+            {
+              header: "<i>on</i> | <i>off</i>",
+              description: `Turns unequip on Reality on or off. Equivalent to toggling the "Respec Glyphs" option.`
+            },
+            {
+              header: "<i>main</i> | <i>protected</i>",
+              description: `Sets whether unequipped Glyphs are returned to your Main Inventory or Protected slots.`
+            }
+          ]
+        }
+      ],
+      examples: [
+        `glyph unequip on`,
+        `glyph unequip off`,
+        `glyph unequip main`,
+        `glyph unequip protected`,
+      ]
+    },
+    {
+      id: 23,
+      isUnlocked: () => PlayerProgress.realityUnlocked(),
+      keyword: "REALITY OVER",
+      category: 1,
+      syntax: `<b>reality over</b>`,
+      description: `Restarts the current Reality immediately without requiring the Reality threshold or displaying
+        any confirmation modals. If currently inside a Celestial Reality, safely restarts or exits the Celestial run.`,
+      examples: [
+        `reality over`
+      ]
+    },
   ],
   otherAutomatorPoints: [
     {
