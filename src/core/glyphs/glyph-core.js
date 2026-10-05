@@ -869,6 +869,10 @@ export const Glyphs = {
   // something which should work in most cases - we match greedily when it won't obviously lead to an incomplete
   // preset match, and leniently when matching greedily may lead to an incomplete set being loaded
   loadPreset(id) {
+    //Save Check for the old
+    while (player.reality.glyphs.sets.length < 70) {
+      player.reality.glyphs.sets.push({ name: "", glyphs: [] });
+    }
     const preset = player.reality.glyphs.sets[id];
     if (!preset || !preset.glyphs.length) {
       GameUI.notify.error(`Glyph Preset #${id + 1} is empty!`);

@@ -16,6 +16,7 @@ export default {
       effects: false,
       rarity: false,
       level: false,
+      page: 0,
     };
   },
   computed: {
@@ -25,6 +26,23 @@ export default {
     },
     noSet() {
       return `No Glyph Preset saved in this slot`;
+    },
+    pageCount() {
+      return 10;
+    },
+    currentGlyphSets() {
+      const start = this.page * 7;
+      const end = start + 7;
+      return this.glyphSets.slice(start, end).map((set, idx) => ({
+        set,
+        id: start + idx,
+      }));
+    },
+    pageRangeText() {
+      const start = this.page * 7 + 1;
+      const end = start + 6;
+      const pad = (n) => String(n).padStart(2, '0');
+      return `#${pad(start)} - #${pad(end)}`;
     },
   },
   watch: {
@@ -93,7 +111,16 @@ export default {
     },
     glyphSetKey(set, index) {
       return `${index} ${Glyphs.hash(set)}`;
-    }
+    },
+    pad(n, len = 2) {
+      return String(n).padStart(len, '0');
+    },
+    prevPage() {
+      if (this.page > 0) this.page--;
+    },
+    nextPage() {
+      if (this.page < this.pageCount - 1) this.page++;
+    },
   }
 };
 </script>
@@ -134,8 +161,27 @@ export default {
         off="Exact"
       />
     </div>
+    <div class="l-glyph-set-save__page-bar">
+      <button
+        class="c-glyph-set-save-button"
+        :class="{ 'c-glyph-set-save-button--unavailable': page === 0 }"
+        @click="prevPage"
+      >
+        Prev
+      </button>
+      <span class="c-glyph-set-save-page-text">
+        Page {{ pad(page + 1) }} / {{ pad(pageCount) }} (Preset {{ pageRangeText }})
+      </span>
+      <button
+        class="c-glyph-set-save-button"
+        :class="{ 'c-glyph-set-save-button--unavailable': page >= pageCount - 1 }"
+        @click="nextPage"
+      >
+        Next
+      </button>
+    </div>
     <div
-      v-for="(set, id) in glyphSets"
+      v-for="{ set, id } in currentGlyphSets"
       :key="id"
       class="c-glyph-single-set-save"
     >
@@ -210,5 +256,11 @@ export default {
 
 .c-glyph-set-preview-area {
   width: 18rem;
+}
+
+.c-glyph-set-save-page-text {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--color-text, #fff);
 }
 </style>

@@ -164,7 +164,7 @@ CodeMirror.defineSimpleMode("automato", {
   glyphLoadId: [
     commentRule,
     { sol: true, next: "start" },
-    { regex: /\d/ui, token: "qualifier", next: "commandDone" },
+    { regex: /\d+/ui, token: "qualifier", next: "commandDone" },
   ],
   glyphLoadPreset: [
     commentRule,

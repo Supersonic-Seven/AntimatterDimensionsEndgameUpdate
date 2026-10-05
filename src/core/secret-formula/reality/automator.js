@@ -686,7 +686,7 @@ export const automator = {
             {
               header: "<i>selector</i>",
               description: `
-                Finds and loads the specified Glyph preset by its slot number (1 through 7), ordered from left to right.`
+                Finds and loads the specified Glyph preset by its slot number (1 through 70), ordered from left to right.`
             },
             {
               header: "<i>name</i>",
@@ -697,8 +697,8 @@ export const automator = {
       ],
       examples: [
         `glyph load id 1`,
-        `glyph load name Push`,
-        `glyph nowait load id 2`,
+        `glyph load name RM`,
+        `glyph nowait load id 69`,
       ]
     },
     {

@@ -5,7 +5,7 @@ import { standardizeAutomatorValues, tokenMap as T } from "./lexer";
  */
 
 const presetSplitter = /name[ \t]+(.+$)/ui;
-const idSplitter = /id[ \t]+(\d)/ui;
+const idSplitter = /id[ \t]+(\d+)/ui;
 
 function prestigeNotify(flag) {
   if (!AutomatorBackend.isOn) return;
