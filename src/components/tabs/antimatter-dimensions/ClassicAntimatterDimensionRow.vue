@@ -112,8 +112,12 @@ export default {
       this.totalAmount = dimension.totalAmount;
       this.bought.copyFrom(dimension.bought);
       this.boughtBefore10 = dimension.boughtBefore10;
-      this.singleCost.copyFrom(dimension.cost);
-      this.until10Cost.copyFrom(dimension.costUntil10);
+      this.singleCost.copyFrom(this.tier === 9 ? dimension.cost.pow(dimension.boughtBefore10 + 1) : dimension.cost);
+      this.until10Cost.copyFrom(
+        this.tier === 9
+          ? dimension.cost.pow(dimension.boughtBefore10 + Math.max(dimension.howManyCanBuy, 1))
+          : dimension.cost.times(Math.max(dimension.howManyCanBuy, 1))
+      );
       if (tier < ((player.celestials.slabdrill.goodbyeTick >= 40000 || Slabdrill.isDestroyed) ? 9 : 8)) {
         this.rateOfChange.copyFrom(dimension.rateOfChange);
       }
