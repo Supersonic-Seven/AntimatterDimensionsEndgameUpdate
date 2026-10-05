@@ -33,6 +33,7 @@ export const GlyphSacrificeHandler = {
   },
   // Removes a glyph, accounting for sacrifice unlock and alchemy state
   removeGlyph(glyph, force = false) {
+    if (Slabdrill.isCursed) return;
     if (this.handleSpecialGlyphTypes(glyph)) return;
     if (!this.canSacrifice) this.deleteGlyph(glyph, force);
     else if (this.isRefining) this.attemptRefineGlyph(glyph, force);
