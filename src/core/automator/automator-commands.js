@@ -1345,4 +1345,96 @@ export const AutomatorCommands = [
       ...automatorBlocksMap["GLYPH UNEQUIP"]
     })
   },
+  {
+    id: "glyphCreate",
+    rule: $ => () => {
+      $.CONSUME(T.Glyph);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.CONSUME(T.Create);
+      $.CONSUME(T.Cursed);
+    },
+    validate: (ctx, VVal) => {
+      ctx.startLine = ctx.Glyph[0].startLine;
+      if (!V.isFlipped) {
+        VVal.addError(ctx.Cursed[0], "Cursed Glyphs are not unlocked yet",
+          "Unlock Hard V to create Cursed Glyphs");
+        return false;
+      }
+      return true;
+    },
+    compile: ctx => {
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        if (!V.isFlipped) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Cursed Glyph creation skipped: Hard V is not unlocked (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+
+        const cursedCount = Glyphs.allGlyphs.filter(g => g && g.type === "cursed").length;
+        const maxCount = Math.max(Glyphs.activeSlotCount, 5);
+        if (cursedCount >= maxCount) {
+          AutomatorData.logCommandEvent(`Cursed Glyph creation skipped: already at cap (${maxCount})`, ctx.startLine);
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        }
+        if (GameCache.glyphInventorySpace.value === 0) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Cursed Glyph creation skipped: inventory full (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        Glyphs.giveCursedGlyph();
+        AutomatorData.logCommandEvent(`Created a Cursed Glyph`, ctx.startLine);
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      nowait: ctx.Nowait !== undefined,
+      ...automatorBlocksMap["GLYPH CREATE"]
+    })
+  },
+  {
+    id: "glyphEquip",
+    rule: $ => () => {
+      $.CONSUME(T.Glyph);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.CONSUME(T.Equip);
+      $.CONSUME(T.Cursed);
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Glyph[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        const targetSlot = Glyphs.active.indexOf(null);
+        if (targetSlot === -1 || targetSlot >= Glyphs.activeSlotCount) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Equip Cursed Glyph skipped: no empty active slot (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        const cursedGlyph = Glyphs.inventory.find(g => g && g.type === "cursed");
+        if (!cursedGlyph) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Equip Cursed Glyph skipped: no Cursed Glyph in inventory (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        Glyphs.equip(cursedGlyph, targetSlot);
+        AutomatorData.logCommandEvent(`Equipped a Cursed Glyph into slot ${targetSlot + 1}`, ctx.startLine);
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      nowait: ctx.Nowait !== undefined,
+      ...automatorBlocksMap["GLYPH EQUIP"]
+    })
+  },
 ];

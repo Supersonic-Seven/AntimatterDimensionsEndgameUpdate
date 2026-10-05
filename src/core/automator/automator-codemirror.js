@@ -146,6 +146,14 @@ CodeMirror.defineSimpleMode("automato", {
     { regex: /nowait(\s+|$)/ui, token: "property" },
     { regex: /load(\s+|$)/ui, token: "variable-2", next: "glyphLoad" },
     { regex: /unequip(\s+|$)/ui, token: "variable-2", next: "glyphUnequip" },
+    { regex: /create(\s+|$)/ui, token: "variable-2", next: "glyphTarget" },
+    { regex: /equip(\s+|$)/ui, token: "variable-2", next: "glyphTarget" },
+    { regex: /\S+/ui, token: "error" },
+  ],
+  glyphTarget: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /cursed(\s+|$)/ui, token: "property", next: "commandDone" },
     { regex: /\S+/ui, token: "error" },
   ],
   glyphUnequip: [

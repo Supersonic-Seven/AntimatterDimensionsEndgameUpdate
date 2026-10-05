@@ -108,6 +108,7 @@ export const automator = {
         <b>infinity</b> [nowait]<br>
         <b>eternity</b> [nowait] [respec]<br>
         <b>reality</b> [nowait] [respec]<br>
+        <b>reality over</b><br>
         <b>doom</b> [nowait]<br>
         <b>armageddon</b> [nowait]<br>
         <b>endgame</b> [nowait]`,
@@ -135,6 +136,14 @@ export const automator = {
                 Endgame: Respec Endgame Masteries and Endgame.
               `
             },
+            {
+              header: "<i>over</i>",
+              description: `
+                Usable with Reality only. Immediately restarts the current Reality without checking the Reality
+                threshold or showing confirmation modals. If currently inside a Celestial Reality, safely restarts
+                or exits the Celestial run.
+              `
+            },
           ]
         }
       ],
@@ -142,6 +151,7 @@ export const automator = {
         "infinity",
         "eternity respec",
         "reality nowait",
+        "reality over",
         "doom",
         "armageddon",
         "endgame nowait respec"
@@ -732,15 +742,51 @@ export const automator = {
       ]
     },
     {
-      id: 23,
+      id: 24,
       isUnlocked: () => PlayerProgress.realityUnlocked(),
-      keyword: "REALITY OVER",
-      category: 1,
-      syntax: `<b>reality over</b>`,
-      description: `Restarts the current Reality immediately without requiring the Reality threshold or displaying
-        any confirmation modals. If currently inside a Celestial Reality, safely restarts or exits the Celestial run.`,
+      keyword: "GLYPH CREATE",
+      category: 2,
+      syntax: "<b>glyph</b> [nowait] <b>create cursed</b>",
+      description: `Spawns a Cursed Glyph and places it into your inventory if there is free space available.`,
+      sections: [
+        {
+          name: "MODIFIERS",
+          items: [
+            {
+              header: "<i>nowait</i>",
+              description: `If present, advances to the next command immediately even if the inventory is full
+                or the maximum number of Cursed Glyphs has already been reached.`
+            }
+          ]
+        }
+      ],
       examples: [
-        `reality over`
+        "glyph create cursed",
+        "glyph nowait create cursed"
+      ]
+    },
+    {
+      id: 25,
+      isUnlocked: () => PlayerProgress.realityUnlocked(),
+      keyword: "GLYPH EQUIP",
+      category: 2,
+      syntax: "<b>glyph</b> [nowait] <b>equip cursed</b>",
+      description: `Finds an unequipped Cursed Glyph in your inventory and equips it into the first available active Glyph slot.`,
+      sections: [
+        {
+          name: "MODIFIERS",
+          items: [
+            {
+              header: "<i>nowait</i>",
+              description: `If present, advances to the next command immediately even if there are no Cursed Glyphs
+                in inventory or no empty active slots available.`
+            }
+          ]
+        }
+      ],
+      examples: [
+        "glyph equip cursed",
+        "glyph nowait equip cursed"
       ]
     },
   ],
