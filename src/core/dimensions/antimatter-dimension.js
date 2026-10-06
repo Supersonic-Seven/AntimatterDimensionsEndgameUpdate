@@ -344,7 +344,7 @@ export function buyOneDimension(tier) {
 export function buyManyDimension(tier) {
   const dimension = AntimatterDimension(tier);
   if ((Laitela.continuumActive && tier !== 9) || !dimension.isAvailableForPurchase || !dimension.isAffordableUntil10) return false;
-  const cost = dimension.costUntil10;
+  const cost = tier === 9 ? dimension.cost.pow(10) : dimension.costUntil10;
 
   if (tier === 8 && DualityUpgrade(15).isLockingMechanics) {
     const lockString = `purchase an 8th ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimension`;
@@ -369,7 +369,7 @@ export function buyAsManyAsYouCanBuy(tier) {
   const dimension = AntimatterDimension(tier);
   if ((Laitela.continuumActive && tier !== 9) || !dimension.isAvailableForPurchase || !dimension.isAffordable) return false;
   const howMany = dimension.howManyCanBuy;
-  const cost = dimension.cost.times(howMany);
+  const cost = tier === 9 ? dimension.cost.pow(howMany + dimension.boughtBefore10) : dimension.cost.times(howMany);
 
   if (tier === 8 && DualityUpgrade(15).isLockingMechanics) {
     const lockString = `purchase an 8th ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimension`;
@@ -420,7 +420,7 @@ export function maxAll() {
 export function buyMaxDimension(tier, bulk = Infinity) {
   const dimension = AntimatterDimension(tier);
   if ((Laitela.continuumActive && tier !== 9) || !dimension.isAvailableForPurchase || !dimension.isAffordableUntil10) return;
-  const cost = dimension.costUntil10;
+  const cost = tier === 9 ? dimension.cost.pow(10) : dimension.costUntil10;
   let bulkLeft = bulk;
   const goal = Player.infinityGoal;
   if (dimension.cost.gt(goal) && Player.isInAntimatterChallenge) return;
@@ -540,7 +540,7 @@ class AntimatterDimensionState extends DimensionState {
    * @returns {Decimal}
    */
   get costUntil10() {
-    if (this.tier === 9) return this.cost.pow(this.boughtBefore10 + this.howManyCanBuy);
+    if (this.tier === 9) return this.cost.pow(this.boughtBefore10 + Math.max(this.howManyCanBuy, 1));
     return this.cost.times(this.remainingUntil10);
   }
 
@@ -548,7 +548,7 @@ class AntimatterDimensionState extends DimensionState {
     let ratio = this.currencyAmount.dividedBy(this.cost);
     if (this.tier === 9) {
       if (!Slabdrill.isCursed && true) ratio = this.currencyAmount.gte(this.cost) ? DC.D1.sub(this.bought) : DC.D0;
-      else ratio = this.currencyAmount.max(1).log10().div(this.cost.max(1).log10());
+      else ratio = this.currencyAmount.max(1).log10().div(this.cost.max(1).log10()).sub(this.boughtBefore10);
     }
     return Decimal.floor(Decimal.max(Decimal.min(ratio, 10 - this.boughtBefore10), 0)).toNumber();
   }
@@ -675,7 +675,7 @@ class AntimatterDimensionState extends DimensionState {
   get isAffordable() {
     if (Laitela.continuumActive && this.tier !== 9) return false;
     if (!player.break && this.cost.gt(DC.NUMMAX)) return false;
-    return this.cost.lte(this.currencyAmount);
+    return this.tier === 9 ? this.cost.pow(this.boughtBefore10 + 1).lte(this.currencyAmount) : this.cost.lte(this.currencyAmount);
   }
 
   /**
@@ -683,6 +683,7 @@ class AntimatterDimensionState extends DimensionState {
    */
   get isAffordableUntil10() {
     if (!player.break && this.cost.gt(DC.NUMMAX)) return false;
+    if (this.tier === 9) return this.cost.pow(10).lte(this.currencyAmount);
     return this.costUntil10.lte(this.currencyAmount);
   }
 

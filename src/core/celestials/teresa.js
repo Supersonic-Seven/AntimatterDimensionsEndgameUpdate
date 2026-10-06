@@ -166,6 +166,7 @@ class PerkShopUpgradeState extends RebuyableMechanicState {
     }
     // Give a single music glyph
     if (this.id === 4 && (!Pelle.isDoomed || PelleDestructionUpgrade.teresaShop.canBeApplied)) {
+      if (Slabdrill.isCursed) return;
       if (GameCache.glyphInventorySpace.value === 0) {
         // Refund the perk point if they didn't actually get a glyph
         Currency.perkPoints.add(1);
@@ -177,6 +178,7 @@ class PerkShopUpgradeState extends RebuyableMechanicState {
     }
     // Fill the inventory with music glyphs
     if (this.id === 5 && (!Pelle.isDoomed || PelleDestructionUpgrade.teresaShop.canBeApplied)) {
+      if (Slabdrill.isCursed) return;
       const toCreate = GameCache.glyphInventorySpace.value;
       for (let count = 0; count < toCreate; count++) Glyphs.addToInventory(GlyphGenerator.musicGlyph());
       if (!PerkShopUpgrade.musicGlyph.isCharged) GameUI.notify.success(`Created ${quantifyInt("Music Glyph", toCreate)}`);

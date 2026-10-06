@@ -224,7 +224,7 @@ export const CMilestones = {
 
   tesseractEqualizer(bought, free) {
     const effectiveC = Math.clamp((this.c - 0.5) * 2, 0, 1);
-    return Math.pow((Math.max(bought, 1) * Math.max(free, 1)) / (bought + free), effectiveC) * (bought + free);
+    return Math.pow((Math.max(bought, 1) * Math.max(free, 1)) / Math.max(bought + free, 1), effectiveC) * (bought + free);
   },
 
   antimatterEqualizer(mults, tick) {
@@ -237,7 +237,7 @@ export const CMilestones = {
 
   tickspeedEqualizer(bought, free) {
     const effectiveC = Math.clamp((this.c - 0.85) * 20/3, 0, 1);
-    return Decimal.pow(bought.max(1).times(free.max(1)).div(bought.add(free)), effectiveC).times(bought.add(free));
+    return Decimal.pow(bought.max(1).times(free.max(1)).div(bought.add(free).max(1)), effectiveC).times(bought.add(free));
   },
 
   bhImprovement(mult) {
