@@ -162,8 +162,9 @@ export const automator = {
       isUnlocked: () => true,
       keyword: "UNLOCK",
       category: 1,
-      syntax: "<b>unlock</b> [nowait] <u>feature</u>",
-      description: "Unlocks the specified Eternity Challenge or Time Dilation.",
+      syntax: `<b>unlock</b> [nowait] <u>feature</u><br>
+        <b>unlock</b> [nowait] <b>generator</b>`,
+      description: `Unlocks the specified Eternity Challenge, Time Dilation, or Pelle's Galaxy Generator.`,
       sections: [
         {
           name: "MODIFIERS",
@@ -175,12 +176,21 @@ export const automator = {
                 default, the Automator will keep running this command until the unlock succeeds.
               `
             },
+            {
+              header: "<i>generator</i>",
+              description: `
+                Unlocks the Galaxy Generator inside Pelle's Reality once the prerequisite milestone (Recursion rift milestone 3)
+                is met and you are inside Dilation or have finalized it.
+              `
+            },
           ]
         }
       ],
       examples: [
         "unlock dilation",
-        "unlock ec7"
+        "unlock ec7",
+        "unlock generator",
+        "unlock nowait generator"
       ]
     },
     {
@@ -207,10 +217,10 @@ export const automator = {
       category: 2,
       syntax: `<b>auto infinity</b> [setting]<br>
         <b>auto eternity</b> [setting]<br>
-        <b>auto reality</b> [setting]`,
-      description: `Turns prestige Autobuyers on or off and allows you to change their settings. If the setting option
-        is not present, this command will toggle the Autobuyer state, turning it off if it is on and turning it on if
-        it is off. <b>This command will not work if you try to modify an Autobuyer or setting you do not have.</b>`,
+        <b>auto reality</b> [setting]<br>
+        <b>auto</b> [nowait] <b>pour on</b>|<b>off</b>`,
+      description: `Turns prestige Autobuyers on or off and configures their settings, or toggles automatic pouring into Teresa's container.
+        <b>This command will not work if you try to modify an Autobuyer or setting you do not have unlocked.</b>`,
       sections: [
         {
           name: "SETTINGS",
@@ -218,6 +228,10 @@ export const automator = {
             {
               header: "<i>on</i> | <i>off</i>",
               description: "Turns specified Autobuyer on or off.",
+            },
+            {
+              header: "<i>pour on</i> | <i>pour off</i>",
+              description: "Toggles automatic RM pouring into Teresa's container on or off (requires Teresa Expansion Pack).",
             },
             {
               header: "<u><i>number</i></u> <u><i>time units</i></u>",
@@ -243,7 +257,9 @@ export const automator = {
         "auto eternity off",
         "auto infinity 30s",
         "auto eternity 10 seconds",
-        "auto eternity 1e100 x highest"
+        "auto eternity 1e100 x highest",
+        "auto pour on",
+        "auto pour off"
       ]
     },
     {
@@ -905,30 +921,6 @@ export const automator = {
     },
     {
       id: 28,
-      isUnlocked: () => ExpansionPack.teresaPack.isBought && !player.disablePostReality,
-      keyword: "AUTO POUR",
-      category: 2,
-      syntax: "<b>auto</b> [nowait] <b>pour</b> <b>on</b>|<b>off</b>",
-      description: `Toggles automatic pouring of Reality Machines into Teresa's container.`,
-      examples: [
-        "auto pour on",
-        "auto pour off",
-      ]
-    },
-    {
-      id: 29,
-      isUnlocked: () => Pelle.isUnlocked,
-      keyword: "UNLOCK GENERATOR",
-      category: 1,
-      syntax: "<b>unlock</b> [nowait] <b>generator</b>",
-      description: `Unlocks the Galaxy Generator inside Pelle's Reality (requires being dilated or finalized).`,
-      examples: [
-        "unlock generator",
-        "unlock nowait generator",
-      ]
-    },
-    {
-      id: 31,
       isUnlocked: () => true,
       keyword: "TAB",
       category: 2,
