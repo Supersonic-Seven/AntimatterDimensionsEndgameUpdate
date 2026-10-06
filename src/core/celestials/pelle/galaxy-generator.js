@@ -6,6 +6,21 @@ export const GalaxyGenerator = {
   // This is used for a slightly annoying workaround in order to visually update the glyph tab when the rifts
   // are refilling and the single glyph slot (which was lost during the drain) becomes available again
   hasReturnedGlyphSlot: false,
+  get canUnlock() {
+    const hasMilestoneReq = PelleRifts.recursion.milestones[2].canBeApplied || GalaxyGenerator.spentGalaxies.gt(0);
+    const inDilationOrFinalized = player.dilation.active || PelleStrikes.dilation.isDestroyed();
+    return Pelle.isDoomed &&
+      hasMilestoneReq &&
+      inDilationOrFinalized &&
+      !player.celestials.pelle.galaxyGenerator.unlocked;
+  },
+  unlock() {
+    if (!this.canUnlock) return false;
+    player.celestials.pelle.galaxyGenerator.unlocked = true;
+    Pelle.quotes.galaxyGeneratorUnlock.show();
+    if (player.endgames >= 1) Pelle.quotes.galgen2?.show();
+    return true;
+  },
 
   get generationCaps() {
     return PelleRifts.all
@@ -118,12 +133,24 @@ export const GalaxyGenerator = {
     return PelleRifts[this.capObj?.rift];
   },
 
-  get isCapped() {
-    return new Decimal(this.generationCap).eq(this.generatedGalaxies);
-  },
-
   get sacrificeActive() {
     return player.celestials.pelle.galaxyGenerator.sacrificeActive;
+  },
+
+  canSacrifice(targetRiftId = null) {
+    if (!Pelle.hasGalaxyGenerator || !this.isCapped || this.sacrificeActive || !this.capRift) return false;
+    if (targetRiftId !== null) {
+      const riftIndex = PelleRifts.all.indexOf(this.capRift) + 1;
+      if (riftIndex !== targetRiftId) return false;
+    }
+    return true;
+  },
+
+  startSacrifice(targetRiftId = null) {
+    if (!this.canSacrifice(targetRiftId)) return false;
+    player.celestials.pelle.collapsed.rifts = false;
+    player.celestials.pelle.galaxyGenerator.sacrificeActive = true;
+    return true;
   },
 
   startSacrifice() {

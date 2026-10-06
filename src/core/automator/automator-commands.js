@@ -6,6 +6,78 @@ import { standardizeAutomatorValues, tokenMap as T } from "./lexer";
 
 const presetSplitter = /name[ \t]+(.+$)/ui;
 const idSplitter = /id[ \t]+(\d+)/ui;
+function parseTabTokens(ctx) {
+  let tabStr = (ctx.Identifier?.[0]?.image || ctx.PrestigeEvent?.[0]?.image || ctx.Celestial?.[0]?.image || "").toLowerCase();
+
+  const TAB_ALIASES = {
+    dim: "dimensions", dims: "dimensions", dimension: "dimensions", dimensions: "dimensions",
+    opt: "options", option: "options", options: "options",
+    stat: "statistics", stats: "statistics", statistic: "statistics", statistics: "statistics",
+    ach: "achievements", achievement: "achievements", achievements: "achievements",
+    auto: "automation", automation: "automation",
+    chal: "challenges", challenge: "challenges", challenges: "challenges",
+    inf: "infinity", infinity: "infinity",
+    etern: "eternity", eternity: "eternity",
+    real: "reality", reality: "reality",
+    cel: "celestials", celestial: "celestials", celestials: "celestials",
+    shop: "shop",
+    end: "endgame", endgame: "endgame",
+    cd: "cdexpansion", cdexpansion: "cdexpansion",
+    div: "divinity", divinity: "divinity",
+    universe: "universes", universes: "universes",
+  };
+
+  const cleanTab = TAB_ALIASES[tabStr.replace(/[-_\s]/g, "")] || tabStr;
+  if (!Tab[cleanTab]) {
+    return {
+      error: true,
+      errorInfo: `Unrecognized tab name "${tabStr}"`,
+      errorTip: "Valid tabs include: dimensions, options, statistics, achievements, automation, challenges, infinity, eternity, reality, celestials, shop, endgame, cdexpansion, divinity, universes",
+      errorToken: ctx.Tab[0]
+    };
+  }
+
+  const rawSub = ctx.NumberLiteral?.[0]?.image || ctx.Identifier?.[1]?.image || ctx.Glyph?.[0]?.image ||
+    ctx.Alchemy?.[0]?.image || ctx.Dilation?.[0]?.image || ctx.Teresa?.[0]?.image || ctx.Effarig?.[0]?.image ||
+    ctx.Enslaved?.[0]?.image || ctx.V?.[0]?.image || ctx.Ra?.[0]?.image || ctx.Laitela?.[0]?.image ||
+    ctx.Pelle?.[0]?.image || ctx.StudyPath?.[0]?.image || ctx.PrestigeEvent?.[1]?.image;
+
+  let subtabKey;
+  if (rawSub) {
+    if (cleanTab === "celestials") {
+      const celNum = parseInt(rawSub, 10);
+      const CELESTIAL_NUM_MAP = [
+        "", "teresa", "effarig", "enslaved", "v", "ra", "laitela", "pelle", "alpha", "slabdrill"
+      ];
+      if (!isNaN(celNum)) {
+        if (celNum < 1 || celNum > 9) {
+          return {
+            error: true,
+            errorInfo: `Invalid celestial number ${celNum}`,
+            errorTip: "Celestial tab number must be between 1 and 9",
+            errorToken: ctx.NumberLiteral?.[0] || ctx.Tab[0]
+          };
+        }
+        subtabKey = CELESTIAL_NUM_MAP[celNum];
+        return { tabKey: cleanTab, subtabKey };
+      }
+    }
+
+    const cleanSub = rawSub.toLowerCase().replace(/[-_\s]/g, "");
+    const targetSub = Tab[cleanTab].subtabs.find(s => s.key.toLowerCase().replace(/[-_\s]/g, "") === cleanSub);
+    if (!targetSub) {
+      return {
+        error: true,
+        errorInfo: `Unrecognized subtab "${rawSub}" under ${cleanTab}`,
+        errorTip: `Check subtab name or spelling for tab ${cleanTab}`,
+        errorToken: ctx.Tab[0]
+      };
+    }
+    subtabKey = targetSub.key;
+  }
+
+  return { tabKey: cleanTab, subtabKey };
+}
 
 function prestigeNotify(flag) {
   if (!AutomatorBackend.isOn) return;
@@ -1516,31 +1588,44 @@ export const AutomatorCommands = [
     rule: $ => () => {
       $.CONSUME(T.Rift);
       $.OPTION(() => $.CONSUME(T.Nowait));
-      $.CONSUME(T.NumberLiteral);
       $.OR([
-        { ALT: () => $.CONSUME(T.On) },
-        { ALT: () => $.CONSUME(T.Off) },
+        {
+          ALT: () => {
+            $.CONSUME(T.NumberLiteral);
+            $.OR1([
+              { ALT: () => $.CONSUME(T.On) },
+              { ALT: () => $.CONSUME(T.Off) },
+              { ALT: () => $.CONSUME(T.Sacrifice) },
+            ]);
+          }
+        },
+        {
+          ALT: () => $.CONSUME1(T.Sacrifice)
+        }
       ]);
       $.OPTION1(() => $.CONSUME1(T.Nowait));
     },
     validate: (ctx, V) => {
       ctx.startLine = ctx.Rift[0].startLine;
-      if (!ctx.NumberLiteral || ctx.NumberLiteral[0].isInsertedInRecovery) {
-        V.addError(ctx, "Missing Rift number",
+      const isSacrifice = ctx.Sacrifice !== undefined;
+      if (ctx.NumberLiteral) {
+        const riftId = parseInt(ctx.NumberLiteral[0].image, 10);
+        if (isNaN(riftId) || riftId < 1 || riftId > 5) {
+          V.addError(ctx.NumberLiteral[0], `Invalid Rift ID ${ctx.NumberLiteral[0].image}`,
+            "Rift ID must be an integer between 1 and 5");
+          return false;
+        }
+        ctx.$riftId = riftId;
+      } else if (!isSacrifice) {
+        V.addError(ctx.Rift[0], "Missing Rift number",
           "Specify which Rift (1 - 5) is being referred to");
         return false;
       }
-      const riftId = parseInt(ctx.NumberLiteral[0].image, 10);
-      if (isNaN(riftId) || riftId < 1 || riftId > 5) {
-        V.addError(ctx.NumberLiteral[0], `Invalid Rift ID ${ctx.NumberLiteral[0].image}`,
-          "Rift ID must be an integer between 1 and 5");
-        return false;
-      }
-      ctx.$riftId = riftId;
       return true;
     },
     compile: ctx => {
-      const riftId = ctx.$riftId;
+      const riftId = ctx.$riftId ?? null;
+      const isSacrifice = ctx.Sacrifice !== undefined;
       const isOn = Boolean(ctx.On);
       const nowait = ctx.Nowait !== undefined;
       return () => {
@@ -1551,6 +1636,43 @@ export const AutomatorCommands = [
           }
           return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
         }
+
+        if (isSacrifice) {
+          if (!Pelle.hasGalaxyGenerator) {
+            if (nowait) {
+              AutomatorData.logCommandEvent(`Rift Sacrifice skipped: Galaxy Generator not unlocked (NOWAIT)`, ctx.startLine);
+              return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            }
+            return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+          }
+
+          if (riftId !== null) {
+            const currentCapRiftIndex = GalaxyGenerator.capRift ? (PelleRifts.all.indexOf(GalaxyGenerator.capRift) + 1) : 99;
+            if (currentCapRiftIndex > riftId) {
+              AutomatorData.logCommandEvent(`Rift ${riftId} already sacrificed, continuing`, ctx.startLine);
+              return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            }
+          }
+
+          if (GalaxyGenerator.sacrificeActive) {
+            AutomatorData.logCommandEvent(`Rift sacrifice currently in progress, continuing`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+
+          if (GalaxyGenerator.canSacrifice(riftId)) {
+            const targetName = GalaxyGenerator.capRift?.name || (riftId ? `Rift ${riftId}` : "Rift");
+            GalaxyGenerator.startSacrifice(riftId);
+            AutomatorData.logCommandEvent(`Started sacrifice of ${targetName} for Galaxy Generator cap`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Rift Sacrifice skipped: not at Galaxy Generator cap yet (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+
         const rift = PelleRifts.all[riftId - 1];
         if (!rift || !rift.canBeApplied) {
           if (nowait) {
@@ -1584,8 +1706,8 @@ export const AutomatorCommands = [
       };
     },
     blockify: ctx => ({
-      singleTextInput: ctx.$riftId,
-      singleSelectionInput: ctx.On ? "ON" : "OFF",
+      singleTextInput: ctx.$riftId || "",
+      singleSelectionInput: ctx.Sacrifice ? "SACRIFICE" : (ctx.On ? "ON" : "OFF"),
       nowait: ctx.Nowait !== undefined,
       ...(automatorBlocksMap?.RIFT || {})
     })
@@ -1683,5 +1805,176 @@ export const AutomatorCommands = [
       nowait: ctx.Nowait !== undefined,
       ...(automatorBlocksMap?.["AUTO POUR"] || {})
     })
+  },
+  {
+    id: "unlockGenerator",
+    rule: $ => () => {
+      $.CONSUME(T.Unlock);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.CONSUME(T.Generator);
+      $.OPTION1(() => $.CONSUME1(T.Nowait));
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Unlock[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        if (!Pelle.isUnlocked) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Galaxy Generator unlock skipped: Pelle not unlocked (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        if (Pelle.hasGalaxyGenerator || player.celestials.pelle.galaxyGenerator.unlocked) {
+          AutomatorData.logCommandEvent(`Galaxy Generator is already unlocked`, ctx.startLine);
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        }
+        if (!GalaxyGenerator.canUnlock) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Galaxy Generator unlock skipped: requirements not met (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        GalaxyGenerator.unlock();
+        AutomatorData.logCommandEvent(`Unlocked the Galaxy Generator`, ctx.startLine);
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: "GENERATOR",
+      nowait: ctx.Nowait !== undefined,
+      ...automatorBlocksMap.UNLOCK
+    })
+  },
+  {
+    id: "storeRealTime",
+    rule: $ => () => {
+      $.CONSUME(T.StoreRealTime);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.OPTION1(() => $.OR([
+        { ALT: () => $.CONSUME(T.On) },
+        { ALT: () => $.CONSUME(T.Off) },
+      ]));
+      $.OPTION2(() => $.CONSUME1(T.Nowait));
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.StoreRealTime[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const isOn = ctx.On !== undefined;
+      const isOff = ctx.Off !== undefined;
+      const isToggle = !isOn && !isOff;
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        if (!Enslaved.isUnlocked) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Store Real Time skipped: Enslaved not unlocked (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        const currentStoring = Boolean(player.celestials.enslaved.isStoringReal);
+        if (isToggle) {
+          Enslaved.toggleStoreReal();
+          AutomatorData.logCommandEvent(`Store Real Time toggled to ${!currentStoring ? "ON" : "OFF"}`, ctx.startLine);
+        } else if (isOn && !currentStoring) {
+          Enslaved.toggleStoreReal();
+          AutomatorData.logCommandEvent(`Store Real Time set to ON`, ctx.startLine);
+        } else if (isOff && currentStoring) {
+          Enslaved.toggleStoreReal();
+          AutomatorData.logCommandEvent(`Store Real Time set to OFF`, ctx.startLine);
+        }
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: ctx.On ? "ON" : (ctx.Off ? "OFF" : "TOGGLE"),
+      nowait: ctx.Nowait !== undefined,
+      ...(automatorBlocksMap?.["STORE REAL TIME"] || {})
+    })
+  },
+  {
+    id: "tab",
+    rule: $ => () => {
+      $.CONSUME(T.Tab);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.OR([
+        { ALT: () => $.CONSUME(T.Identifier) },
+        { ALT: () => $.CONSUME(T.PrestigeEvent) },
+        { ALT: () => $.CONSUME(T.Celestial) },
+      ]);
+      $.OPTION1(() => $.OR1([
+        { ALT: () => $.CONSUME1(T.Identifier) },
+        { ALT: () => $.CONSUME(T.NumberLiteral) },
+        { ALT: () => $.CONSUME1(T.PrestigeEvent) },
+        { ALT: () => $.CONSUME1(T.Celestial) },
+        { ALT: () => $.CONSUME(T.Glyph) },
+        { ALT: () => $.CONSUME(T.Alchemy) },
+        { ALT: () => $.CONSUME(T.Dilation) },
+        { ALT: () => $.CONSUME(T.Teresa) },
+        { ALT: () => $.CONSUME(T.Effarig) },
+        { ALT: () => $.CONSUME(T.Enslaved) },
+        { ALT: () => $.CONSUME(T.V) },
+        { ALT: () => $.CONSUME(T.Ra) },
+        { ALT: () => $.CONSUME(T.Laitela) },
+        { ALT: () => $.CONSUME(T.Pelle) },
+        { ALT: () => $.CONSUME(T.StudyPath) },
+      ]));
+      $.OPTION2(() => $.CONSUME2(T.Nowait));
+    },
+    validate: (ctx, V) => {
+      ctx.startLine = ctx.Tab[0].startLine;
+      const res = parseTabTokens(ctx);
+      if (res.error) {
+        V.addError(res.errorToken || ctx.Tab[0], res.errorInfo, res.errorTip);
+        return false;
+      }
+      return true;
+    },
+    compile: ctx => {
+      const { tabKey, subtabKey } = parseTabTokens(ctx);
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        const targetTab = Tab[tabKey];
+        if (!targetTab || !targetTab.isUnlocked) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Tab switch to ${tabKey} skipped: tab not unlocked (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+
+        if (subtabKey) {
+          const targetSubtab = targetTab[subtabKey];
+          if (!targetSubtab || !targetSubtab.isUnlocked || !targetSubtab.isAvailable) {
+            if (nowait) {
+              AutomatorData.logCommandEvent(`Subtab switch to ${tabKey}.${subtabKey} skipped: subtab not available (NOWAIT)`, ctx.startLine);
+              return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            }
+            return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+          }
+          targetSubtab.show(true);
+          AutomatorData.logCommandEvent(`Switched tab to ${tabKey} -> ${subtabKey}`, ctx.startLine);
+        } else {
+          targetTab.show(true);
+          AutomatorData.logCommandEvent(`Switched tab to ${tabKey}`, ctx.startLine);
+        }
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => {
+      const { tabKey, subtabKey } = parseTabTokens(ctx);
+      return {
+        singleSelectionInput: (tabKey || "").toUpperCase(),
+        singleTextInput: subtabKey || "",
+        nowait: ctx.Nowait !== undefined,
+        ...(automatorBlocksMap?.TAB || {})
+      };
+    }
   },
 ];

@@ -251,6 +251,16 @@ createInCategory(AutomatorCurrency, "PouredRM", /poured[ \t]*rm/i, {
   $getter: () => new Decimal(player.celestials.teresa.pouredAmount),
   $unlocked: () => Teresa.isUnlocked,
 });
+createInCategory(AutomatorCurrency, "StoredGameTime", /stored[ \t]+(game[ \t]+)?time/i, {
+  $autocomplete: "stored time",
+  $getter: () => new Decimal(player.celestials.enslaved.stored),
+  $unlocked: () => Enslaved.isUnlocked,
+});
+createInCategory(AutomatorCurrency, "StoredRealTimeCurrency", /stored[ \t]+real[ \t]+time/i, {
+  $autocomplete: "stored real time",
+  $getter: () => new Decimal(player.celestials.enslaved.storedReal),
+  $unlocked: () => Enslaved.isUnlocked,
+});
 
 // $prestigeLevel is used by things that wait for a prestige event. Something waiting for
 // eternity will be triggered by something waiting for reality, for example.
@@ -424,6 +434,13 @@ createKeyword("Alchemy", /alchemy/i);
 createKeyword("Reset", /reset/i);
 createKeyword("Rift", /rifts?/i);
 createKeyword("Pour", /pour/i);
+createKeyword("Generator", /(galaxy[ \t]+)?generator/i);
+createKeyword("StoreRealTime", /store[ \t]+real[ \t]+time/i, {
+  $autocomplete: "store real time",
+  $unlocked: () => Enslaved.isUnlocked,
+});
+createKeyword("Tab", /tabs?/i);
+createKeyword("Sacrifice", /sacrifice/i);
 
 // We allow ECLiteral to consume lots of digits because that makes error reporting more
 // clear (it's nice to say ec123 is an invalid ec)

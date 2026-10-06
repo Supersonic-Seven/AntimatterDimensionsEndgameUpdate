@@ -29,17 +29,68 @@ CodeMirror.registerHelper("hint", "anyword", editor => {
   let start = cursor.ch;
   const end = cursor.ch;
   const line = editor.getLine(cursor.line);
-  while (start && /\w/u.test(line.charAt(start - 1)))--start;
+  while (start && /[\w-]/u.test(line.charAt(start - 1)))--start;
   const lineStart = line.slice(0, start);
-  const currentPrefix = line.slice(start, end);
-  const lineLex = lexer.tokenize(lineStart);
-  if (lineLex.errors.length > 0) return undefined;
-  const rawSuggestions = parser.computeContentAssist("command", lineLex.tokens);
+  const currentPrefix = line.slice(start, end).toLowerCase();
+
   const suggestions = new Set();
-  for (const s of rawSuggestions) {
-    if (s.ruleStack[1] === "badCommand") continue;
-    walkSuggestion(s.nextTokenType, currentPrefix, suggestions);
+
+  const tabTokens = lineStart.trim().split(/\s+/);
+  if (tabTokens[0]?.toLowerCase() === "tab") {
+    const isNowait = tabTokens[1]?.toLowerCase() === "nowait";
+    const mainTabArg = isNowait ? tabTokens[2] : tabTokens[1];
+    const isMainTabSlot = !mainTabArg || (isNowait ? tabTokens.length === 2 : tabTokens.length === 1);
+
+    const MAIN_TABS = [
+      "dimensions", "options", "statistics", "achievements", "automation",
+      "challenges", "infinity", "eternity", "reality", "celestials",
+      "shop", "endgame", "cdexpansion", "divinity", "universes"
+    ];
+
+    const SUBTAB_MAP = {
+      celestials: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "teresa", "effarig", "enslaved", "v", "ra", "laitela", "pelle", "alpha", "slabdrill"],
+      celestial: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "teresa", "effarig", "enslaved", "v", "ra", "laitela", "pelle", "alpha", "slabdrill"],
+      dimensions: ["antimatter", "infinity", "time", "celestial", "divine"],
+      options: ["saving", "visual", "gameplay"],
+      statistics: ["statistics", "challenges", "prestige runs", "glyph sets", "stored time"],
+      achievements: ["normal", "secret"],
+      automation: ["autobuyers", "automator"],
+      challenges: ["normal", "infinity", "eternity"],
+      infinity: ["upgrades", "break", "replicanti"],
+      eternity: ["studies", "upgrades", "milestones", "dilation"],
+      reality: ["glyphs", "upgrades", "imag_upgrades", "dual_upgrades", "perks", "hole", "alchemy"],
+      endgame: ["endgame", "break-eternity", "pelle-destruction", "expansion-packs", "masteries", "milestones", "upgrades", "power", "ethereal", "hypercubes", "collider", "ascension", "compression"],
+      cdexpansion: ["celestial-infinity", "celestial-break-infinity", "celestial-eternity", "celestial-eternity-plus"],
+      divinity: ["milestones", "upgrades", "resurgence"],
+      universes: ["transient", "tangible"]
+    };
+
+    if (isMainTabSlot) {
+      if (!isNowait && "nowait".startsWith(currentPrefix)) suggestions.add("nowait");
+      for (const tab of MAIN_TABS) {
+        if (tab.startsWith(currentPrefix)) suggestions.add(tab);
+      }
+    } else {
+      const cleanMain = mainTabArg?.toLowerCase().replace(/[-_\s]/g, "");
+      const matchedKey = Object.keys(SUBTAB_MAP).find(k => k.replace(/[-_\s]/g, "") === cleanMain);
+      if (matchedKey) {
+        for (const sub of SUBTAB_MAP[matchedKey]) {
+          if (sub.startsWith(currentPrefix)) suggestions.add(sub);
+        }
+      }
+      if ("nowait".startsWith(currentPrefix)) suggestions.add("nowait");
+    }
   }
+
+  const lineLex = lexer.tokenize(lineStart);
+  if (lineLex.errors.length === 0) {
+    const rawSuggestions = parser.computeContentAssist("command", lineLex.tokens);
+    for (const s of rawSuggestions) {
+      if (s.ruleStack[1] === "badCommand") continue;
+      walkSuggestion(s.nextTokenType, currentPrefix, suggestions);
+    }
+  }
+
   return {
     list: Array.from(suggestions),
     from: CodeMirror.Pos(cursor.line, start),
@@ -65,6 +116,7 @@ CodeMirror.defineSimpleMode("automato", {
     { regex: /glyphs?\s+/ui, token: "keyword", next: "glyphArgs" },
     { regex: /alchemy\s+/ui, token: "keyword", next: "alchemyArgs" },
     { regex: /rifts?\s+/ui, token: "keyword", next: "riftArgs" },
+    { regex: /tabs?\s+/ui, token: "keyword", next: "tabArgs" },
     { regex: /blob\s\s/ui, token: "blob" },
     {
       // eslint-disable-next-line max-len
@@ -150,6 +202,28 @@ CodeMirror.defineSimpleMode("automato", {
     { regex: /nowait(\s+|$)/ui, token: "property", next: "commandDone" },
     { regex: /\S+/ui, token: "error" },
   ],
+  tabArgs: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /nowait(\s+|$)/ui, token: "property" },
+    { regex: /[1-9](\s+|$)/ui, token: "number", next: "tabModifiers" },
+    { regex: /[a-zA-Z_][a-zA-Z_0-9-]*/u, token: "variable-2", next: "tabSubArgs" },
+    { regex: /\S+/ui, token: "error" },
+  ],
+  tabSubArgs: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /nowait(\s+|$)/ui, token: "property", next: "commandDone" },
+    { regex: /[1-9](\s+|$)/ui, token: "number", next: "tabModifiers" },
+    { regex: /[a-zA-Z_][a-zA-Z_0-9-]*/u, token: "variable-2", next: "tabModifiers" },
+    { regex: /\S+/ui, token: "error" },
+  ],
+  tabModifiers: [
+    commentRule,
+    { sol: true, next: "start" },
+    { regex: /nowait(\s+|$)/ui, token: "property", next: "commandDone" },
+    { regex: /\S+/ui, token: "error" },
+  ],
   celestialModifiers: [
     commentRule,
     { sol: true, next: "start" },
@@ -213,12 +287,13 @@ CodeMirror.defineSimpleMode("automato", {
     { sol: true, next: "start" },
     { regex: /nowait(\s+|$)/ui, token: "property" },
     { regex: /[1-5](\s+|$)/ui, token: "number", next: "riftAction" },
+    { regex: /sacrifice(\s+|$)/ui, token: "property", next: "riftModifiers" },
     { regex: /\S+/ui, token: "error" },
   ],
   riftAction: [
     commentRule,
     { sol: true, next: "start" },
-    { regex: /(on|off)(\s+|$)/ui, token: "property", next: "riftModifiers" },
+    { regex: /(on|off|sacrifice)(\s+|$)/ui, token: "property", next: "riftModifiers" },
     { regex: /\S+/ui, token: "error" },
   ],
   riftModifiers: [
@@ -278,6 +353,7 @@ CodeMirror.defineSimpleMode("automato", {
     { regex: /(rifts?[1-5]|rifts?[ \t]+[1-5][ \t]+(percentage|fill|percent))(\s|$)/ui, token: "variable-2" },
     { regex: /(total[ \t]+)?rifts?[ \t]+milestones?(\s|$)/ui, token: "variable-2" },
     { regex: /poured[ \t]*rm(\s|$)/ui, token: "variable-2" },
+    { regex: /stored[ \t]+(game[ \t]+|real[ \t]+)?time(\s|$)/ui, token: "variable-2" },
     { regex: / sec(onds ?) ?| min(utes ?) ?| hours ?/ui, token: "variable-2" },
     { regex: /([0-9]+:[0-5][0-9]:[0-5][0-9]|[0-5]?[0-9]:[0-5][0-9]|t[1-4])/ui, token: "number" },
     { regex: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/ui, token: "number" },

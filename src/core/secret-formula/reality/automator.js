@@ -557,6 +557,8 @@ export const automator = {
           <b>rift1</b> - <b>rift5</b> - Current fill percentage of Rift 1 to 5 (0 to 100)<br>
           <b>rift milestones</b> - Total Pelle Rift milestones unlocked<br>
           <b>poured rm</b> (or <b>pouredrm</b>) - Current Reality Machines poured into Teresa<br>
+          <b>stored time</b> (or <b>stored game time</b>) - Current Stored Game Time in Enslaved (Decimal)<br>
+          <b>stored real time</b> - Current Stored Real Time in Enslaved (ms)<br>
           <b>dt</b> - Current Dilated Time amount <br>
           <b>tp</b> - Current Tachyon Particle amount<br>
           <b>rg</b> - Current Replicanti Galaxy amount (does not use scientific)<br>
@@ -835,24 +837,30 @@ export const automator = {
       isUnlocked: () => Pelle.isUnlocked,
       keyword: "RIFT",
       category: 2,
-      syntax: "<b>rift</b> [nowait] <u>id</u> <b>on</b>|<b>off</b>",
-      description: `Toggles a Pelle Rift on or off to fill it with its respective resource.`,
+      syntax: `<b>rift</b> [nowait] <u>id</u> <b>on</b>|<b>off</b><br>
+        <b>rift</b> [nowait] [<u>id</u>] <b>sacrifice</b>`,
+      description: `Toggles a Pelle Rift on or off to fill it with its respective resource, or triggers a Rift sacrifice to raise the Galaxy Generator cap.`,
       sections: [
         {
           name: "INPUTS",
           items: [
             {
               header: "<i>nowait</i>",
-              description: `If present, moves to the next command immediately even if the Rift cannot be activated
-                (e.g. if it is not unlocked yet, already maxed, or 2 other Rifts are already active).`
+              description: `If present, moves to the next command immediately even if the Rift cannot be toggled or sacrificed
+                (e.g. if conditions are not met). By default, the Automator waits on this line until conditions are fulfilled.`
             },
             {
               header: "<i>id</i>",
-              description: "The Rift number (1 through 5) to toggle."
+              description: "The Rift number (1 through 5) to toggle or sacrifice. Optional for sacrifice commands."
             },
             {
               header: "<i>on</i> | <i>off</i>",
               description: "Turns filling the specified Rift on or off."
+            },
+            {
+              header: "<i>sacrifice</i>",
+              description: `Sacrifices the specified (or currently targeted) Rift once the Galaxy Generator hits its current galaxy generation cap.
+                If the specified Rift has already been sacrificed, the command immediately completes to prevent script deadlocks.`
             },
           ]
         }
@@ -861,6 +869,8 @@ export const automator = {
         "rift 1 on",
         "rift nowait 5 on",
         "rift 2 off",
+        "rift 1 sacrifice",
+        "rift sacrifice nowait",
       ]
     },
     {
@@ -898,6 +908,90 @@ export const automator = {
       examples: [
         "auto pour on",
         "auto pour off",
+      ]
+    },
+    {
+      id: 29,
+      isUnlocked: () => Pelle.isUnlocked,
+      keyword: "UNLOCK GENERATOR",
+      category: 1,
+      syntax: "<b>unlock</b> [nowait] <b>generator</b>",
+      description: `Unlocks the Galaxy Generator inside Pelle's Reality (requires being dilated or finalized).`,
+      examples: [
+        "unlock generator",
+        "unlock nowait generator",
+      ]
+    },
+    {
+      id: 30,
+      isUnlocked: () => Enslaved.isUnlocked,
+      keyword: "STORE REAL TIME",
+      category: 2,
+      syntax: "<b>store real time</b> [nowait] [<b>on</b>|<b>off</b>]",
+      description: `Toggles or turns storing real time on or off.`,
+      examples: [
+        "store real time on",
+        "store real time off",
+        "store real time",
+      ]
+    },
+    {
+      id: 31,
+      isUnlocked: () => true,
+      keyword: "TAB",
+      category: 2,
+      syntax: `<b>tab</b> [nowait] <u>tab</u> [<u>subtab</u>]<br>
+        <b>tab</b> [nowait] <b>celestials</b> <u>1-9</u>`,
+      description: `Switches the game's current screen view to the specified Tab and Subtab without requiring manual mouse clicks.
+        Useful for inspecting mechanics, triggering tab-based automations, or monitoring progress throughout your script.`,
+      sections: [
+        {
+          name: "INPUTS",
+          items: [
+            {
+              header: "<i>nowait</i>",
+              description: `If present, immediately advances to the next script line even if the target tab/subtab
+                is not unlocked or unavailable. By default, the Automator waits until the page is unlocked.`
+            },
+            {
+              header: "<i>tab</i>",
+              description: `The main Tab name. Supported tabs: <b>dimensions, options, statistics, achievements,
+                automation, challenges, infinity, eternity, reality, celestials, shop, endgame, cdexpansion,
+                divinity, universes</b>.`
+            },
+            {
+              header: "<i>subtab</i>",
+              description: `Optional subtab name within the chosen tab (e.g. <u>glyphs</u>, <u>studies</u>, <u>antimatter</u>).`
+            }
+          ]
+        },
+        {
+          name: "CELESTIAL TABS (1 - 9)",
+          items: [
+            {
+              header: "<b>1 - 9 Shortcuts</b>",
+              description: `When switching to Celestials, subtabs can be addressed directly by slot number 1 through 9:<br>
+                <b>1</b>: Teresa<br>
+                <b>2</b>: Effarig<br>
+                <b>3</b>: The Nameless Ones (Enslaved)<br>
+                <b>4</b>: V<br>
+                <b>5</b>: Ra<br>
+                <b>6</b>: Lai'tela<br>
+                <b>7</b>: Pelle<br>
+                <b>8</b>: Alpha<br>
+                <b>9</b>: Slabdrill`
+            }
+          ]
+        }
+      ],
+      examples: [
+        "tab celestials 1",
+        "tab celestials 7",
+        "tab celestials 9 nowait",
+        "tab reality glyphs",
+        "tab reality alchemy",
+        "tab eternity studies",
+        "tab dimensions antimatter",
       ]
     },
   ],
