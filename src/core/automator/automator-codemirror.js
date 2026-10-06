@@ -120,7 +120,7 @@ CodeMirror.defineSimpleMode("automato", {
     { regex: /blob\s\s/ui, token: "blob" },
     {
       // eslint-disable-next-line max-len
-      regex: /(auto|if|pause|studies|time[ \t]+theorems?|space[ \t]+theorems?|until|wait|while|black[ \t]+hole|stored?[ \t]+game[ \t]+time|notify)\s/ui,
+      regex: /(auto|if|pause|studies|time[ \t]+theorems?|space[ \t]+theorems?|until|wait|while|black[ \t]+hole|stored?[ \t]+(game|real)[ \t]+time|notify)\s/ui,
       token: "keyword",
       next: "commandArgs"
     },
@@ -354,6 +354,8 @@ CodeMirror.defineSimpleMode("automato", {
     { regex: /(total[ \t]+)?rifts?[ \t]+milestones?(\s|$)/ui, token: "variable-2" },
     { regex: /poured[ \t]*rm(\s|$)/ui, token: "variable-2" },
     { regex: /stored[ \t]+(game[ \t]+|real[ \t]+)?time(\s|$)/ui, token: "variable-2" },
+    { regex: /laitela[ \t]*tier(\s|$)/ui, token: "variable-2" },
+    { regex: /(laitela[ \t]+)?entropy(\s|$)/ui, token: "variable-2" },
     { regex: / sec(onds ?) ?| min(utes ?) ?| hours ?/ui, token: "variable-2" },
     { regex: /([0-9]+:[0-5][0-9]:[0-5][0-9]|[0-5]?[0-9]:[0-5][0-9]|t[1-4])/ui, token: "number" },
     { regex: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/ui, token: "number" },

@@ -263,25 +263,26 @@ export const automator = {
     {
       id: 8,
       isUnlocked: () => Enslaved.isUnlocked,
-      keyword: "STORE GAME TIME",
+      keyword: "STORE TIME",
       category: 2,
-      syntax: "<b>store game time</b> <u>action</u>",
-      description: `Changes whether or not the Black Hole is storing time. Also allows usage of stored time.`,
+      syntax: `<b>store game time</b> <u>action</u> [nowait]<br>
+        <b>store real time</b> <u>action</u> [nowait]`,
+      description: `Controls storing Black Hole/Game Time or Real Time in The Nameless Ones (Enslaved).`,
       sections: [
         {
           name: "ACTIONS",
           items: [
             {
-              header: "<i>on</i> | <i>off</i>",
-              description: `
-                Turns storing game time on or off.
-              `
+              header: "<i>game time</i>",
+              description: "Diverts Black Hole speedup into Stored Game Time without pausing the game. Supports 'on', 'off', and 'use'."
             },
             {
-              header: "<i>use</i>",
-              description: `
-                Uses all stored game time. Does not alter the on/off state of time storage.
-              `
+              header: "<i>real time</i>",
+              description: "Pauses game progression to store real time into the offline capacitor. Supports 'on' and 'off'. While active, the Automator continues to run."
+            },
+            {
+              header: "<i>nowait</i>",
+              description: "If present, immediately advances to the next line even if Enslaved is not yet unlocked."
             }
           ]
         }
@@ -290,6 +291,8 @@ export const automator = {
         "store game time on",
         "store game time off",
         "store game time use",
+        "store real time on nowait",
+        "store real time off",
       ]
     },
     {
@@ -559,6 +562,8 @@ export const automator = {
           <b>poured rm</b> (or <b>pouredrm</b>) - Current Reality Machines poured into Teresa<br>
           <b>stored time</b> (or <b>stored game time</b>) - Current Stored Game Time in Enslaved (Decimal)<br>
           <b>stored real time</b> - Current Stored Real Time in Enslaved (ms)<br>
+          <b>laitela tier</b> (or <b>laitelatier</b>) - Current Lai'tela reality difficulty tier (0 to 8)<br>
+          <b>entropy</b> (or <b>laitela entropy</b>) - Current Lai'tela reality entropy percentage (0 to 100)<br>
           <b>dt</b> - Current Dilated Time amount <br>
           <b>tp</b> - Current Tachyon Particle amount<br>
           <b>rg</b> - Current Replicanti Galaxy amount (does not use scientific)<br>
@@ -920,19 +925,6 @@ export const automator = {
       examples: [
         "unlock generator",
         "unlock nowait generator",
-      ]
-    },
-    {
-      id: 30,
-      isUnlocked: () => Enslaved.isUnlocked,
-      keyword: "STORE REAL TIME",
-      category: 2,
-      syntax: "<b>store real time</b> [nowait] [<b>on</b>|<b>off</b>]",
-      description: `Toggles or turns storing real time on or off.`,
-      examples: [
-        "store real time on",
-        "store real time off",
-        "store real time",
       ]
     },
     {

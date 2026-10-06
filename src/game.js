@@ -731,6 +731,7 @@ export function realTimeMechanics(realDiff) {
     // Most autobuyers will only tick usefully on the very first tick, but this needs to be here in order to allow
     // the autobuyers unaffected by time storage to tick as well
     Autobuyers.tick();
+    AutomatorBackend.update(realDiff);
     GameUI.update();
     return true;
   }

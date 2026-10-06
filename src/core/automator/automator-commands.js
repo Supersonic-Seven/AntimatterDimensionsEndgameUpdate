@@ -673,44 +673,81 @@ export const AutomatorCommands = [
   {
     id: "storeGameTime",
     rule: $ => () => {
-      $.CONSUME(T.StoreGameTime);
       $.OR([
+        { ALT: () => $.CONSUME(T.StoreGameTime) },
+        { ALT: () => $.CONSUME(T.StoreRealTime) },
+      ]);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.OR1([
         { ALT: () => $.CONSUME(T.On) },
         { ALT: () => $.CONSUME(T.Off) },
         { ALT: () => $.CONSUME(T.Use) },
       ]);
+      $.OPTION1(() => $.CONSUME1(T.Nowait));
     },
     validate: (ctx, V) => {
-      ctx.startLine = ctx.StoreGameTime[0].startLine;
+      const headerToken = (ctx.StoreGameTime || ctx.StoreRealTime)[0];
+      ctx.startLine = headerToken.startLine;
       if (!Enslaved.isUnlocked) {
-        V.addError(ctx.StoreGameTime[0], "You do not yet know how to store game time",
-          "Unlock the ability to store game time");
+        V.addError(headerToken, "You do not yet know how to store time",
+          "Unlock the ability to store time in Enslaved");
+        return false;
+      }
+      if (ctx.StoreRealTime && ctx.Use) {
+        V.addError(ctx.Use[0], "Real time storage does not support 'use'",
+          "Use 'on' or 'off' for real time storage");
         return false;
       }
       return true;
     },
     compile: ctx => {
-      if (ctx.Use) return () => {
-        if (Enslaved.isUnlocked) {
-          Enslaved.useStoredTime(false);
-          AutomatorData.logCommandEvent(`Stored game time used`, ctx.startLine);
-        } else {
-          AutomatorData.logCommandEvent(`Attempted to use stored game time, but failed (not unlocked yet)`,
-            ctx.startLine);
-        }
-        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
-      };
+      const isReal = ctx.StoreRealTime !== undefined;
+      const nowait = ctx.Nowait !== undefined;
       const on = Boolean(ctx.On);
+
+      if (isReal) {
+        return () => {
+          if (!Enslaved.isUnlocked) {
+            if (nowait) return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+          }
+          if (on !== Boolean(player.celestials.enslaved.isStoringReal)) {
+            Enslaved.toggleStoreReal();
+          }
+          AutomatorData.logCommandEvent(`Storing real time turned ${on ? "ON" : "OFF"}`, ctx.startLine);
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        };
+      }
+
+      if (ctx.Use) {
+        return () => {
+          if (Enslaved.isUnlocked) {
+            Enslaved.useStoredTime(false);
+            AutomatorData.logCommandEvent(`Stored game time used`, ctx.startLine);
+          } else {
+            AutomatorData.logCommandEvent(`Attempted to use stored game time, but failed (not unlocked yet)`,
+              ctx.startLine);
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        };
+      }
+
       return () => {
-        if (on !== player.celestials.enslaved.isStoring) Enslaved.toggleStoreBlackHole();
-        AutomatorData.logCommandEvent(`Storing game time toggled ${ctx.On ? "ON" : "OFF"}`, ctx.startLine);
+        if (!Enslaved.isUnlocked) {
+          if (nowait) return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        if (on !== Boolean(player.celestials.enslaved.isStoring)) {
+          Enslaved.toggleStoreBlackHole();
+        }
+        AutomatorData.logCommandEvent(`Storing game time turned ${on ? "ON" : "OFF"}`, ctx.startLine);
         return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
       };
     },
     blockify: ctx => ({
-      // eslint-disable-next-line no-nested-ternary
       singleSelectionInput: ctx.Use ? "USE" : (ctx.On ? "ON" : "OFF"),
-      ...automatorBlocksMap["STORE GAME TIME"]
+      nowait: ctx.Nowait !== undefined,
+      ...(automatorBlocksMap?.["STORE GAME TIME"] || {})
     })
   },
   {
@@ -1848,54 +1885,6 @@ export const AutomatorCommands = [
       singleSelectionInput: "GENERATOR",
       nowait: ctx.Nowait !== undefined,
       ...automatorBlocksMap.UNLOCK
-    })
-  },
-  {
-    id: "storeRealTime",
-    rule: $ => () => {
-      $.CONSUME(T.StoreRealTime);
-      $.OPTION(() => $.CONSUME(T.Nowait));
-      $.OPTION1(() => $.OR([
-        { ALT: () => $.CONSUME(T.On) },
-        { ALT: () => $.CONSUME(T.Off) },
-      ]));
-      $.OPTION2(() => $.CONSUME1(T.Nowait));
-    },
-    validate: ctx => {
-      ctx.startLine = ctx.StoreRealTime[0].startLine;
-      return true;
-    },
-    compile: ctx => {
-      const isOn = ctx.On !== undefined;
-      const isOff = ctx.Off !== undefined;
-      const isToggle = !isOn && !isOff;
-      const nowait = ctx.Nowait !== undefined;
-      return () => {
-        if (!Enslaved.isUnlocked) {
-          if (nowait) {
-            AutomatorData.logCommandEvent(`Store Real Time skipped: Enslaved not unlocked (NOWAIT)`, ctx.startLine);
-            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
-          }
-          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
-        }
-        const currentStoring = Boolean(player.celestials.enslaved.isStoringReal);
-        if (isToggle) {
-          Enslaved.toggleStoreReal();
-          AutomatorData.logCommandEvent(`Store Real Time toggled to ${!currentStoring ? "ON" : "OFF"}`, ctx.startLine);
-        } else if (isOn && !currentStoring) {
-          Enslaved.toggleStoreReal();
-          AutomatorData.logCommandEvent(`Store Real Time set to ON`, ctx.startLine);
-        } else if (isOff && currentStoring) {
-          Enslaved.toggleStoreReal();
-          AutomatorData.logCommandEvent(`Store Real Time set to OFF`, ctx.startLine);
-        }
-        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
-      };
-    },
-    blockify: ctx => ({
-      singleSelectionInput: ctx.On ? "ON" : (ctx.Off ? "OFF" : "TOGGLE"),
-      nowait: ctx.Nowait !== undefined,
-      ...(automatorBlocksMap?.["STORE REAL TIME"] || {})
     })
   },
   {

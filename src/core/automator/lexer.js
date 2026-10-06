@@ -261,6 +261,16 @@ createInCategory(AutomatorCurrency, "StoredRealTimeCurrency", /stored[ \t]+real[
   $getter: () => new Decimal(player.celestials.enslaved.storedReal),
   $unlocked: () => Enslaved.isUnlocked,
 });
+createInCategory(AutomatorCurrency, "LaitelaTier", /laitela[ \t]*tier/i, {
+  $autocomplete: "laitela tier",
+  $getter: () => new Decimal(8 - (Laitela.maxAllowedDimension ?? 8)),
+  $unlocked: () => Laitela.isUnlocked,
+});
+createInCategory(AutomatorCurrency, "Entropy", /(laitela[ \t]+)?entropy/i, {
+  $autocomplete: "entropy",
+  $getter: () => new Decimal((Laitela.entropy ?? player.celestials.laitela.entropy ?? 0) * 100),
+  $unlocked: () => Laitela.isUnlocked,
+});
 
 // $prestigeLevel is used by things that wait for a prestige event. Something waiting for
 // eternity will be triggered by something waiting for reality, for example.
