@@ -596,7 +596,11 @@ export const AutomatorCommands = [
         // In the prestigeToken.$prestige() line above, performing a reality reset has code internal to the call
         // which makes the automator restart. However, in that case we also need to update the execution state here,
         // or else the restarted automator will immediately advance lines and always skip the first command
-        return (prestigeName === "REALITY" && AutomatorBackend.state.forceRestart)
+        const isResetPrestige = ["REALITY", "DOOM", "ARMAGEDDON"].includes(prestigeName);
+        const isEndgame = prestigeName === "ENDGAME";
+        const shouldRestart = (isResetPrestige && AutomatorBackend.state.forceRestart) ||
+          (isEndgame && (AutomatorBackend.state.forceRestartEndgame ?? true));
+        return shouldRestart
           ? AUTOMATOR_COMMAND_STATUS.RESTART
           : AUTOMATOR_COMMAND_STATUS.NEXT_TICK_NEXT_INSTRUCTION;
       };

@@ -795,6 +795,7 @@ window.player = {
         repeat: true,
         forceRestart: true,
         followExecution: true,
+        forceRestartEndgame: true,
         stack: [],
       },
       scripts: {

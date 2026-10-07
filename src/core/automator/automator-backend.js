@@ -936,6 +936,9 @@ export const AutomatorBackend = {
   toggleForceRestart() {
     this.state.forceRestart = !this.state.forceRestart;
   },
+  toggleForceRestartEndgame() {
+    this.state.forceRestartEndgame = !(this.state.forceRestartEndgame ?? true);
+  },
 
   toggleFollowExecution() {
     this.state.followExecution = !this.state.followExecution;
