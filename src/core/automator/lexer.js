@@ -271,6 +271,31 @@ createInCategory(AutomatorCurrency, "Entropy", /(laitela[ \t]+)?entropy/i, {
   $getter: () => new Decimal((Laitela.entropy ?? player.celestials.laitela.entropy ?? 0) * 100),
   $unlocked: () => Laitela.isUnlocked,
 });
+createInCategory(AutomatorCurrency, "GeneratedGalaxies", /(generated([ \t]+galaxies)?|gg)/i, {
+  $autocomplete: "generated",
+  $getter: () => (Pelle.hasGalaxyGenerator ? GalaxyGenerator.generatedGalaxies : DC.D0),
+  $unlocked: () => Pelle.hasGalaxyGenerator,
+});
+createInCategory(AutomatorCurrency, "MemoryTeresa", /(memory[ \t]*(1|teresa)|teresa[ \t]*memory)/i, {
+  $autocomplete: "memory teresa",
+  $getter: () => new Decimal(Ra.pets.teresa.level),
+  $unlocked: () => Ra.isUnlocked && Ra.pets.teresa.isUnlocked,
+});
+createInCategory(AutomatorCurrency, "MemoryEffarig", /(memory[ \t]*(2|effarig)|effarig[ \t]*memory)/i, {
+  $autocomplete: "memory effarig",
+  $getter: () => new Decimal(Ra.pets.effarig.level),
+  $unlocked: () => Ra.isUnlocked && Ra.pets.effarig.isUnlocked,
+});
+createInCategory(AutomatorCurrency, "MemoryEnslaved", /(memory[ \t]*(3|enslaved)|enslaved[ \t]*memory)/i, {
+  $autocomplete: "memory enslaved",
+  $getter: () => new Decimal(Ra.pets.enslaved.level),
+  $unlocked: () => Ra.isUnlocked && Ra.pets.enslaved.isUnlocked,
+});
+createInCategory(AutomatorCurrency, "MemoryV", /(memory[ \t]*(4|v)|v[ \t]*memory)/i, {
+  $autocomplete: "memory v",
+  $getter: () => new Decimal(Ra.pets.v.level),
+  $unlocked: () => Ra.isUnlocked && Ra.pets.v.isUnlocked,
+});
 
 // $prestigeLevel is used by things that wait for a prestige event. Something waiting for
 // eternity will be triggered by something waiting for reality, for example.

@@ -356,6 +356,10 @@ CodeMirror.defineSimpleMode("automato", {
     { regex: /stored[ \t]+(game[ \t]+|real[ \t]+)?time(\s|$)/ui, token: "variable-2" },
     { regex: /laitela[ \t]*tier(\s|$)/ui, token: "variable-2" },
     { regex: /(laitela[ \t]+)?entropy(\s|$)/ui, token: "variable-2" },
+    { regex: /(generated([ \t]+galaxies)?|gg)(\s|$)/ui, token: "variable-2" },
+    { 
+      regex: /(memory[ \t]*(1|2|3|4|teresa|effarig|enslaved|v)|(teresa|effarig|enslaved|v)[ \t]*memory)(\s|$)/ui, token: "variable-2" 
+    },
     { regex: / sec(onds ?) ?| min(utes ?) ?| hours ?/ui, token: "variable-2" },
     { regex: /([0-9]+:[0-5][0-9]:[0-5][0-9]|[0-5]?[0-9]:[0-5][0-9]|t[1-4])/ui, token: "number" },
     { regex: /-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?/ui, token: "number" },
