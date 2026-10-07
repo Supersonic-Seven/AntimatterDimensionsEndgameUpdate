@@ -12,7 +12,7 @@ export const GalaxyGenerator = {
     return Pelle.isDoomed &&
       hasMilestoneReq &&
       inDilationOrFinalized &&
-      !player.celestials.pelle.galaxyGenerator.unlocked;
+      !Pelle.hasGalaxyGenerator;
   },
   unlock() {
     if (!this.canUnlock) return false;
@@ -163,6 +163,10 @@ export const GalaxyGenerator = {
       Pelle.quotes.galaxyGeneratorRifts.show();
     }
     if (this.sacrificeActive) {
+      if (!this.capRift) {
+        player.celestials.pelle.galaxyGenerator.sacrificeActive = false;
+        return;
+      }
       let reductionSpeed = 0.075;
       if (EndgameMilestone.galGenAnimation.isReached && !player.disablePostReality) reductionSpeed = reductionSpeed * Math.pow(1.2, Math.floor(Math.min(Currency.endgames.value, 40) / 2));
       if (Alpha.isDestroyed) reductionSpeed = 1e300;

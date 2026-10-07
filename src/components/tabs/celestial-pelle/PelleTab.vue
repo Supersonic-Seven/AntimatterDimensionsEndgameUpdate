@@ -45,7 +45,7 @@ export default {
           !Slabdrill.isCursed && !player.endgame.overcharge.isRunning && !player.compression.active && player.universes.current === 0;
       }
       this.hasStrike = PelleStrikes.all.some(s => s.hasStrike);
-      this.hasGalaxyGenerator = PelleRifts.recursion.milestones[2].canBeApplied || GalaxyGenerator.spentGalaxies.gt(0);
+      this.hasGalaxyGenerator = Pelle.hasGalaxyGenerator || PelleRifts.recursion.milestones[2].canBeApplied || GalaxyGenerator.spentGalaxies.gt(0);
       this.hasEndgame = PlayerProgress.endgameUnlocked();
     },
     toggleBought() {

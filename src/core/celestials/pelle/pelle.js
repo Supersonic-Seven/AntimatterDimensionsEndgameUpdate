@@ -575,12 +575,8 @@ export const Pelle = {
   },
 
   get hasGalaxyGenerator() {
-    const isReady = PelleRifts.recursion.milestones[2].canBeApplied || GalaxyGenerator.spentGalaxies.gt(0);
-    if (!isReady && player.celestials.pelle.galaxyGenerator.unlocked) {
-      player.celestials.pelle.galaxyGenerator.unlocked = false;
-    }
-    return Boolean(player.celestials.pelle.galaxyGenerator.unlocked && isReady);
-  }, 
+    return player.celestials.pelle.galaxyGenerator.unlocked;
+  },
 
   // Transition text from "from" to "to", stage is 0-1, 0 is fully "from" and 1 is fully "to"
   // Also adds more zalgo the bigger the stage
