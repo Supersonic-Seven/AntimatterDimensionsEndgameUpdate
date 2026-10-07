@@ -190,26 +190,17 @@ export default {
       Modal.h2p.show();
     },
     toggleAllReactions() {
-      const setIsActive = this.allReactionsDisabled;
-      for (const reaction of this.reactions) {
-        reaction.isActive = setIsActive;
-      }
+      AlchemyResources.setAllReactions(this.allReactionsDisabled);
     },
     resetAlchemy() {
-      for (const res of AlchemyResources.all) res.amount = 0;
+      AlchemyResources.reset();
     },
     createRealityGlyph() {
       if (ExpansionPack.effarigPack.isBought && !player.disablePostReality) {
-        if (GameCache.glyphInventorySpace.value === 0) {
-          Modal.message.show("No available inventory space; Sacrifice some Glyphs to free up space.",
-            { closeEvent: GAME_EVENT.GLYPHS_CHANGED });
-          return;
-        }
-        Glyphs.addToInventory(GlyphGenerator.realityGlyph(Decimal.floor(AlchemyResource.reality.amount)));
-        if (!ExpansionPack.effarigPack.isBought || player.disablePostReality) AlchemyResource.reality.amount = 0;
-        player.reality.glyphs.createdRealityGlyph = true;
+        AlchemyResources.createRealityGlyph();
+      } else {
+        Modal.realityGlyph.show();
       }
-      else Modal.realityGlyph.show();
     },
     nodeClass(node) {
       const resource = node.resource;

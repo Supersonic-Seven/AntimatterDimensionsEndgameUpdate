@@ -181,6 +181,9 @@ export const Glyphs = {
     }
   },
   refresh() {
+    while (player.reality.glyphs.sets.length < 70) {
+      player.reality.glyphs.sets.push({ name: "", glyphs: [] });
+    }
     this.refreshActive();
     this.inventory = new Array(this.totalSlots).fill(null);
     // Glyphs could previously end up occupying the same inventory slot (Stacking)
@@ -864,7 +867,115 @@ export const Glyphs = {
       this.addToInventory(GlyphGenerator.cursedGlyph());
       GameUI.notify.error("Created a Cursed Glyph");
     }
-  }
+  },
+  // A proper full solution to this turns out to contain an NP-hard problem as a subproblem, so instead we do
+  // something which should work in most cases - we match greedily when it won't obviously lead to an incomplete
+  // preset match, and leniently when matching greedily may lead to an incomplete set being loaded
+  loadPreset(id) {
+    //Save Check for the old
+    while (player.reality.glyphs.sets.length < 70) {
+      player.reality.glyphs.sets.push({ name: "", glyphs: [] });
+    }
+    const preset = player.reality.glyphs.sets[id];
+    if (!preset || !preset.glyphs.length) {
+      GameUI.notify.error(`Glyph Preset #${id + 1} is empty!`);
+      return { success: false, missing: 0 };
+    }
+    const set = preset.glyphs;
+    if (set.length > this.activeSlotCount) {
+      GameUI.notify.error(`Preset #${id + 1} requires ${set.length} slots, but you only have ${this.activeSlotCount}!`);
+      return { success: false, missing: set.length };
+    }
+
+    const ignoreLevel = player.options.ignoreGlyphLevel;
+    const ignoreRarity = player.options.ignoreGlyphRarity;
+    const ignoreEffects = player.options.ignoreGlyphEffects;
+
+    let glyphsToLoad = [...set].sort((a, b) => Decimal.compare(a.level.times(a.strength), b.level.times(b.strength)));
+    const activeGlyphs = [...this.active.filter(g => g)];
+
+    // Create an array where each entry contains a single active glyph and all its matches in the preset which it
+    // could fill in for, based on the preset loading settings
+    const activeOptions = [];
+    for (const glyph of activeGlyphs) {
+      const options = this.findByValues(glyph, glyphsToLoad, {
+        level: ignoreLevel ? -1 : 0,
+        strength: ignoreRarity ? -1 : 0,
+        effects: ignoreEffects ? -1 : 0
+      });
+      activeOptions.push({ glyph, options });
+    }
+
+    // Using the active glyphs one by one, select matching to-be-loaded preset glyphs to be removed from the list.
+    // This makes sure the inventory doesn't attempt to match a glyph which is already satisfied by an equipped one
+    const selectedFromActive = this.findSelectedGlyphs(activeOptions, 5);
+    for (const glyph of selectedFromActive) glyphsToLoad = glyphsToLoad.filter(g => g !== glyph);
+
+    // For the remaining glyphs to load from the preset, find all their appropriate matches within the inventory.
+    // This is largely the same as earlier with the equipped glyphs
+    const remainingOptions = [];
+    for (let index = 0; index < glyphsToLoad.length; index++) {
+      const glyph = glyphsToLoad[index];
+      const options = this.findByValues(glyph, this.sortedInventoryList, {
+        level: ignoreLevel ? 1 : 0,
+        strength: ignoreRarity ? 1 : 0,
+        effects: ignoreEffects ? 1 : 0
+      });
+      remainingOptions[index] = { glyph, options };
+    }
+
+    // This is scanned through similarly to the active slot glyphs, except we need to make sure we don't try to
+    // match more glyphs than we have room for
+    const selectedFromInventory = this.findSelectedGlyphs(remainingOptions,
+      this.active.countWhere(g => g === null));
+    for (const glyph of selectedFromInventory) glyphsToLoad = glyphsToLoad.filter(g => g !== glyph);
+
+    // Actually equip the glyphs and then notify how successful (or not) the loading was
+    let missingGlyphs = glyphsToLoad.length;
+    for (const glyph of selectedFromInventory) {
+      const idx = this.active.indexOf(null);
+      if (idx !== -1) {
+        this.equip(glyph, idx);
+        missingGlyphs--;
+      }
+    }
+
+    const setName = preset.name ? `"${preset.name}" (Slot #${id + 1})` : `Slot #${id + 1}`;
+    if (missingGlyphs > 0) {
+      GameUI.notify.error(`Could not equip ${missingGlyphs} ${pluralize("Glyph", missingGlyphs)} from preset ${setName}.`);
+    } else {
+      GameUI.notify.success(`Successfully loaded Glyph Preset ${setName}.`);
+    }
+
+    return { success: missingGlyphs === 0, missing: missingGlyphs, name: setName };
+  },
+  // Given a list of options for suitable matches to those glyphs and a maximum glyph count to match, returns the
+  // set of glyphs which should be loaded. This is a tricky matching process to do since on one hand we don't want
+  // early matches to prevent later ones, but on the other hand matching too leniently can cause any passed-on later
+  // requirements to be too strict (eg. preset 1234 and equipped 234 could match 123, leaving an unmatchable 4).
+  // The compromise solution here is to check how many choices the next-strictest option list has - if it only has
+  // one choice then we pick conservatively (the weakest glyph) - otherwise we pick greedily (the strongest glyph).
+  findSelectedGlyphs(optionList, maxGlyphs) {
+    // We do a weird composite function here in order to make sure that glyphs get treated by type individually; then
+    // within type they are generally ordered in strictest to most lenient in terms of matches. Note that the options
+    // are sorted internally starting with the strictest match first
+    const compFn = o => 1000 * (10 * o.glyph.type.length + o.glyph.type.codePointAt(0)) + o.options.length;
+    optionList.sort((a, b) => compFn(a) - compFn(b));
+
+    const toLoad = [];
+    let slotsLeft = maxGlyphs;
+    for (let index = 0; index < optionList.length; index++) {
+      if (slotsLeft === 0) break;
+      const entry = optionList[index];
+
+      const filteredOptions = entry.options.filter(g => !toLoad.includes(g));
+      if (filteredOptions.length === 0) continue;
+      const selectedGlyph = filteredOptions[filteredOptions.length - 1];
+      toLoad.push(selectedGlyph);
+      slotsLeft--;
+    }
+    return toLoad;
+  },
 };
 
 class GlyphSacrificeState extends GameMechanicState { }
