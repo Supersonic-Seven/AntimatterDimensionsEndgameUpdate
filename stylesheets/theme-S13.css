@@ -1,0 +1,21 @@
+html {
+  background: url("../images/s13-bg.jpg");
+  background-position-x: 50%;
+  background-position-y: 50%;
+  background-size: 150%;
+}
+
+body.t-s13 {
+  color: black;
+  text-shadow: 0.5px 0.5px 0 black;
+  background: none;
+}
+
+.t-s13 #container,
+.t-s13 #page,
+.t-s13 .l-notification-container,
+.t-s13 .c-modal,
+.t-s13 .time-theorem-buttons,
+.t-s13 .c-modern-sidebar {
+  filter: sepia(100%) hue-rotate(0deg) saturate(100%);
+}
