@@ -694,10 +694,10 @@ window.player = {
         reality: DC.D0
       },
       undo: [],
-      sets: new Array(7).fill({
+      sets: new Array(70).fill(0).map(() => ({
         name: "",
         glyphs: [],
-      }),
+      })),
       protectedRows: 2,
       filter: {
         select: AUTO_GLYPH_SCORE.LOWEST_SACRIFICE,
@@ -795,6 +795,7 @@ window.player = {
         repeat: true,
         forceRestart: true,
         followExecution: true,
+        forceRestartEndgame: true,
         stack: [],
       },
       scripts: {

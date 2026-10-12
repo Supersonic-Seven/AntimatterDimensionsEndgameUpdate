@@ -108,6 +108,7 @@ export const automator = {
         <b>infinity</b> [nowait]<br>
         <b>eternity</b> [nowait] [respec]<br>
         <b>reality</b> [nowait] [respec]<br>
+        <b>reality over</b><br>
         <b>doom</b> [nowait]<br>
         <b>armageddon</b> [nowait]<br>
         <b>endgame</b> [nowait]`,
@@ -135,6 +136,14 @@ export const automator = {
                 Endgame: Respec Endgame Masteries and Endgame.
               `
             },
+            {
+              header: "<i>over</i>",
+              description: `
+                Usable with Reality only. Immediately restarts the current Reality without checking the Reality
+                threshold or showing confirmation modals. If currently inside a Celestial Reality, safely restarts
+                or exits the Celestial run.
+              `
+            },
           ]
         }
       ],
@@ -142,6 +151,7 @@ export const automator = {
         "infinity",
         "eternity respec",
         "reality nowait",
+        "reality over",
         "doom",
         "armageddon",
         "endgame nowait respec"
@@ -152,8 +162,9 @@ export const automator = {
       isUnlocked: () => true,
       keyword: "UNLOCK",
       category: 1,
-      syntax: "<b>unlock</b> [nowait] <u>feature</u>",
-      description: "Unlocks the specified Eternity Challenge or Time Dilation.",
+      syntax: `<b>unlock</b> [nowait] <u>feature</u><br>
+        <b>unlock</b> [nowait] <b>generator</b>`,
+      description: `Unlocks the specified Eternity Challenge, Time Dilation, or Pelle's Galaxy Generator.`,
       sections: [
         {
           name: "MODIFIERS",
@@ -165,12 +176,21 @@ export const automator = {
                 default, the Automator will keep running this command until the unlock succeeds.
               `
             },
+            {
+              header: "<i>generator</i>",
+              description: `
+                Unlocks the Galaxy Generator inside Pelle's Reality once the prerequisite milestone (Recursion rift milestone 3)
+                is met and you are inside Dilation or have finalized it.
+              `
+            },
           ]
         }
       ],
       examples: [
         "unlock dilation",
-        "unlock ec7"
+        "unlock ec7",
+        "unlock generator",
+        "unlock nowait generator"
       ]
     },
     {
@@ -197,10 +217,10 @@ export const automator = {
       category: 2,
       syntax: `<b>auto infinity</b> [setting]<br>
         <b>auto eternity</b> [setting]<br>
-        <b>auto reality</b> [setting]`,
-      description: `Turns prestige Autobuyers on or off and allows you to change their settings. If the setting option
-        is not present, this command will toggle the Autobuyer state, turning it off if it is on and turning it on if
-        it is off. <b>This command will not work if you try to modify an Autobuyer or setting you do not have.</b>`,
+        <b>auto reality</b> [setting]<br>
+        <b>auto</b> [nowait] <b>pour on</b>|<b>off</b>`,
+      description: `Turns prestige Autobuyers on or off and configures their settings, or toggles automatic pouring into Teresa's container.
+        <b>This command will not work if you try to modify an Autobuyer or setting you do not have unlocked.</b>`,
       sections: [
         {
           name: "SETTINGS",
@@ -208,6 +228,10 @@ export const automator = {
             {
               header: "<i>on</i> | <i>off</i>",
               description: "Turns specified Autobuyer on or off.",
+            },
+            {
+              header: "<i>pour on</i> | <i>pour off</i>",
+              description: "Toggles automatic RM pouring into Teresa's container on or off (requires Teresa Expansion Pack).",
             },
             {
               header: "<u><i>number</i></u> <u><i>time units</i></u>",
@@ -233,7 +257,9 @@ export const automator = {
         "auto eternity off",
         "auto infinity 30s",
         "auto eternity 10 seconds",
-        "auto eternity 1e100 x highest"
+        "auto eternity 1e100 x highest",
+        "auto pour on",
+        "auto pour off"
       ]
     },
     {
@@ -253,25 +279,26 @@ export const automator = {
     {
       id: 8,
       isUnlocked: () => Enslaved.isUnlocked,
-      keyword: "STORE GAME TIME",
+      keyword: "STORE TIME",
       category: 2,
-      syntax: "<b>store game time</b> <u>action</u>",
-      description: `Changes whether or not the Black Hole is storing time. Also allows usage of stored time.`,
+      syntax: `<b>store game time</b> <u>action</u> [nowait]<br>
+        <b>store real time</b> <u>action</u> [nowait]`,
+      description: `Controls storing Black Hole/Game Time or Real Time in The Nameless Ones (Enslaved).`,
       sections: [
         {
           name: "ACTIONS",
           items: [
             {
-              header: "<i>on</i> | <i>off</i>",
-              description: `
-                Turns storing game time on or off.
-              `
+              header: "<i>game time</i>",
+              description: "Diverts Black Hole speedup into Stored Game Time without pausing the game. Supports 'on', 'off', and 'use'."
             },
             {
-              header: "<i>use</i>",
-              description: `
-                Uses all stored game time. Does not alter the on/off state of time storage.
-              `
+              header: "<i>real time</i>",
+              description: "Pauses game progression to store real time into the offline capacitor. Supports 'on' and 'off'. While active, the Automator continues to run."
+            },
+            {
+              header: "<i>nowait</i>",
+              description: "If present, immediately advances to the next line even if Enslaved is not yet unlocked."
             }
           ]
         }
@@ -280,6 +307,8 @@ export const automator = {
         "store game time on",
         "store game time off",
         "store game time use",
+        "store real time on nowait",
+        "store real time off",
       ]
     },
     {
@@ -543,6 +572,16 @@ export const automator = {
           <b>pending rs</b> - RS gained on Armageddon (0 if not available)<br>
           <b>pending glyph level</b> - Glyph Level gained on Reality (0 if not available)<br>
           <b>pending remnants</b> - Remnants gained on Armageddon (0 if not available)<br>
+          <b>reality resources</b> (or <b>realityresources</b>) - Current Reality Alchemy Resource amount<br>
+          <b>rift1</b> - <b>rift5</b> - Current fill percentage of Rift 1 to 5 (0 to 100)<br>
+          <b>rift milestones</b> - Total Pelle Rift milestones unlocked<br>
+          <b>poured rm</b> (or <b>pouredrm</b>) - Current Reality Machines poured into Teresa<br>
+          <b>stored time</b> (or <b>stored game time</b>) - Current Stored Game Time in Enslaved (Decimal)<br>
+          <b>stored real time</b> - Current Stored Real Time in Enslaved (ms)<br>
+          <b>laitela tier</b> (or <b>laitelatier</b>) - Current Lai'tela reality difficulty tier (0 to 8)<br>
+          <b>entropy</b> (or <b>laitela entropy</b>) - Current Lai'tela reality entropy percentage (0 to 100)<br>
+          <b>generated</b> (or <b>gg</b>) - Current Galaxies generated by Pelle's Galaxy Generator<br>
+          <b>memory <u>X</u></b> (or <b>memory <u>name</u></b>) - Memory level of a Celestial in Ra (1: Teresa, 2: Effarig, 3: Enslaved, 4: V)<br>
           <b>dt</b> - Current Dilated Time amount <br>
           <b>tp</b> - Current Tachyon Particle amount<br>
           <b>rg</b> - Current Replicanti Galaxy amount (does not use scientific)<br>
@@ -630,6 +669,315 @@ export const automator = {
           pause 10s<br>
           eternity respec</blockquote>
         }`
+      ]
+    },
+    {
+      id: 20,
+      isUnlocked: () => TeresaUnlocks.run.isUnlocked,
+      keyword: "CELESTIAL",
+      category: 1,
+      syntax: "<b>celestial</b> <u>name</u> <b>start</b> [nowait]",
+      description: `Performs a Reality reset and enters the specified Celestial's Reality.
+        If you are already within the specified Celestial Reality,
+        running this command again will do nothing and continue onward.`,
+      sections: [
+        {
+          name: "INPUTS",
+          items: [
+            {
+              header: "<i>name</i>",
+              description: "The name of the Celestial to enter."
+            },
+            {
+              header: "<i>nowait</i>",
+              description: `If present, the Automator will move on to the next command if entering
+                the Celestial Reality is not possible (eg. if it is not yet unlocked). By default,
+                the Automator will repeatedly attempt this command until it succeeds.`
+            }
+          ]
+        }
+      ],
+      examples: [
+        "celestial teresa start",
+        "celestial teresa start nowait"
+      ]
+    },
+    {
+      id: 21,
+      isUnlocked: () => PlayerProgress.realityUnlocked(),
+      keyword: "GLYPH LOAD",
+      category: 2,
+      syntax: `<b>glyph</b> [nowait] <b>load id</b> <u>selector</u><br>
+        <b>glyph</b> [nowait] <b>load name</b> <u>name</u>`,
+      description: `Loads a saved Glyph Preset, equipping matching Glyphs from your inventory.`,
+      sections: [
+        {
+          name: "INPUTS",
+          items: [
+            {
+              header: "<i>nowait</i>",
+              description: `
+                If present, the Automator will equip as many matching Glyphs as possible and immediately advance
+                to the next line. By default (without "nowait"), this command will repeat on this line indefinitely
+                until all Glyphs in the preset are successfully equipped.
+              `
+            },
+            {
+              header: "<i>selector</i>",
+              description: `
+                Finds and loads the specified Glyph preset by its slot number (1 through 70), ordered from left to right.`
+            },
+            {
+              header: "<i>name</i>",
+              description: "Finds and loads the specified Glyph preset by its assigned nickname (case-sensitive)."
+            },
+          ]
+        }
+      ],
+      examples: [
+        `glyph load id 1`,
+        `glyph load name RM`,
+        `glyph nowait load id 69`,
+      ]
+    },
+    {
+      id: 22,
+      isUnlocked: () => PlayerProgress.realityUnlocked(),
+      keyword: "GLYPH UNEQUIP",
+      category: 2,
+      syntax: `<b>glyph unequip</b> <u>setting</u>`,
+      description: `Controls whether equipped Glyphs will be unequipped on the next Reality, or configures
+        the inventory destination where unequipped Glyphs will be sent.`,
+      sections: [
+        {
+          name: "SETTINGS",
+          items: [
+            {
+              header: "<i>on</i> | <i>off</i>",
+              description: `Turns unequip on Reality on or off. Equivalent to toggling the "Respec Glyphs" option.`
+            },
+            {
+              header: "<i>main</i> | <i>protected</i>",
+              description: `Sets whether unequipped Glyphs are returned to your Main Inventory or Protected slots.`
+            }
+          ]
+        }
+      ],
+      examples: [
+        `glyph unequip on`,
+        `glyph unequip off`,
+        `glyph unequip main`,
+        `glyph unequip protected`,
+      ]
+    },
+    {
+      id: 23,
+      isUnlocked: () => PlayerProgress.realityUnlocked(),
+      keyword: "GLYPH CREATE",
+      category: 2,
+      syntax: `<b>glyph</b> [nowait] <b>create cursed</b><br>
+        <b>glyph</b> [nowait] <b>create reality</b>`,
+      description: `Spawns a Cursed Glyph (requires Hard V), or consumes all Reality Resources to create a Reality Glyph.`,
+      sections: [
+        {
+          name: "MODIFIERS",
+          items: [
+            {
+              header: "<i>nowait</i>",
+              description: `If present, advances to the next command immediately even if the inventory is full
+                or creation conditions are not met.`
+            }
+          ]
+        }
+      ],
+      examples: [
+        "glyph create cursed",
+        "glyph create reality",
+        "glyph nowait create reality",
+      ]
+    },
+    {
+      id: 24,
+      isUnlocked: () => PlayerProgress.realityUnlocked(),
+      keyword: "GLYPH EQUIP",
+      category: 2,
+      syntax: "<b>glyph</b> [nowait] <b>equip cursed</b>",
+      description: `Finds an unequipped Cursed Glyph in your inventory and equips it into the first available active Glyph slot.`,
+      sections: [
+        {
+          name: "MODIFIERS",
+          items: [
+            {
+              header: "<i>nowait</i>",
+              description: `If present, advances to the next command immediately even if there are no Cursed Glyphs
+                in inventory or no empty active slots available.`
+            }
+          ]
+        }
+      ],
+      examples: [
+        "glyph equip cursed",
+        "glyph nowait equip cursed"
+      ]
+    },
+    {
+      id: 25,
+      isUnlocked: () => Ra.pets.effarig.level >= 2,
+      keyword: "ALCHEMY",
+      category: 2,
+      syntax: `<b>alchemy on</b> [nowait]<br>
+        <b>alchemy off</b> [nowait]<br>
+        <b>alchemy reset</b>`,
+      description: `Turns all unlocked Glyph Alchemy reactions on or off, or force-resets all Alchemy resources to 0.`,
+      sections: [
+        {
+          name: "SETTINGS",
+          items: [
+            {
+              header: "<i>on</i> | <i>off</i>",
+              description: `Turns all unlocked Alchemy reactions on or off.`
+            },
+            {
+              header: "<i>reset</i>",
+              description: `Resets all Alchemy resources to zero.`
+            },
+            {
+              header: "<i>nowait</i>",
+              description: `Usable with on/off only. Advances to the next line immediately even if no reactions
+                are currently unlocked.`
+            }
+          ]
+        }
+      ],
+      examples: [
+        "alchemy on",
+        "alchemy off nowait",
+        "alchemy reset",
+      ]
+    },
+    {
+      id: 26,
+      isUnlocked: () => Pelle.isUnlocked,
+      keyword: "RIFT",
+      category: 2,
+      syntax: `<b>rift</b> [nowait] <u>id</u> <b>on</b>|<b>off</b><br>
+        <b>rift</b> [nowait] [<u>id</u>] <b>sacrifice</b>`,
+      description: `Toggles a Pelle Rift on or off to fill it with its respective resource, or triggers a Rift sacrifice to raise the Galaxy Generator cap.`,
+      sections: [
+        {
+          name: "INPUTS",
+          items: [
+            {
+              header: "<i>nowait</i>",
+              description: `If present, moves to the next command immediately even if the Rift cannot be toggled or sacrificed
+                (e.g. if conditions are not met). By default, the Automator waits on this line until conditions are fulfilled.`
+            },
+            {
+              header: "<i>id</i>",
+              description: "The Rift number (1 through 5) to toggle or sacrifice. Optional for sacrifice commands."
+            },
+            {
+              header: "<i>on</i> | <i>off</i>",
+              description: "Turns filling the specified Rift on or off."
+            },
+            {
+              header: "<i>sacrifice</i>",
+              description: `Sacrifices the specified (or currently targeted) Rift once the Galaxy Generator hits its current galaxy generation cap.
+                If the specified Rift has already been sacrificed, the command immediately completes to prevent script deadlocks.`
+            },
+          ]
+        }
+      ],
+      examples: [
+        "rift 1 on",
+        "rift nowait 5 on",
+        "rift 2 off",
+        "rift 1 sacrifice",
+        "rift sacrifice nowait",
+      ]
+    },
+    {
+      id: 27,
+      isUnlocked: () => Teresa.isUnlocked,
+      keyword: "CELESTIAL POUR",
+      category: 2,
+      syntax: "<b>celestial teresa pour</b> [nowait] <b>on</b>|<b>off</b>",
+      description: `Toggles pouring Reality Machines into Teresa's container.`,
+      sections: [
+        {
+          name: "MODIFIERS",
+          items: [
+            {
+              header: "<i>nowait</i>",
+              description: `If present, advances to the next command immediately even if Teresa is not unlocked
+                or there are no Reality Machines to pour.`
+            }
+          ]
+        }
+      ],
+      examples: [
+        "celestial teresa pour on",
+        "celestial teresa pour off",
+        "celestial teresa pour on nowait",
+      ]
+    },
+    {
+      id: 28,
+      isUnlocked: () => true,
+      keyword: "TAB",
+      category: 2,
+      syntax: `<b>tab</b> [nowait] <u>tab</u> [<u>subtab</u>]<br>
+        <b>tab</b> [nowait] <b>celestials</b> <u>1-9</u>`,
+      description: `Switches the game's current screen view to the specified Tab and Subtab without requiring manual mouse clicks.
+        Useful for inspecting mechanics, triggering tab-based automations, or monitoring progress throughout your script.`,
+      sections: [
+        {
+          name: "INPUTS",
+          items: [
+            {
+              header: "<i>nowait</i>",
+              description: `If present, immediately advances to the next script line even if the target tab/subtab
+                is not unlocked or unavailable. By default, the Automator waits until the page is unlocked.`
+            },
+            {
+              header: "<i>tab</i>",
+              description: `The main Tab name. Supported tabs: <b>dimensions, options, statistics, achievements,
+                automation, challenges, infinity, eternity, reality, celestials, shop, endgame, cdexpansion,
+                divinity, universes</b>.`
+            },
+            {
+              header: "<i>subtab</i>",
+              description: `Optional subtab name within the chosen tab (e.g. <u>glyphs</u>, <u>studies</u>, <u>antimatter</u>).`
+            }
+          ]
+        },
+        {
+          name: "CELESTIAL TABS (1 - 9)",
+          items: [
+            {
+              header: "<b>1 - 9 Shortcuts</b>",
+              description: `When switching to Celestials, subtabs can be addressed directly by slot number 1 through 9:<br>
+                <b>1</b>: Teresa<br>
+                <b>2</b>: Effarig<br>
+                <b>3</b>: The Nameless Ones (Enslaved)<br>
+                <b>4</b>: V<br>
+                <b>5</b>: Ra<br>
+                <b>6</b>: Lai'tela<br>
+                <b>7</b>: Pelle<br>
+                <b>8</b>: Alpha<br>
+                <b>9</b>: Slabdrill`
+            }
+          ]
+        }
+      ],
+      examples: [
+        "tab celestials 1",
+        "tab celestials 7",
+        "tab celestials 9 nowait",
+        "tab reality glyphs",
+        "tab reality alchemy",
+        "tab eternity studies",
+        "tab dimensions antimatter",
       ]
     },
   ],

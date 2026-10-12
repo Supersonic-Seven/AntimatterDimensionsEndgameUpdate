@@ -814,7 +814,9 @@ export const Endgame = {
     tryChargeAllPerkUpgrades();
     tryChargeAllBreakUpgrades();
     tryChargeAllEternityUpgrades();
-    AutomatorBackend.restart();
+    if (Player.automatorUnlocked && (AutomatorBackend.state.forceRestartEndgame ?? true)) {
+      AutomatorBackend.restart();
+    }
   }
 };
 function lockAchievementsOnEndgame() {

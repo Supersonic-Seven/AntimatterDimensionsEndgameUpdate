@@ -54,7 +54,7 @@ export default {
       return text;
     },
     sacrificeText() {
-      return this.capRift.galaxyGeneratorText.replace("$value", this.capRiftName);
+      return this.capRift ? this.capRift.galaxyGeneratorText.replace("$value", this.capRiftName) : "";
     },
     emphasisedStart() {
       return Decimal.pow(this.generatedGalaxies.div(this.cap), 0.45).toNumber();
@@ -74,7 +74,7 @@ export default {
       this.cap = GalaxyGenerator.generationCap;
       this.capRift = GalaxyGenerator.capRift;
       this.sacrificeActive = GalaxyGenerator.sacrificeActive;
-      this.barWidth = (this.isCapped ? this.capRift.reducedTo : this.emphasisedStart);
+      this.barWidth = (this.isCapped && this.capRift ? this.capRift.reducedTo : this.emphasisedStart);
       if (this.capRift) this.capRiftName = wordShift.wordCycle(this.capRift.name);
       this.galGenInstability = GalaxyGenerator.galGenInstability;
       this.harshGalGenInstability = GalaxyGenerator.harshGalGenInstability;
@@ -87,15 +87,13 @@ export default {
       this.isSecondInstabilityShown = this.galaxies.gte(this.harshInstabilityStart);
     },
     increaseCap() {
-      if (GalaxyGenerator.isCapped) GalaxyGenerator.startSacrifice();
-    },
+      GalaxyGenerator.startSacrifice();
+    },    
     toggleCollapse() {
       player.celestials.pelle.collapsed.galaxies = !this.isCollapsed;
     },
     unlock() {
-      player.celestials.pelle.galaxyGenerator.unlocked = true;
-      Pelle.quotes.galaxyGeneratorUnlock.show();
-      if (player.endgames >= 1) Pelle.quotes.galgen2.show();
+      GalaxyGenerator.unlock();
     }
   },
 };
