@@ -60,18 +60,17 @@ export function getDimensionFinalMultiplierUncached(tier) {
   if (tier < 1 || tier > 9) throw new Error(`Invalid Antimatter Dimension tier ${tier}`);
   if (Slabdrill.isCursed && tier > (Math.max(Math.min(Math.floor((player.celestials.slabdrill.goodbyeTick - 30000) / 1000), 10), 2) - 1)) return DC.D1;
   if (NormalChallenge(10).isRunning && tier > 6) return DC.D1;
-  if (EternityChallenge(11).isRunning) {
-    return Currency.infinityPower.value.pow(
-      InfinityDimensions.powerConversionRate
-    ).max(1).times(DimBoost.multiplierToNDTier(tier));
-  }
 
   if (Slabdrill.coreActive) return DC.D1.times(Slabdrill.slabPowers.adMult());
 
   let multiplier = DC.D1;
 
-  multiplier = applyNDMultipliers(multiplier, tier);
-  multiplier = applyNDPowers(multiplier, tier);
+  if (EternityChallenge(11).isRunning) {
+    multiplier = Currency.infinityPower.value.pow(InfinityDimensions.powerConversionRate).max(1).times(DimBoost.multiplierToNDTier(tier));
+  } else {
+    multiplier = applyNDMultipliers(multiplier, tier);
+    multiplier = applyNDPowers(multiplier, tier);
+  }
 
   const glyphDilationPowMultiplier = getAdjustedGlyphEffect("dilationpow");
   if (player.dilation.active || (PelleStrikes.dilation.hasStrike && !PelleStrikes.dilation.isDestroyed())) {
