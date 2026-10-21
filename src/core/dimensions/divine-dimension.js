@@ -49,14 +49,30 @@ class DivineDimensionState extends DimensionState {
     return Currency.divineMatter.gte(this.cost);
   }
 
+  _prevAmount = DC.D0;
+
+  get prevAmount() {
+    return this._prevAmount ?? DC.D0;
+  }
+
+  set prevAmount(value) {
+    this._prevAmount = value;
+  }
+
+  /**
+   * @returns {Decimal}
+   */
   get rateOfChange() {
-    const tier = this.tier;
+    /*const tier = this.tier;
     if (tier === 8) {
       return DC.D0;
     }
     const toGain = DivineDimension(tier + 1).productionPerSecond;
     const current = Decimal.max(this.amount, 1);
-    return toGain.times(10).dividedBy(current);
+    return toGain.times(10).dividedBy(current);*/
+    let gained = this.prevAmount.lte(0) ? DC.D0 : DivineDimension(this.tier).amount.div(this.prevAmount).pow(DC.E3.div(Time.unscaledDeltaTime._ms)).sub(1).times(100);
+    this.prevAmount = DivineDimension(this.tier).amount;
+    return gained;
   }
 
   get productionPerSecond() {
