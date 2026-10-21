@@ -194,6 +194,10 @@ body.t-s12 {
   border-left-color: var(--color-pelle--base);
 }
 
+.o-tab-btn--celestial-plus::after {
+  animation: a-celestial-plus-glow-border-left 12s infinite;
+}
+
 .o-tab-btn--universes::after {
   animation: a-universes-glow-border-left 10s infinite;
 }
@@ -388,6 +392,15 @@ body.t-s12 {
 
 .o-tab-btn--divinity .o-subtab__tooltip::after {
   border-top-color: var(--color-pelle--base);
+}
+
+.o-tab-btn--celestial-plus .o-subtab__tooltip {
+  background: var(--color-prestige--accent);
+  animation: a-celestial-plus-glow-primary 12s infinite;
+}
+
+.o-tab-btn--celestial-plus .o-subtab__tooltip::after {
+  animation: a-celestial-plus-glow-border-top 12s infinite;
 }
 
 .o-tab-btn--universes .o-subtab__tooltip {
@@ -998,6 +1011,18 @@ body.t-s12 {
 .l-break-eternity-upgrade-btn {
   width: 18rem;
   margin: 0.6rem 0.4rem;
+}
+
+.l-celestial-reality-upgrade-btn {
+  width: 18rem;
+  margin: 0.6rem 0.4rem;
+}
+
+.l--spoon-btn-group__little-spoon-celestial-reality-btn {
+  width: 18rem;
+  align-self: center;
+  margin-top: -0.2rem;
+  margin-bottom: 0.6rem;
 }
 
 .l-hint-text--reality-upgrade {
