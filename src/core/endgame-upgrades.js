@@ -76,7 +76,7 @@ class EndgameUpgradeState extends BitPurchasableMechanicState {
     const endgameReached = PlayerProgress.endgameUnlocked() && EndgameMastery.endgameUpgrades.isBought;
     if (!endgameReached || this.isAvailableForPurchase || !this.config.checkRequirement()) return;
     player.endgame.upgReqs |= (1 << this.id);
-    GameUI.notify.endgame(`You've unlocked a Endgame Upgrade: ${this.config.name}`);
+    GameUI.notify.endgame(`You've unlocked a Endgame Upgrade: ${this.name}`);
     this.hasPlayerLock = false;
   }
 
