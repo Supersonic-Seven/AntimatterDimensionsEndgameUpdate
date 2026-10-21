@@ -35,12 +35,12 @@ class DualityUpgradeState extends BitPurchasableMechanicState {
   }
 
   get hasPlayerLock() {
-    return (player.reality.reqLock.dual & (1 << this.bitIndex)) !== 0;
+    return (player.reality.reqLock.duality & (1 << this.bitIndex)) !== 0;
   }
 
   set hasPlayerLock(value) {
-    if (value) player.reality.reqLock.dual |= 1 << this.bitIndex;
-    else player.reality.reqLock.dual &= ~(1 << this.bitIndex);
+    if (value) player.reality.reqLock.duality |= 1 << this.bitIndex;
+    else player.reality.reqLock.duality &= ~(1 << this.bitIndex);
   }
 
   get isLockingMechanics() {
