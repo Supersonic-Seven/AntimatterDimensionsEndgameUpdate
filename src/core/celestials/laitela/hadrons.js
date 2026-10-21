@@ -17,28 +17,28 @@ export const Hadrons = {
       DivinityMilestone.ascendedSurge.isReached && !player.disablePostReality ? 4 : 1);
   },
   get singularityMultiplier() {
-    let time = this.timeFactor.times(4).times(this.speedFactor);
+    let time = this.timeFactor.times(6).times(this.speedFactor);
     time = time.gte(100) ? time.sub(100).sqrt().add(100) : time;
     return DualityUpgrade(15).isBought && !player.disablePostReality ? Decimal.pow10(new Decimal(this.hadrons.totalLight).times(
       time.min((100 * Accelerators.emptiness.effectValue2 + EndgameMastery(251).effectOrDefault(0)) *
       (DivinityMilestone.serpentPower.isReached ? 2 : 1))).times(10)) : DC.D1;
   },
   get darkMatterCapMultiplier() {
-    let time = this.timeFactor.times(2).times(this.speedFactor);
+    let time = this.timeFactor.times(3).times(this.speedFactor);
     time = time.gte(100) ? time.sub(100).sqrt().add(100) : time;
     return DualityUpgrade(16).isBought && !player.disablePostReality ? Decimal.pow10(new Decimal(this.hadrons.totalLight).times(
       time.min((100 * Accelerators.emptiness.effectValue2 + EndgameMastery(251).effectOrDefault(0)) *
       (DivinityMilestone.serpentPower.isReached ? 2 : 1))).times(100)) : DC.D1;
   },
   get darkEnergyAscensionBoost() {
-    let time = this.timeFactor.times(this.speedFactor);
+    let time = this.timeFactor.times(5/3).times(this.speedFactor);
     time = time.gte(100) ? time.sub(100).sqrt().add(100) : time;
     return DualityUpgrade(17).isBought && !player.disablePostReality ? new Decimal(this.hadrons.totalLight).times(
       time.min((100 * Accelerators.emptiness.effectValue2 + EndgameMastery(251).effectOrDefault(0)) *
       (DivinityMilestone.serpentPower.isReached ? 2 : 1))) : DC.D0;
   },
   get entropyFormulaBoost() {
-    let time = this.timeFactor.div(2).times(this.speedFactor);
+    let time = this.timeFactor.times(this.speedFactor);
     time = time.gte(100) ? time.sub(100).sqrt().add(100) : time;
     return DualityUpgrade(18).isBought && !player.disablePostReality ? Decimal.pow(Decimal.log10(
       time.max(1).min((100 * Accelerators.emptiness.effectValue2 + EndgameMastery(251).effectOrDefault(0)) *
@@ -46,7 +46,7 @@ export const Hadrons = {
       .times(2).add(1), this.hadrons.totalLight) : DC.D1;
   },
   get continuumMultiplier() {
-    let time = this.timeFactor.div(5).times(this.speedFactor);
+    let time = this.timeFactor.div(2).times(this.speedFactor);
     time = time.gte(100) ? time.sub(100).sqrt().add(100) : time;
     return DualityUpgrade(19).isBought && !player.disablePostReality ? Decimal.pow(Decimal.log10(
       time.max(1).min((100 * Accelerators.emptiness.effectValue2 + EndgameMastery(251).effectOrDefault(0)) *
