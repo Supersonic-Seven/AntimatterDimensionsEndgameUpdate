@@ -178,7 +178,7 @@ export default {
       return this.renderedRowIndices.includes(row);
     },
     isObscured(row) {
-      if (player.celestials.slabdrill.hasBoughtNinthDimension && player.endgame.creditsTick > 0 && !player.endgame.credits) {
+      if (PlayerProgress.celestialPlusUnlocked()) {
         return row >= 30;
       }
       if (Slabdrill.isCursed || Slabdrill.isDestroyed) {
