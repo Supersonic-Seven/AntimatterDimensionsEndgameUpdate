@@ -84,10 +84,12 @@ export const Effarig = {
       case EFFARIG_STAGES.REALITY:
         return new Decimal(2000);
       case EFFARIG_STAGES.ENDGAME:
-        return Decimal.floor(Time.thisEndgameRealTime.totalMilliseconds).times(Decimal.pow(2, Time.thisEndgameRealTime.totalHours));
+        return Decimal.floor(Time.thisEndgameRealTime.totalMilliseconds).times(
+          Decimal.pow(1.05, Time.thisEndgameRealTime.totalMinutes));
       default:
         return EffarigUnlock.extendRun.isUnlocked
-          ? Decimal.floor(Time.thisEndgameRealTime.totalMilliseconds).times(Decimal.pow(2, Time.thisEndgameRealTime.totalHours))
+          ? Decimal.floor(Time.thisEndgameRealTime.totalMilliseconds).times(
+            Decimal.pow(1.05, Time.thisEndgameRealTime.totalMinutes))
           : new Decimal(2000);
     }
   },
