@@ -2199,7 +2199,7 @@ export const celestialNavigation = {
         player.records.totalRealityAntimatter.max(1).log10().max(1).log10().div(DC.NUMMAX.log10()).div(10).min(0.1))).toNumber();
     },
     node: {
-      clickAction: () => Achievement(261).isUnlocked ? Tab.celestialplus.show(true) : Tab.dimensions.antimatter.show(true),
+      clickAction: () => Tab.dimensions.antimatter.show(true),
       incompleteClass: "c-celestial-nav__test-incomplete",
       symbol: "♆",
       symbolOffset: "1.6",
