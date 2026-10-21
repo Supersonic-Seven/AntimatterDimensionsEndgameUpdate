@@ -573,11 +573,21 @@ class AntimatterDimensionState extends DimensionState {
     return false;
   }
 
+  _prevAmount = DC.D0;
+
+  get prevAmount() {
+    return this._prevAmount ?? DC.D0;
+  }
+
+  set prevAmount(value) {
+    this._prevAmount = value;
+  }
+
   /**
    * @returns {Decimal}
    */
   get rateOfChange() {
-    const tier = this.tier;
+    /*const tier = this.tier;
     if (tier === 9 ||
       (tier > 3 && EternityChallenge(3).isRunning) ||
       (tier > 6 && NormalChallenge(12).isRunning)) {
@@ -594,7 +604,10 @@ class AntimatterDimensionState extends DimensionState {
     } else {
       toGain = AntimatterDimension(tier + 1).productionPerSecond;
     }
-    return toGain.times(10).dividedBy(this.amount.max(1)).times(getGameSpeedupForDisplay());
+    return toGain.times(10).dividedBy(this.amount.max(1)).times(getGameSpeedupForDisplay());*/
+    let gained = this.prevAmount.lte(0) ? DC.D0 : AntimatterDimension(this.tier).amount.div(this.prevAmount).pow(DC.E3.div(Time.unscaledDeltaTime._ms)).sub(1).times(100);
+    this.prevAmount = AntimatterDimension(this.tier).amount;
+    return gained;
   }
 
   /**
@@ -751,11 +764,11 @@ class AntimatterDimensionState extends DimensionState {
       if (tier === 6) amount = amount.pow(1.2);
     }
     if (Slabdrill.coreActive) return amount.times(this.multiplier);
-    let production = tier === 1 ? CMilestones.antimatterEqualizer(amount.times(this.multiplier), Tickspeed.perSecond) : amount.times(this.multiplier).times(tier === 9 ? 1 : Tickspeed.perSecond);
+    let production = (tier === 1 || (tier === 2 && NormalChallenge(12).isRunning)) ? CMilestones.antimatterEqualizer(amount.times(this.multiplier), Tickspeed.perSecond) : amount.times(this.multiplier).times(tier === 9 ? 1 : Tickspeed.perSecond);
     if (NormalChallenge(2).isRunning) {
       production = production.times(player.chall2Pow);
     }
-    if (tier === 1 && !player.compression.active) {
+    if ((tier === 1 || (tier === 2 && NormalChallenge(12).isRunning)) && !player.compression.active) {
       if (NormalChallenge(3).isRunning) {
         production = production.times(player.chall3Pow);
       }
@@ -803,6 +816,10 @@ class AntimatterDimensionState extends DimensionState {
         const log10 = production.log10();
         production = Decimal.pow10(Decimal.pow(log10.div(1e260), 0.01).times(1e260));
       }
+      if (production.gt(Decimal.pow10(1e280)) && !Pelle.isDoomed && !player.endgame.overcharge.isRunning && !Slabdrill.isCursed) {
+        const log10 = production.log10();
+        production = Decimal.pow10(Decimal.pow(log10.div(1e280), 0.2).times(1e280));
+      }
       if (production.gt(10) && LHC.nullifiedVoidRunning) {
         const log10 = production.log10();
         production = Decimal.pow10(Decimal.pow(log10, 0.01));
@@ -827,7 +844,13 @@ class AntimatterDimensionState extends DimensionState {
         production = Decimal.tetrate(10, slog.times(0.5).add(1).add(Currency.molecularMass.value.max(1).slog().div(2).sub(1).max(0)).toNumber());
       }
     }
-    if (tier !== 1 && NormalChallenge(12).isCharged && ((player.break && !NormalChallenge.isRunning) || InfinityChallenge.isRunning || Enslaved.isRunning)) production = production.min(amount.times(this.multiplier).times(NormalChallenge(2).isRunning ? player.chall2Pow : 1));
+    if ((tier === 1 || (tier === 2 && NormalChallenge(12).isRunning)) && player.compression.active) {
+      if (production.gt(Decimal.pow10(1e25))) {
+        const log10 = production.log10();
+        production = Decimal.pow10(Decimal.pow(log10.div(1e25), 0.1).times(1e25));
+      }
+    }
+    if ((tier !== 1 && (tier !== 2 || !NormalChallenge(12).isRunning)) && NormalChallenge(12).isCharged && ((player.break && !NormalChallenge.isRunning) || InfinityChallenge.isRunning || Enslaved.isRunning)) production = production.min(amount.times(this.multiplier).times(NormalChallenge(2).isRunning ? player.chall2Pow : 1));
     else production = production.min(this.cappedProductionInNormalChallenges);
     return production;
   }
