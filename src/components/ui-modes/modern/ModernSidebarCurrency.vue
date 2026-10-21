@@ -225,4 +225,19 @@ export default {
 .o-sidebar-currency--slabdrill {
   color: var(--color-slabdrill--base);
 }
+
+.o-sidebar-currency--ephemeral {
+  animation: a-ephemeral-cycle 10s infinite;
+}
+
+@keyframes a-ephemeral-cycle {
+  0% { color: #ffe0a0; }
+  33% { color: white; }
+  67% { color: #a0e0ff; }
+  100% { color: #ffe0a0; }
+}
+
+.o-sidebar-currency--compression {
+  color: #64ddad;
+}
 </style>
