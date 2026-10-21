@@ -1034,6 +1034,15 @@ button:focus {
   background: var(--color-pelle--base);
 }
 
+.o-tab-btn--celestial-plus {
+  background-color: var(--color-prestige--accent);
+  animation: a-celestial-plus-glow-primary 12s infinite;
+}
+
+.o-tab-btn--celestial-plus:hover {
+  animation: a-celestial-plus-glow-hover 12s infinite;
+}
+
 .o-tab-btn--universes {
   background-color: var(--color-prestige--accent);
   animation: a-universes-glow-primary 10s infinite;
@@ -1059,6 +1068,46 @@ button:focus {
 
 .o-tab-btn--universes__tangible:hover {
   animation: a-universes--tangible-glow-hover 10s infinite;
+}
+
+@keyframes a-celestial-plus-glow-primary {
+  0% { color: #ff0000; border-color: #ff0000; }
+  17% { color: #ffff00; border-color: #ffff00; }
+  33% { color: #00ff00; border-color: #00ff00; }
+  50% { color: #00ffff; border-color: #00ffff; }
+  67% { color: #0000ff; border-color: #0000ff; }
+  83% { color: #ff00ff; border-color: #ff00ff; }
+  100% { color: #ff0000; border-color: #ff0000; }
+}
+
+@keyframes a-celestial-plus-glow-hover {
+  0% { background: #ff0000; }
+  17% { background: #ffff00; }
+  33% { background: #00ff00; }
+  50% { background: #00ffff; }
+  67% { background: #0000ff; }
+  83% { background: #ff00ff; }
+  100% { background: #ff0000; }
+}
+
+@keyframes a-celestial-plus-glow-border-left {
+  0% { border-left-color: #ff0000; }
+  17% { border-left-color: #ffff00; }
+  33% { border-left-color: #00ff00; }
+  50% { border-left-color: #00ffff; }
+  67% { border-left-color: #0000ff; }
+  83% { border-left-color: #ff00ff; }
+  100% { border-left-color: #ff0000; }
+}
+
+@keyframes a-celestial-plus-glow-border-top {
+  0% { border-top-color: #ff0000; }
+  17% { border-top-color: #ffff00; }
+  33% { border-top-color: #00ff00; }
+  50% { border-top-color: #00ffff; }
+  67% { border-top-color: #0000ff; }
+  83% { border-top-color: #ff00ff; }
+  100% { border-top-color: #ff0000; }
 }
 
 @keyframes a-universes-glow-primary {
@@ -1494,6 +1543,72 @@ button:focus {
 .t-s10 .c-reset-endgame-button-doom.force-hover {
   color: black;
   background: var(--color-pelle--base);
+}
+
+.l-celestial-reality-button {
+  width: 40rem;
+  height: 6rem;
+}
+
+.t-metro .l-celestial-reality-button {
+  box-shadow: 0.1rem 0.1rem 0.1rem 0 #9e9e9e;
+}
+
+.l-celestial-reality-button__contents {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.c-celestial-reality-button__header {
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.c-celestial-reality-button {
+  width: 100%;
+  height: 100%;
+  font-family: Typewriter;
+  font-size: 1.2rem;
+  font-weight: bold;
+  background: var(--color-background);
+  border-style: solid;
+  border-width: var(--var-border-width, 0.2rem);
+  border-radius: var(--var-border-radius, 0.4rem);
+  transition-duration: 0.2s;
+}
+
+.t-s6 .c-celestial-reality-button,
+.t-s10 .c-celestial-reality-button {
+  background: black;
+}
+
+.c-celestial-reality-button--unlocked {
+  color: #2e787d;
+  border-color: #2e787d;
+  cursor: pointer;
+}
+
+.c-celestial-reality-button--locked {
+  color: #181818;
+  background-color: var(--color-glyph-sac-text-input--focused);
+  border-color: var(--color-bad);
+}
+
+.t-s6 .c-celestial-reality-button--locked,
+.t-s10 .c-celestial-reality-button--locked {
+  color: grey;
+}
+
+.c-celestial-reality-button--unlocked:hover,
+.c-celestial-reality-button--unlocked.force-hover {
+  color: black;
+  background: linear-gradient(var(--color-reality), var(--color-celestials));
+}
+
+.c-celestial-reality-button--locked:hover {
+  color: #1d1d1d;
+  background-color: var(--color-bad);
 }
 
 [draggable] {
@@ -3236,6 +3351,64 @@ br {
 }
 
 /* #endregion Neb Amount */
+
+/* #region CP Amount */
+
+.l-game-header__celestial-points {
+  position: absolute;
+  right: 75%;
+}
+
+.c-game-header__cp-amount {
+  font-weight: bold;
+}
+
+.t-dark .c-game-header__cp-amount,
+.t-s6 .c-game-header__cp-amount,
+.t-s10 .c-game-header__cp-amount {
+  color: var(--color-endgame);
+  text-shadow: 0 0 0.7rem var(--color-endgame);
+}
+
+.s-base--metro .c-game-header__cp-amount {
+  color: var(--color-endgame);
+}
+
+.t-s1 .c-game-header__cp-amount {
+  color: var(--color-endgame);
+  text-shadow: 0.1rem 0.1rem 0 black;
+}
+
+/* #endregion CP Amount */
+
+/* #region DP Amount */
+
+.l-game-header__doomed-particles {
+  position: absolute;
+  right: 75%;
+}
+
+.c-game-header__dp-amount {
+  font-weight: bold;
+}
+
+.t-dark .c-game-header__dp-amount,
+.t-s6 .c-game-header__dp-amount,
+.t-s10 .c-game-header__dp-amount {
+  color: var(--color-pelle--base);
+  text-shadow: 0 0 0.7rem var(--color-pelle--base);
+}
+
+.s-base--metro .c-game-header__dp-amount {
+  color: var(--color-pelle--base);
+}
+
+.t-s1 .c-game-header__dp-amount {
+  color: var(--color-pelle--base);
+  text-shadow: 0.1rem 0.1rem 0 black;
+}
+
+/* #endregion DP Amount */
 
 /* #region c-game-header__antimatter */
 
@@ -11720,6 +11893,140 @@ kbd {
   background-color: var(--color-reality);
 }
 
+.l-celestial-reality-upgrade-grid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  margin-top: 1.2rem;
+}
+
+.l-celestial-reality-upgrade-grid__row {
+  display: flex;
+  flex-direction: row;
+}
+
+.l-celestial-reality-upgrade-btn {
+  display: flex;
+  flex-direction: column;
+  width: 20.5rem;
+  height: 10rem;
+  position: relative;
+  justify-content: center;
+  align-items: center;
+  margin: 1.2rem;
+  padding: 0 0.5rem;
+}
+
+.c-celestial-reality-upgrade-btn {
+  text-align: center;
+  font-family: Typewriter, serif;
+  font-size: 1rem;
+  color: #2e787d;
+  background-color: var(--color-background);
+  border: var(--var-border-width, 0.2rem) solid #2e787d;
+  border-radius: var(--var-border-radius, 0.5rem);
+  transition-duration: 0.15s;
+  cursor: pointer;
+}
+
+.c-celestial-reality-upgrade-btn__requirement {
+  font-weight: bold;
+}
+
+.c-celestial-reality-upgrade-btn:hover {
+  color: black;
+  background-color: #2e787d;
+}
+
+.c-celestial-reality-upgrade-btn--unavailable {
+  color: #2e787d;
+  background-color: #202020;
+  cursor: default;
+}
+
+.c-celestial-reality-upgrade-btn--unavailable:hover {
+  color: #2e787d;
+  background-color: #202020;
+}
+
+.c-celestial-reality-upgrade-btn--bought {
+  color: black;
+  background: linear-gradient(var(--color-reality), var(--color-celestials));
+  border-color: #094e0b;
+  cursor: default;
+}
+
+.c-celestial-reality-upgrade-btn--bought:hover {
+  color: black;
+  background: linear-gradient(var(--color-reality), var(--color-celestials));
+}
+
+.c-celestial-reality-upgrade-btn--possible {
+  /* Text color gets inherited from other pseudo-classes; so we use !important here in order to ensure good contrast
+    specifically on reality and imaginary upgrades, the only upgrades which use this and the related --locked below */
+  color: black !important;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      #A2A229,
+      #A2A229 3rem,
+      #919122 3rem,
+      #919122 6rem
+    );
+  cursor: default;
+}
+
+.c-celestial-reality-upgrade-btn--possible:hover {
+  /* This is actually a solid color, but it flickers on hover if we don't make it a linear-gradient */
+  background: linear-gradient(0deg, #919122, #919122);
+}
+
+.c-celestial-reality-upgrade-btn--locked {
+  color: white !important;
+  background: #952020;
+  background-image:
+    linear-gradient(45deg, #802222 25%, transparent 25%),
+    linear-gradient(135deg, #802222 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #802222 75%),
+    linear-gradient(135deg, transparent 75%, #802222 75%);
+  background-position: 0 0, 2rem 0, 2rem -2rem, 0 2rem;
+  background-size: 4rem 4rem;
+  cursor: default;
+}
+
+.c-celestial-reality-upgrade-btn--locked:hover {
+  background-color: #802222;
+}
+
+.t-dark .c-celestial-reality-upgrade-btn--unavailable {
+  color: #2e787d;
+  background-color: #37474f;
+}
+
+.t-s6.c-celestial-reality-upgrade-btn:hover,
+.t-s10.c-celestial-reality-upgrade-btn:hover {
+  background: linear-gradient(var(--color-reality), var(--color-celestials));
+}
+
+.t-s6.c-celestial-reality-upgrade-btn--unavailable:hover,
+.t-s10.c-celestial-reality-upgrade-btn--unavailable:hover {
+  color: #2e787d;
+  background-color: #656565;
+}
+
+.t-s6.c-celestial-reality-upgrade-btn--bought,
+.t-s10.c-celestial-reality-upgrade-btn--bought {
+  background: linear-gradient(var(--color-reality), var(--color-celestials));
+  border-color: #094e0b;
+}
+
+.t-s6.c-celestial-reality-upgrade-btn--bought:hover,
+.t-s10.c-celestial-reality-upgrade-btn--bought:hover {
+  color: black;
+  background: linear-gradient(var(--color-reality), var(--color-celestials));
+}
+
 .l-black-hole-tab {
   display: flex;
   flex-direction: column;
@@ -13488,6 +13795,36 @@ kbd {
 /* #endregion themes */
 
 /* #endregion reality-tab */
+
+/* #region celestial-reality-tab */
+
+.c-celestial-reality-tab__celestial-reality-machines {
+  color: #2e787d;
+}
+
+/* #region themes */
+
+/* #region t-dark t-s6 t-s10 */
+
+.t-dark .c-celestial-reality-tab__celestial-reality-machines,
+.t-s6 .c-celestial-reality-tab__celestial-reality-machines,
+.t-s10 .c-celestial-reality-tab__celestial-reality-machines {
+  text-shadow: 0 0 0.7rem;
+}
+
+/* #endregion t-dark t-s6 t-s10 */
+
+/* #region t-s1 */
+
+.t-s1 .c-celestial-reality-tab__celestial-reality-machines {
+  text-shadow: 0.1rem 0.1rem 0 black;
+}
+
+/* #endregion t-s1 */
+
+/* #endregion themes */
+
+/* #endregion celestial-reality-tab */
 
 .o-automator-command {
   width: fit-content;
