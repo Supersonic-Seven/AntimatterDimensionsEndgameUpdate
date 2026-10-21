@@ -17,7 +17,7 @@ export class CelestialGalaxyAutobuyerState extends IntervaledAutobuyerState {
     let minValue = 1000 / CelestialBreakInfinityUpgrade.betterAuto.effectOrDefault(1) /
       (CelestialEternityUpgrade.instaAutos.isBought ? 1e300 : 1);
     return this.isBuyMaxUnlocked
-      ? TimeSpan.fromSeconds(Decimal.max(this.buyMaxInterval, minValue)).totalMilliseconds.toNumber()
+      ? TimeSpan.fromSeconds(Decimal.max(this.buyMaxInterval, minValue / 1000)).totalMilliseconds.toNumber()
       : minValue;
   }
 

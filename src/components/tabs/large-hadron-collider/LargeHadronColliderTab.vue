@@ -18,12 +18,14 @@ export default {
       unlockReq: new Decimal(),
       canSeeEntropy1: false,
       canSeeEntropy2: false,
+      canSeeEntropy3: false,
       entropyCorrupted: false,
       textShift: [],
       hadronSpeed: 0,
       accelPower: 1,
       amSoftcap: new Decimal(),
       amSoftcap2: new Decimal(),
+      amSoftcap3: new Decimal(),
       amHardcap: new Decimal(),
       isRunning: false,
       highestAntimatter: new Decimal(),
@@ -82,12 +84,14 @@ export default {
       this.unlockReq.copyFrom(Decimal.pow10(1e200));
       this.canSeeEntropy1 = player.records.totalAntimatterOutsideDoom.gte(Decimal.pow10(1e200)) && !Slabdrill.isCursed;
       this.canSeeEntropy2 = player.records.totalAntimatterOutsideDoom.gte(Decimal.pow10(1e260)) && !Pelle.isDoomed && !Slabdrill.isCursed;
+      this.canSeeEntropy3 = player.records.totalAntimatterOutsideDoom.gte(Decimal.pow10(1e280)) && !Pelle.isDoomed && !Slabdrill.isCursed;
       this.entropyCorrupted = Slabdrill.isCursed;
       this.textShift = ["Glitched", "Corrupted", "Disrupted"];
       this.hadronSpeed = LHC.hadronSpeed;
       this.accelPower = LHC.acceleratorSpeed * 100000;
       this.amSoftcap.copyFrom(Pelle.isDoomed ? DC.E9E15 : Decimal.pow10(1e200));
       this.amSoftcap2.copyFrom(Decimal.pow10(1e260));
+      this.amSoftcap3.copyFrom(Decimal.pow10(1e280));
       this.amHardcap.copyFrom(Pelle.isDoomed ? DC.ENUMMAX : LHC.breakingPoint);
       this.isRunning = LHC.voidRunning || LHC.nullifiedVoidRunning;
       this.highestAntimatter.copyFrom(player.endgame.largeHadronCollider.void.highestAntimatter);
@@ -224,6 +228,12 @@ export default {
         v-if="canSeeEntropy2"
       >
         The {{ isFlipped ? "Matter" : "Antimatter" }} decay is significantly stronger past {{ format(amSoftcap2, 2, 2) }}.
+      </div>
+      <div
+        class="c-large-hadron-collider-entropy"
+        v-if="canSeeEntropy3"
+      >
+        The {{ isFlipped ? "Matter" : "Antimatter" }} decay is slightly stronger again past {{ format(amSoftcap3, 2, 2) }}.
       </div>
       <div
         class="c-large-hadron-collider-entropy"

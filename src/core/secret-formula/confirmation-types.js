@@ -16,6 +16,10 @@ export const confirmationTypes = [
     option: "bigCrunch",
     isUnlocked: () => player.break || PlayerProgress.eternityUnlocked(),
   }, {
+    name: "Celestial Crunch",
+    option: "celestialCrunch",
+    isUnlocked: () => player.endgame.celDimExpansion.isBroken || PlayerProgress.celestialEternityUnlocked(),
+  }, {
     name: "Challenges",
     option: "challenges",
     isUnlocked: () => PlayerProgress.infinityUnlocked(),

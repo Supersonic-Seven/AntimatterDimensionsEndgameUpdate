@@ -124,6 +124,8 @@ const Positions = Object.freeze({
   celestialBreak: new Vector(720, 850),
   celestialEternity: new Vector(600, 750),
   slabdrillUnlock: new Vector(450, 900),
+
+  destroyerUnlock: new Vector(340, 1030),
   
 
   pelleGalaxyGen: pelleStarPosition(0, 0),
@@ -2055,7 +2057,7 @@ export const celestialNavigation = {
   "cd-break": {
     visible: () => Alpha.isDestroyedForDisplay,
     complete: () => {
-      if (player.endgame.celDimExpansion.isBroken) return 1;
+      if (player.endgame.celDimExpansion.isBroken || PlayerProgress.celestialEternityUnlocked()) return 1;
       if (player.endgame.celDimExpansion.isBreakUnlocked) return 0.999;
       return Decimal.clampMax(0.5, Currency.celestialInfinityPoints.value.div(20000)).add(
         Decimal.clampMax(0.499, CelestialInfinityUpgrade.all.countWhere(u => u.isBought) / 18)).toNumber();
@@ -2091,7 +2093,7 @@ export const celestialNavigation = {
     }
   },
   "cd-eternity": {
-    visible: () => player.endgame.celDimExpansion.isBroken,
+    visible: () => player.endgame.celDimExpansion.isBroken || PlayerProgress.celestialEternityUnlocked(),
     complete: () => {
       if (PlayerProgress.celestialEternityUnlocked()) return 1;
       return Decimal.clampMax(0.999, Currency.celestialInfinityPoints.value.add(1).log10().div(Decimal.log10(DC.NUMMAX))).toNumber();
@@ -2129,12 +2131,13 @@ export const celestialNavigation = {
   "slab-unlock": {
     visible: () => PlayerProgress.celestialEternityUnlocked(),
     complete: () => {
-      if (Slabdrill.isCursed) return 1;
+      if (Slabdrill.isCursed || Slabdrill.isDestroyed) return 1;
       if (CelestialEternityPlusUpgrade.oldStoneSlabAndSteelDrill.isBought) return 0.999;
       return Decimal.clampMax(0.998, Currency.celestialEternityPoints.value.add(1).pLog10().div(4000)).toNumber();
     },
     node: {
-      clickAction: () => Slabdrill.isCursed ? Tab.celestials.slabdrill.show(true) : Tab.cdexpansion.subtabs[3].show(true),
+      clickAction: () => (Slabdrill.isCursed || Slabdrill.isDestroyed)
+        ? Tab.celestials.slabdrill.show(true) : Tab.cdexpansion.subtabs[3].show(true),
       incompleteClass: "c-celestial-nav__test-incomplete",
       symbol: "⁹δ",
       symbolOffset: "1.6",
@@ -2156,7 +2159,7 @@ export const celestialNavigation = {
               "Curse Your Reality"
             ];
           }
-          if (true && complete === 0.999) {
+          if (!player.celestials.slabdrill.isWarping && complete === 0.999) {
             return [
               "Enter Pelle's Domain"
             ];
@@ -2184,6 +2187,67 @@ export const celestialNavigation = {
       completeWidth: 6,
       incompleteWidth: 4,
     },
+  },
+  "slab-progress": {
+    visible: () => Slabdrill.isCursed || Slabdrill.isDestroyed,
+    complete: () => {
+      if (Achievement(261).isUnlocked) return 1;
+      if (Slabdrill.isDestroyed) return 0.999;
+      return Decimal.clampMax(0.999, player.antimatter.max(1).log10().div(DC.NUMMAX.log10()).div(5).min(0.2).add(
+        player.infinityPoints.max(1).log10().div(DC.NUMMAX.log10()).div(10/3).min(0.3)).add(
+        player.eternityPoints.max(1).log10().div(4000).div(2.5).min(0.4)).add(
+        player.records.totalRealityAntimatter.max(1).log10().max(1).log10().div(DC.NUMMAX.log10()).div(10).min(0.1))).toNumber();
+    },
+    node: {
+      clickAction: () => Tab.dimensions.antimatter.show(true),
+      incompleteClass: "c-celestial-nav__test-incomplete",
+      symbol: "♆",
+      symbolOffset: "1.6",
+      fill: "#00bcd4",
+      position: Positions.destroyerUnlock,
+      ring: {
+        rMajor: 24,
+      },
+      forceLegend: () => Slabdrill.isDestroyed,
+      legend: {
+        text: complete => {
+          if (complete >= 1) return `${player.username}`;
+          if (complete === 0.999) return "Become a Celestial";
+          const layer = player.celestials.slabdrill.stage;
+          const antimatter = player.antimatter;
+          if (layer >= 11) {
+            return [
+              "Unlock ???",
+              `Reach ${format(antimatter)} / ${format(DC.ENUMMAX)}`,
+              "antimatter inside the Cursed Reality."
+            ];
+          }
+          return [
+            "Unlock ???",
+            `Reach Strike ${formatInt(layer)} / ${formatInt(11)}`,
+            "inside the Cursed Reality."
+          ];
+        },
+        angle: 240,
+        diagonal: 100,
+        horizontal: 20,
+      },
+      bgDrawOrder: CELESTIAL_NAV_DRAW_ORDER.NODE_BG + 750,
+    },
+    connector: (function() {
+      const pathStart = 0.375 * Math.PI;
+      const pathEnd = pathStart + 2.25 * Math.PI;
+      const path = LogarithmicSpiral.fromPolarEndpoints(new Vector(430, 850),
+        pathStart, 50, pathEnd, 200);
+      return {
+        pathStart,
+        pathEnd,
+        path,
+        pathPadStart: 0,
+        pathPadEnd: 0,
+        fill: "#952ba8",
+      };
+    }()),
   },
   // All the fill elements are generated outside of here as a loop, and then unpacked here with the spread operator
   ...riftFillElements,

@@ -102,7 +102,7 @@ export const galacticPowerRewards = {
   },
   stelliferousUniverse: {
     id: 16,
-    galacticPower: DC.NUMMAX.pow(1000),
+    galacticPower: new Decimal("1e1250000"),
     reward: "Unlock the Stelliferous Universe"
   }
 };

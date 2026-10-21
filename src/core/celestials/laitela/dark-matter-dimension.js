@@ -205,7 +205,7 @@ export class DarkMatterDimensionState extends DimensionState {
       this.intervalCostIncrease).add(1).max(0).floor();
     const gained = new Decimal(x).min(canBuyTotal.sub(isBought)).max(0);
     const cost = new Decimal(INTERVAL_START_COST).times(this.adjustedStartingCost).times(
-      Decimal.pow(this.intervalCostIncrease, canBuyTotal.sub(1).max(0))).floor();
+      Decimal.pow(this.intervalCostIncrease, Decimal.max(canBuyTotal.sub(1), isBought).max(0))).floor();
     if (Currency.darkMatter.gte(cost)) {
       Currency.unnerfedDarkMatter.purchase(cost);
       this.data.intervalUpgrades = this.data.intervalUpgrades.add(gained);
@@ -219,7 +219,7 @@ export class DarkMatterDimensionState extends DimensionState {
       this.powerDMCostIncrease).add(1).max(0).floor();
     const gained = new Decimal(x).min(canBuyTotal.sub(isBought)).max(0);
     const cost = new Decimal(POWER_DM_START_COST).times(this.adjustedStartingCost).times(
-      Decimal.pow(this.powerDMCostIncrease, canBuyTotal.sub(1).max(0))).floor();
+      Decimal.pow(this.powerDMCostIncrease, Decimal.max(canBuyTotal.sub(1), isBought).max(0))).floor();
     if (Currency.darkMatter.gte(cost)) {
       Currency.unnerfedDarkMatter.purchase(cost);
       this.data.powerDMUpgrades = this.data.powerDMUpgrades.add(gained);
@@ -233,7 +233,7 @@ export class DarkMatterDimensionState extends DimensionState {
       this.powerDECostIncrease).add(1).max(0).floor();
     const gained = new Decimal(x).min(canBuyTotal.sub(isBought)).max(0);
     const cost = new Decimal(POWER_DE_START_COST).times(this.adjustedStartingCost).times(
-      Decimal.pow(this.powerDECostIncrease, canBuyTotal.sub(1).max(0))).floor();
+      Decimal.pow(this.powerDECostIncrease, Decimal.max(canBuyTotal.sub(1), isBought).max(0))).floor();
     if (Currency.darkMatter.gte(cost)) {
       Currency.unnerfedDarkMatter.purchase(cost);
       this.data.powerDEUpgrades = this.data.powerDEUpgrades.add(gained);

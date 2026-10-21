@@ -112,8 +112,7 @@ export const EndgameSkills = {
   checkForBuying(auto) {
     if (CelestialDimension(1).baseAmount.gt(0)) return true;
     if (!auto) Modal.message.show(`You need to buy at least ${formatInt(1)} Celestial Dimension before you can purchase
-      Endgame Skills. You also need to be outside Doom to prevent
-      ${player.universes.current === 2 ? "M" : "AM"} overflow.`, { closeEvent: GAME_EVENT.ENDGAME_RESET_AFTER });
+      Endgame Skills.`, { closeEvent: GAME_EVENT.ENDGAME_RESET_AFTER });
     return false;
   },
 
@@ -153,5 +152,14 @@ export const EndgameSkills = {
     let totalCost = list.map(em => em.cost).reduce(Number.sumReducer, 0);
     totalCost += masteryIncrease.entanglementCost();
     return totalCost;
+  },
+
+  getTotalMasteryCost() {
+    let perma = 0;
+    if (EndgameMastery.endgameUpgrades.isBought) perma += EndgameMastery.endgameUpgrades.cost;
+    if (EndgameMastery.permaMasteries.isBought) perma += EndgameMastery.permaMasteries.cost;
+    if (EndgameMastery.timeCompression.isBought) perma += EndgameMastery.timeCompression.cost;
+    if (EndgameMastery.celestialReality.isBought) perma += EndgameMastery.celestialReality.cost;
+    return perma + EndgameSkills.calculateEndgameMasteriesCost();
   }
 };

@@ -3237,6 +3237,64 @@ br {
 
 /* #endregion Neb Amount */
 
+/* #region CP Amount */
+
+.l-game-header__celestial-points {
+  position: absolute;
+  right: 75%;
+}
+
+.c-game-header__cp-amount {
+  font-weight: bold;
+}
+
+.t-dark .c-game-header__cp-amount,
+.t-s6 .c-game-header__cp-amount,
+.t-s10 .c-game-header__cp-amount {
+  color: var(--color-endgame);
+  text-shadow: 0 0 0.7rem var(--color-endgame);
+}
+
+.s-base--metro .c-game-header__cp-amount {
+  color: var(--color-endgame);
+}
+
+.t-s1 .c-game-header__cp-amount {
+  color: var(--color-endgame);
+  text-shadow: 0.1rem 0.1rem 0 black;
+}
+
+/* #endregion CP Amount */
+
+/* #region DP Amount */
+
+.l-game-header__doomed-particles {
+  position: absolute;
+  right: 75%;
+}
+
+.c-game-header__dp-amount {
+  font-weight: bold;
+}
+
+.t-dark .c-game-header__dp-amount,
+.t-s6 .c-game-header__dp-amount,
+.t-s10 .c-game-header__dp-amount {
+  color: var(--color-pelle--base);
+  text-shadow: 0 0 0.7rem var(--color-pelle--base);
+}
+
+.s-base--metro .c-game-header__dp-amount {
+  color: var(--color-pelle--base);
+}
+
+.t-s1 .c-game-header__dp-amount {
+  color: var(--color-pelle--base);
+  text-shadow: 0.1rem 0.1rem 0 black;
+}
+
+/* #endregion DP Amount */
+
 /* #region c-game-header__antimatter */
 
 .c-game-header__antimatter {

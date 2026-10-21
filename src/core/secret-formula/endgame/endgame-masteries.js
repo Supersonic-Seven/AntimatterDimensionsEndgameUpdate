@@ -500,7 +500,7 @@ export const endgameMasteries = [
     requirement: [271, 272, 273, 274],
     reqType: EM_REQUIREMENT_TYPE.ENTANGLEMENT,
     description: "Multiply Thermal Radiation based on Celestial Points of Eternity",
-    effect: () => player.disablePostReality ? DC.D1 : player.endgame.celDimExpansion.celestialEternityPoints.max(1).log10().div(4000).pow(8),
+    effect: () => player.disablePostReality ? DC.D1 : player.endgame.celDimExpansion.celestialEternityPoints.max(1).log10().div(4000).max(1).pow(8),
     formatEffect: value => formatX(value, 2, 2)
   },
   {
@@ -509,7 +509,7 @@ export const endgameMasteries = [
     requirement: [271, 272, 273, 274],
     reqType: EM_REQUIREMENT_TYPE.ENTANGLEMENT,
     description: "Multiply Thermal Radiation based on Nebulae",
-    effect: () => player.disablePostReality ? DC.D1 : player.celestials.pelle.divinity.nebulae.log10().pow(0.3),
+    effect: () => player.disablePostReality ? DC.D1 : player.celestials.pelle.divinity.nebulae.max(10).log10().pow(0.3),
     formatEffect: value => formatX(value, 2, 2)
   },
   {
@@ -527,7 +527,8 @@ export const endgameMasteries = [
     requirement: [282],
     reqType: EM_REQUIREMENT_TYPE.AT_LEAST_ONE,
     description: "Empower Galactic Power based on Celestial Points of Eternity",
-    effect: () => player.disablePostReality ? DC.D1 : player.endgame.celDimExpansion.celestialEternityPoints.max(1).log10().div(4000).pow(1.5),
+    effect: () => player.disablePostReality ? DC.D1 : player.endgame.celDimExpansion.celestialEternityPoints.max(1).log10().div(4000).max(1).min(2).pow(1.5).times(
+      player.endgame.celDimExpansion.celestialEternityPoints.max(1).log10().div(8000).max(1).pow(0.1)),
     formatEffect: value => formatPow(value, 2, 3)
   },
   {
@@ -536,7 +537,7 @@ export const endgameMasteries = [
     requirement: [283],
     reqType: EM_REQUIREMENT_TYPE.AT_LEAST_ONE,
     description: "Empower Galactic Power based on Nebulae",
-    effect: () => player.disablePostReality ? DC.D1 : player.celestials.pelle.divinity.nebulae.log10().pow(0.05),
+    effect: () => player.disablePostReality ? DC.D1 : player.celestials.pelle.divinity.nebulae.max(10).log10().pow(0.05),
     formatEffect: value => formatPow(value, 2, 3)
   },
   {

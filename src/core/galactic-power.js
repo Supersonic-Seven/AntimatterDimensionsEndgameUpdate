@@ -58,5 +58,6 @@ export function getGalacticPowerGainPerSecond() {
   const exponent = galaxyExponent1.times(galaxyExponent2).times(galaxyExponent3).times(galaxyExponent4).times(galaxyExponent5)
     .timesEffectsOf(EndgameMastery(291), EndgameMastery(292), EndgameMastery(293), DualityUpgrade(29)).times(
       NormalChallenge(10).chargedEffect);
-  return Pelle.isDoomed ? new Decimal(0) : Decimal.pow(base, exponent);
+  let gain = Pelle.isDoomed ? new Decimal(0) : Decimal.pow(base, exponent);
+  return gain.min(DC.E1E6).pow(gain.max(1).log10().div(1e6).max(1).pow(0.1));
 }

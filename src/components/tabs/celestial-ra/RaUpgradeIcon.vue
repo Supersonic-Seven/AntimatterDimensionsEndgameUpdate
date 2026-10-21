@@ -1,6 +1,11 @@
 <script>
+import EffectDisplay from "@/components/EffectDisplay";
+
 export default {
   name: "RaUpgradeIcon",
+  components: {
+    EffectDisplay
+  },
   props: {
     unlock: {
       type: Object,
@@ -60,6 +65,12 @@ export default {
         :class="{ 'o-pelle-disabled': isUseless }"
       >
         {{ description }}
+        <span v-if="isUnlocked">
+          <br>
+          <EffectDisplay
+            :config="unlock.config"
+          />
+        </span>
       </div>
     </div>
   </div>

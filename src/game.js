@@ -747,6 +747,31 @@ export function gameLoop(passedDiff, options = {}) {
 
   EventHub.dispatch(GAME_EVENT.GAME_TICK_BEFORE);
 
+  let currentGameState = localStorage.getItem("gameFileVersionState") ?? 0;
+  let gameState = 0;
+  /*if (currentGameState <= 0 && !PlayerProgress.celestialPlusUnlocked()) {
+    gameState = 0;
+  }
+  // Expanse checker will land here when it is time
+  else if (currentGameState <= 1 && PlayerProgress.celestialPlusUnlocked()) {
+    gameState = 1;
+  }*/
+  localStorage.setItem("gameFileVersionState", gameState);
+
+  let stateNumber = Number(localStorage.getItem("gameFileVersionState")) ?? 0;
+  let gameStateName = "";
+  if (stateNumber === 0) {
+    gameStateName = "Antimatter Dimensions: The Endgame Update";
+  }
+  else if (stateNumber === 1) {
+    gameStateName = "Antimatter Dimensions: The Celestial Plus Update";
+  }
+  localStorage.setItem("gameFileUpdateName", gameStateName);
+
+  if (localStorage.gameFileUpdateName) {
+    document.title = localStorage.gameFileUpdateName;
+  }
+
   const thisUpdate = Date.now();
   const passDiff = passedDiff === undefined
     ? Math.clamp(thisUpdate - player.lastUpdate, 1, 8.64e7) : passedDiff;

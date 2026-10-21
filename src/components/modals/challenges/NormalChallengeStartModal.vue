@@ -30,7 +30,7 @@ export default {
       return `You are about to enter Challenge ${this.id}`;
     },
     reward() {
-      return `The reward for completing this challenge is: ${this.challenge._config.reward}`;
+      return `The reward for completing this challenge is: ${this.challenge._config.reward()}`;
     },
     condition() {
       let conditionOfChallenge = this.challenge._config.description;

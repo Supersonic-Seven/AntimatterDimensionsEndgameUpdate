@@ -1952,6 +1952,7 @@ window.player = {
       deleteGlyphSetSave: true,
       glyphRefine: true,
       bigCrunch: true,
+      celestialCrunch: true,
       replicantiGalaxy: true,
       antimatterGalaxy: true,
       dimensionBoost: true,

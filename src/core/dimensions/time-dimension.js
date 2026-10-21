@@ -390,14 +390,30 @@ class TimeDimensionState extends DimensionState {
     return production;
   }
 
+  _prevAmount = DC.D0;
+
+  get prevAmount() {
+    return this._prevAmount ?? DC.D0;
+  }
+
+  set prevAmount(value) {
+    this._prevAmount = value;
+  }
+
+  /**
+   * @returns {Decimal}
+   */
   get rateOfChange() {
-    const tier = this._tier;
+    /*const tier = this._tier;
     if (tier === 8) {
       return DC.D0;
     }
     const toGain = TimeDimension(tier + 1).productionPerSecond;
     const current = Decimal.max(this.totalAmount, 1);
-    return toGain.times(10).dividedBy(current).times(getGameSpeedupForDisplay());
+    return toGain.times(10).dividedBy(current).times(getGameSpeedupForDisplay());*/
+    let gained = this.prevAmount.lte(0) ? DC.D0 : TimeDimension(this.tier).amount.div(this.prevAmount).pow(DC.E3.div(Time.unscaledDeltaTime._ms)).sub(1).times(100);
+    this.prevAmount = TimeDimension(this.tier).amount;
+    return gained;
   }
 
   get isProducing() {

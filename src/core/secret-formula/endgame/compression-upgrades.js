@@ -65,7 +65,7 @@ export const compressionUpgrades = {
     cost: 1e9,
     description: () => `Space Theorems are affected by the double-log2 of your Replicanti Multiplier`,
     effect: () => {
-      return replicantiMult().max(4).log2().log2();
+      return player.disablePostReality ? DC.D1 : replicantiMult().max(4).log2().log2();
     },
     formatEffect: value => formatX(value, 2, 1)
   },
@@ -73,21 +73,21 @@ export const compressionUpgrades = {
     id: 6,
     cost: 5e7,
     description: () => `Gain a multiplier to ${player.universes.current === 2 ? "MDs" : "ADs"} based on Thermal Radiation and real time this Endgame applying after the Compression nerf`,
-    effect: () => Currency.thermalRadiation.value.pow(Time.thisEndgameRealTime.totalMinutes.pow(0.75)).clampMin(1),
+    effect: () => player.disablePostReality ? DC.D1 : Currency.thermalRadiation.value.pow(Time.thisEndgameRealTime.totalMinutes.pow(0.75)).clampMin(1),
     formatEffect: value => formatX(value, 2, 1)
   },
   adBigMultTR: {
     id: 7,
     cost: 2e12,
     description: () => `Gain another multiplier to ${player.universes.current === 2 ? "Matter" : "Antimatter"} Dimensions based on Thermal Radiation that applies after the Compression nerf`,
-    effect: () => Currency.thermalRadiation.value.pow(1000).clampMin(1),
+    effect: () => player.disablePostReality ? DC.D1 : Currency.thermalRadiation.value.pow(1000).clampMin(1),
     formatEffect: value => formatX(value, 2, 1)
   },
   entanglementSplit: {
     id: 8,
     cost: 1e10,
     description: "You can purchase all three Entanglement Paths in the Mastery Tree and empower all Machines based on TR",
-    effect: () => Currency.thermalRadiation.value.max(1).log10().div(308).add(1).pow(2),
+    effect: () => player.disablePostReality ? DC.D1 : Currency.thermalRadiation.value.max(1).log10().div(308).add(1).pow(2),
     formatEffect: value => formatPow(value, 2, 3)
   },
   compressionPenalty: {
@@ -99,7 +99,7 @@ export const compressionUpgrades = {
     id: 10,
     cost: 1e15,
     description: "Generate Endgame Skills based on Hawking Radiation",
-    effect: () => Currency.hawkingRadiation.value.pow(0.5),
+    effect: () => player.disablePostReality ? DC.D0 : Currency.hawkingRadiation.value.pow(0.5),
     formatEffect: value => `${format(value, 2, 1)}/sec`
   }
 };

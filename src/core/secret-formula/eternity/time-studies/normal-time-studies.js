@@ -506,7 +506,7 @@ export const normalTimeStudies = [
     effect: () => Decimal.pow(Currency.timeShards.value.clampMin(2).log2(), 0.008).min(1.2).times(
       Currency.timeShards.value.clampMin(2).log2().add(1).log2().add(1).log2().sub(2.1).div(3).max(1)).toNumber(),
     cap: () => Alpha.isDestroyed ? Infinity : 1.2,
-    formatEffect: value => `+${formatPercents(value - 1, 3)}`
+    formatEffect: value => value >= 11 ? formatX(value, 2, 2) : `+${formatPercents(value - 1, 3)}`
   },
   {
     id: 213,
@@ -646,8 +646,8 @@ export const normalTimeStudies = [
     reqType: TS_REQUIREMENT_TYPE.AT_LEAST_ONE,
     requiresST: [231],
     description: () => `All Galaxies are stronger based on ${player.universes.current === 2 ? "Matter" : "Antimatter"} Galaxies`,
-    effect: () => Decimal.pow(player.galaxies.div(500).add(1), 0.25).toNumber(),
-    formatEffect: value => `+${formatPercents(value - 1, 3)}`
+    effect: () => Decimal.pow(player.galaxies.div(500).add(1), 0.25),
+    formatEffect: value => value.gte(11) ? formatX(value, 2, 2) : `+${formatDecimalPercents(value.sub(1), 3)}`
   },
   {
     id: 233,

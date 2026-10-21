@@ -30,42 +30,42 @@ export default {
   },
   computed: {
     effect1Time() {
-      return new Decimal(0.25).div(Hadrons.speedFactor).times(this.percentageCap).sub(this.hadronTimer);
+      return new Decimal(1/6).div(Hadrons.speedFactor).times(this.percentageCap).sub(this.hadronTimer);
     },
     effect2Time() {
-      return new Decimal(0.5).div(Hadrons.speedFactor).times(this.percentageCap).sub(this.hadronTimer);
+      return new Decimal(1/3).div(Hadrons.speedFactor).times(this.percentageCap).sub(this.hadronTimer);
     },
     effect3Time() {
-      return new Decimal(1).div(Hadrons.speedFactor).times(this.percentageCap).sub(this.hadronTimer);
+      return new Decimal(0.6).div(Hadrons.speedFactor).times(this.percentageCap).sub(this.hadronTimer);
     },
     effect4Time() {
-      return new Decimal(2).div(Hadrons.speedFactor).times(this.percentageCap).sub(this.hadronTimer);
+      return new Decimal(1).div(Hadrons.speedFactor).times(this.percentageCap).sub(this.hadronTimer);
     },
     effect5Time() {
-      return new Decimal(5).div(Hadrons.speedFactor).times(this.percentageCap).sub(this.hadronTimer);
+      return new Decimal(2).div(Hadrons.speedFactor).times(this.percentageCap).sub(this.hadronTimer);
     },
     effect1Percent() {
-      let fac = this.hadronTimer.times(100).times(4).times(Hadrons.speedFactor);
+      let fac = this.hadronTimer.times(100).times(6).times(Hadrons.speedFactor);
       let per = fac.gte(100) ? fac.sub(100).sqrt().add(100) : fac;
       return per.div(100).min(this.basePercentageCap / 100);
     },
     effect2Percent() {
-      let fac = this.hadronTimer.times(100).times(2).times(Hadrons.speedFactor);
+      let fac = this.hadronTimer.times(100).times(3).times(Hadrons.speedFactor);
       let per = fac.gte(100) ? fac.sub(100).sqrt().add(100) : fac;
       return per.div(100).min(this.basePercentageCap / 100);
     },
     effect3Percent() {
-      let fac = this.hadronTimer.times(100).times(Hadrons.speedFactor);
+      let fac = this.hadronTimer.times(100).times(5/3).times(Hadrons.speedFactor);
       let per = fac.gte(100) ? fac.sub(100).sqrt().add(100) : fac;
       return per.div(100).min(this.basePercentageCap / 100);
     },
     effect4Percent() {
-      let fac = this.hadronTimer.times(100).div(2).times(Hadrons.speedFactor);
+      let fac = this.hadronTimer.times(100).times(Hadrons.speedFactor);
       let per = fac.gte(100) ? fac.sub(100).sqrt().add(100) : fac;
       return per.div(100).min(this.basePercentageCap / 100);
     },
     effect5Percent() {
-      let fac = this.hadronTimer.times(100).div(5).times(Hadrons.speedFactor);
+      let fac = this.hadronTimer.times(100).div(2).times(Hadrons.speedFactor);
       let per = fac.gte(100) ? fac.sub(100).sqrt().add(100) : fac;
       return per.div(100).min(this.basePercentageCap / 100);
     },

@@ -9,6 +9,45 @@ export const changelog = [
    * }
    */
   {
+    date: [2026, 10, 21],
+    name: "v2.0.1: The Break Is A Lie",
+    info: `
+I retired from my retirement.
+<br>
+<br>
+<b><i>The game should now be balanced again.</i></b>
+<br>
+<br>
+<b>Things added:</b><br>
+<ul>
+<li>Antimatter Overflow Prevention</li>
+<li>A few internal functions</li>
+<li>Dynamic page name functions</li>
+<li>Some new sidebar resources</li>
+<li>Visual Ra unlock effects in the tooltips</li>
+</ul>
+<br>
+<b>Things changed:</b><br>
+<ul>
+<li>Decreased the starting times for Remnants of Alpha Decay and Hadron effects to cap</li>
+<li>Refactored the formula for the third Celestial Infinity Upgrade</li>
+<li>Increased the requirement for the final Galactic Power</li>
+</ul>
+<br>
+<b>Bugs fixed:</b><br>
+<ul>
+<li>Fixed Antimatter Overflow</li>
+<li>Fixed EC11 abuse</li>
+<li>Fixed C12 abuse</li>
+<li>Fixed some Duality Upgrades not locking properly</li>
+<li>Fixed Celestial Dimboost/Galaxy autobuyers not ticking</li>
+<li>Fixed DMD costs</li>
+<li>Oen or to leeftower tpyos</li>
+</ul>
+<br>
+`
+  },
+  {
     date: [2026, 9, 30],
     name: "v2.0.0: The Serpent Ariseth",
     info: `

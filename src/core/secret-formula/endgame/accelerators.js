@@ -33,7 +33,7 @@ export const accelerators = {
       {
         resource: "potency",
         requirement: 0.75,
-        description: () => `Convert Celestial Dimensions to Continuum and boost them by Continuum Purchases at a ${formatPow(0.1, 1, 1)} rate`
+        description: () => `Convert Celestial Dimensions to Continuum and boost them by Continuum Purchases at a ${formatPow(0.001, 2, 3)} rate`
       },
     ]
   },
