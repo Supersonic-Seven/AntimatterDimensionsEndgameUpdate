@@ -349,7 +349,7 @@ export const dualityUpgrades = [
     name: "Timeless Transcension",
     id: 30,
     cost: new Decimal("1e900"),
-    requirement: () => `Reach ${format(Decimal.pow10(1e272), 2, 2)} ${player.universes.current === 2 ? "Matter" : "Antimatter"} outside Doomed/Cursed Realities`,
+    requirement: () => `Reach ${format(Decimal.pow10(Decimal.pow10(Math.E * 100)), 2, 2)} ${player.universes.current === 2 ? "Matter" : "Antimatter"} outside Doomed/Cursed Realities`,
     hasFailed: () => Pelle.isDoomed || Slabdrill.isCursed,
     checkRequirement: () => player.antimatter.gte(Decimal.pow10(Decimal.pow10(Math.E * 100))) && !Pelle.isDoomed && !Slabdrill.isCursed,
     checkEvent: GAME_EVENT.GAME_TICK_AFTER,
