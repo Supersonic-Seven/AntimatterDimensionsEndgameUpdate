@@ -5,7 +5,79 @@ import { standardizeAutomatorValues, tokenMap as T } from "./lexer";
  */
 
 const presetSplitter = /name[ \t]+(.+$)/ui;
-const idSplitter = /id[ \t]+(\d)/ui;
+const idSplitter = /id[ \t]+(\d+)/ui;
+function parseTabTokens(ctx) {
+  let tabStr = (ctx.Identifier?.[0]?.image || ctx.PrestigeEvent?.[0]?.image || ctx.Celestial?.[0]?.image || "").toLowerCase();
+
+  const TAB_ALIASES = {
+    dim: "dimensions", dims: "dimensions", dimension: "dimensions", dimensions: "dimensions",
+    opt: "options", option: "options", options: "options",
+    stat: "statistics", stats: "statistics", statistic: "statistics", statistics: "statistics",
+    ach: "achievements", achievement: "achievements", achievements: "achievements",
+    auto: "automation", automation: "automation",
+    chal: "challenges", challenge: "challenges", challenges: "challenges",
+    inf: "infinity", infinity: "infinity",
+    etern: "eternity", eternity: "eternity",
+    real: "reality", reality: "reality",
+    cel: "celestials", celestial: "celestials", celestials: "celestials",
+    shop: "shop",
+    end: "endgame", endgame: "endgame",
+    cd: "cdexpansion", cdexpansion: "cdexpansion",
+    div: "divinity", divinity: "divinity",
+    universe: "universes", universes: "universes",
+  };
+
+  const cleanTab = TAB_ALIASES[tabStr.replace(/[-_\s]/g, "")] || tabStr;
+  if (!Tab[cleanTab]) {
+    return {
+      error: true,
+      errorInfo: `Unrecognized tab name "${tabStr}"`,
+      errorTip: "Valid tabs include: dimensions, options, statistics, achievements, automation, challenges, infinity, eternity, reality, celestials, shop, endgame, cdexpansion, divinity, universes",
+      errorToken: ctx.Tab[0]
+    };
+  }
+
+  const rawSub = ctx.NumberLiteral?.[0]?.image || ctx.Identifier?.[1]?.image || ctx.Glyph?.[0]?.image ||
+    ctx.Alchemy?.[0]?.image || ctx.Dilation?.[0]?.image || ctx.Teresa?.[0]?.image || ctx.Effarig?.[0]?.image ||
+    ctx.Enslaved?.[0]?.image || ctx.V?.[0]?.image || ctx.Ra?.[0]?.image || ctx.Laitela?.[0]?.image ||
+    ctx.Pelle?.[0]?.image || ctx.StudyPath?.[0]?.image || ctx.PrestigeEvent?.[1]?.image;
+
+  let subtabKey;
+  if (rawSub) {
+    if (cleanTab === "celestials") {
+      const celNum = parseInt(rawSub, 10);
+      const CELESTIAL_NUM_MAP = [
+        "", "teresa", "effarig", "enslaved", "v", "ra", "laitela", "pelle", "alpha", "slabdrill"
+      ];
+      if (!isNaN(celNum)) {
+        if (celNum < 1 || celNum > 9) {
+          return {
+            error: true,
+            errorInfo: `Invalid celestial number ${celNum}`,
+            errorTip: "Celestial tab number must be between 1 and 9",
+            errorToken: ctx.NumberLiteral?.[0] || ctx.Tab[0]
+          };
+        }
+        subtabKey = CELESTIAL_NUM_MAP[celNum];
+        return { tabKey: cleanTab, subtabKey };
+      }
+    }
+
+    const cleanSub = rawSub.toLowerCase().replace(/[-_\s]/g, "");
+    const targetSub = Tab[cleanTab].subtabs.find(s => s.key.toLowerCase().replace(/[-_\s]/g, "") === cleanSub);
+    if (!targetSub) {
+      return {
+        error: true,
+        errorInfo: `Unrecognized subtab "${rawSub}" under ${cleanTab}`,
+        errorTip: `Check subtab name or spelling for tab ${cleanTab}`,
+        errorToken: ctx.Tab[0]
+      };
+    }
+    subtabKey = targetSub.key;
+  }
+
+  return { tabKey: cleanTab, subtabKey };
+}
 
 function prestigeNotify(flag) {
   if (!AutomatorBackend.isOn) return;
@@ -446,6 +518,35 @@ export const AutomatorCommands = [
     }
   },
   {
+    id: "realityOver",
+    rule: $ => () => {
+      $.CONSUME(T.Reality);
+      $.CONSUME(T.Over);
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Reality[0].startLine;
+      return true;
+    },
+    compile: ctx => () => {
+      if (GameEnd.creditsClosed) return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      if (Slabdrill.isCursed) {
+        Slabdrill.enterCore();
+        Slabdrill.exitCore();
+      } else if (Alpha.isRunning) {
+        Alpha.escapeTheMatrix();
+      } else {
+        beginProcessReality(getRealityProps(true));
+      }
+      AutomatorData.logCommandEvent(`Current Reality restarted via REALITY OVER`, ctx.startLine);
+      return AutomatorBackend.state.forceRestart
+        ? AUTOMATOR_COMMAND_STATUS.RESTART
+        : AUTOMATOR_COMMAND_STATUS.NEXT_TICK_NEXT_INSTRUCTION;
+    },
+    blockify: () => ({
+      ...automatorBlocksMap["REALITY OVER"]
+    })
+  },
+  {
     id: "prestige",
     rule: $ => () => {
       $.CONSUME(T.PrestigeEvent);
@@ -495,7 +596,11 @@ export const AutomatorCommands = [
         // In the prestigeToken.$prestige() line above, performing a reality reset has code internal to the call
         // which makes the automator restart. However, in that case we also need to update the execution state here,
         // or else the restarted automator will immediately advance lines and always skip the first command
-        return (prestigeName === "REALITY" && AutomatorBackend.state.forceRestart)
+        const isResetPrestige = ["REALITY", "DOOM", "ARMAGEDDON"].includes(prestigeName);
+        const isEndgame = prestigeName === "ENDGAME";
+        const shouldRestart = (isResetPrestige && AutomatorBackend.state.forceRestart) ||
+          (isEndgame && (AutomatorBackend.state.forceRestartEndgame ?? true));
+        return shouldRestart
           ? AUTOMATOR_COMMAND_STATUS.RESTART
           : AUTOMATOR_COMMAND_STATUS.NEXT_TICK_NEXT_INSTRUCTION;
       };
@@ -572,44 +677,81 @@ export const AutomatorCommands = [
   {
     id: "storeGameTime",
     rule: $ => () => {
-      $.CONSUME(T.StoreGameTime);
       $.OR([
+        { ALT: () => $.CONSUME(T.StoreGameTime) },
+        { ALT: () => $.CONSUME(T.StoreRealTime) },
+      ]);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.OR1([
         { ALT: () => $.CONSUME(T.On) },
         { ALT: () => $.CONSUME(T.Off) },
         { ALT: () => $.CONSUME(T.Use) },
       ]);
+      $.OPTION1(() => $.CONSUME1(T.Nowait));
     },
     validate: (ctx, V) => {
-      ctx.startLine = ctx.StoreGameTime[0].startLine;
+      const headerToken = (ctx.StoreGameTime || ctx.StoreRealTime)[0];
+      ctx.startLine = headerToken.startLine;
       if (!Enslaved.isUnlocked) {
-        V.addError(ctx.StoreGameTime[0], "You do not yet know how to store game time",
-          "Unlock the ability to store game time");
+        V.addError(headerToken, "You do not yet know how to store time",
+          "Unlock the ability to store time in Enslaved");
+        return false;
+      }
+      if (ctx.StoreRealTime && ctx.Use) {
+        V.addError(ctx.Use[0], "Real time storage does not support 'use'",
+          "Use 'on' or 'off' for real time storage");
         return false;
       }
       return true;
     },
     compile: ctx => {
-      if (ctx.Use) return () => {
-        if (Enslaved.isUnlocked) {
-          Enslaved.useStoredTime(false);
-          AutomatorData.logCommandEvent(`Stored game time used`, ctx.startLine);
-        } else {
-          AutomatorData.logCommandEvent(`Attempted to use stored game time, but failed (not unlocked yet)`,
-            ctx.startLine);
-        }
-        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
-      };
+      const isReal = ctx.StoreRealTime !== undefined;
+      const nowait = ctx.Nowait !== undefined;
       const on = Boolean(ctx.On);
+
+      if (isReal) {
+        return () => {
+          if (!Enslaved.isUnlocked) {
+            if (nowait) return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+          }
+          if (on !== Boolean(player.celestials.enslaved.isStoringReal)) {
+            Enslaved.toggleStoreReal();
+          }
+          AutomatorData.logCommandEvent(`Storing real time turned ${on ? "ON" : "OFF"}`, ctx.startLine);
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        };
+      }
+
+      if (ctx.Use) {
+        return () => {
+          if (Enslaved.isUnlocked) {
+            Enslaved.useStoredTime(false);
+            AutomatorData.logCommandEvent(`Stored game time used`, ctx.startLine);
+          } else {
+            AutomatorData.logCommandEvent(`Attempted to use stored game time, but failed (not unlocked yet)`,
+              ctx.startLine);
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        };
+      }
+
       return () => {
-        if (on !== player.celestials.enslaved.isStoring) Enslaved.toggleStoreBlackHole();
-        AutomatorData.logCommandEvent(`Storing game time toggled ${ctx.On ? "ON" : "OFF"}`, ctx.startLine);
+        if (!Enslaved.isUnlocked) {
+          if (nowait) return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        if (on !== Boolean(player.celestials.enslaved.isStoring)) {
+          Enslaved.toggleStoreBlackHole();
+        }
+        AutomatorData.logCommandEvent(`Storing game time turned ${on ? "ON" : "OFF"}`, ctx.startLine);
         return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
       };
     },
     blockify: ctx => ({
-      // eslint-disable-next-line no-nested-ternary
       singleSelectionInput: ctx.Use ? "USE" : (ctx.On ? "ON" : "OFF"),
-      ...automatorBlocksMap["STORE GAME TIME"]
+      nowait: ctx.Nowait !== undefined,
+      ...(automatorBlocksMap?.["STORE GAME TIME"] || {})
     })
   },
   {
@@ -1132,5 +1274,700 @@ export const AutomatorCommands = [
     blockify: () => ({
       ...automatorBlocksMap.STOP,
     })
-  }
+  },
+  {
+    id: "celestialStart",
+    rule: $ => () => {
+      $.CONSUME(T.Celestial);
+      $.OR([
+        { ALT: () => $.CONSUME(T.Teresa) },
+        { ALT: () => $.CONSUME(T.Effarig) },
+        { ALT: () => $.CONSUME(T.Enslaved) },
+        { ALT: () => $.CONSUME(T.V) },
+        { ALT: () => $.CONSUME(T.Ra) },
+        { ALT: () => $.CONSUME(T.Laitela) },
+        { ALT: () => $.CONSUME(T.Pelle) },
+      ]);
+      $.CONSUME(T.Start);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Celestial[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const CELESTIAL_MAP = {
+        teresa: { name: "Teresa's", obj: Teresa, isUnlocked: () => TeresaUnlocks.run.isUnlocked },
+        effarig: { name: "Effarig's", obj: Effarig, isUnlocked: () => EffarigUnlock.run.isUnlocked },
+        enslaved: { name: "The Nameless Ones'", obj: Enslaved, isUnlocked: () => Enslaved.isUnlocked },
+        v: { name: "V's", obj: V, isUnlocked: () => VUnlocks.vAchievementUnlock.isUnlocked },
+        ra: { name: "Ra's", obj: Ra, isUnlocked: () => (Ra.isUnlocked ?? VUnlocks.raUnlock.isUnlocked) },
+        laitela: { name: "Lai'tela's", obj: Laitela, isUnlocked: () => Laitela.isUnlocked },
+        pelle: { name: "Pelle's", obj: Pelle, isUnlocked: () => Pelle.isUnlocked },
+      };
+      const targetKey = (ctx.Teresa && "teresa") || (ctx.Effarig && "effarig") || (ctx.Enslaved && "enslaved") || (ctx.V && "v") || (ctx.Ra && "ra") || (ctx.Laitela && "laitela") || (ctx.Pelle && "pelle");
+      const cel = CELESTIAL_MAP[targetKey];
+      const nowait = Boolean(ctx.Nowait);
+      return () => {
+        if (!cel) return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        const isRunning = cel.obj.isRunning ?? cel.obj.isDoomed;
+        if (isRunning) {
+          AutomatorData.logCommandEvent(
+            `Celestial Start ignored: already in ${cel.name} Reality`,
+            ctx.startLine
+          );
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        }
+        if (!cel.isUnlocked()) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(
+              `Celestial Start skipped: ${cel.name} Reality is not unlocked (NOWAIT)`,
+              ctx.startLine
+            );
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        beginProcessReality(getRealityProps(true));
+        cel.obj.initializeRun();
+        AutomatorData.logCommandEvent(`Entered ${cel.name} Reality`, ctx.startLine);
+        return AutomatorBackend.state.forceRestart
+          ? AUTOMATOR_COMMAND_STATUS.RESTART
+          : AUTOMATOR_COMMAND_STATUS.NEXT_TICK_NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => {
+      const name = (ctx.Teresa && "TERESA") || (ctx.Effarig && "EFFARIG") || (ctx.Enslaved && "ENSLAVED") || (ctx.V && "V") || (ctx.Ra && "RA") || (ctx.Laitela && "LAITELA") || (ctx.Pelle && "PELLE") || "";
+      return {
+        singleSelectionInput: name,
+        nowait: ctx.Nowait !== undefined,
+        ...automatorBlocksMap.START
+      };
+    }
+  },
+  {
+    id: "glyphLoad",
+    rule: $ => () => {
+      $.CONSUME(T.Glyph);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.CONSUME(T.Load);
+      $.OR([
+        { ALT: () => $.CONSUME1(T.Id) },
+        { ALT: () => $.CONSUME1(T.Name) },
+      ]);
+    },
+    validate: (ctx, V) => {
+      ctx.startLine = ctx.Glyph[0].startLine;
+      while (player.reality.glyphs.sets.length < 70) {
+        player.reality.glyphs.sets.push({ name: "", glyphs: [] });
+      }
+      const maxSlots = 70;
+
+      if (ctx.Id) {
+        const split = idSplitter.exec(ctx.Id[0].image);
+        if (!split || ctx.Id[0].isInsertedInRecovery) {
+          V.addError(ctx, "Missing preset id",
+            "Provide the id of a saved Glyph preset slot from the Glyphs tab");
+          return false;
+        }
+
+        const id = parseInt(split[1], 10);
+        if (id < 1 || id > maxSlots) {
+          V.addError(ctx.Id[0], `Could not find a Glyph preset with an id of ${id}`,
+            `Type in a valid id (1 - ${maxSlots}) for your Glyph preset`);
+          return false;
+        }
+        ctx.$presetIndex = id;
+        return true;
+      }
+
+      if (ctx.Name) {
+        const split = presetSplitter.exec(ctx.Name[0].image);
+        if (!split || ctx.Name[0].isInsertedInRecovery) {
+          V.addError(ctx, "Missing preset name",
+            "Provide the name of a saved Glyph preset from the Glyphs tab");
+          return false;
+        }
+
+        const presetIndex = player.reality.glyphs.sets.findIndex(e => e.name === split[1]) + 1;
+        if (presetIndex === 0) {
+          V.addError(ctx.Name[0], `Could not find Glyph preset named ${split[1]} (Note: Names are case-sensitive)`,
+            "Check to make sure you typed in the correct name for your Glyph preset");
+          return false;
+        }
+        ctx.$presetIndex = presetIndex;
+        return true;
+      }
+      return false;
+    },
+    compile: ctx => {
+      const presetIndex = ctx.$presetIndex;
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        const result = Glyphs.loadPreset(presetIndex - 1);
+        AutomatorData.logCommandEvent(`Loaded Glyph preset ${result.name}`, ctx.startLine);
+        return nowait || result.success
+          ? AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION
+          : AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: ctx.Name ? "NAME" : "ID",
+      singleTextInput: ctx.Name ? player.reality.glyphs.sets[ctx.$presetIndex - 1].name : ctx.$presetIndex,
+      nowait: ctx.Nowait !== undefined,
+      ...automatorBlocksMap["GLYPH LOAD"]
+    })
+  },
+  {
+    id: "glyphUnequip",
+    rule: $ => () => {
+      $.CONSUME(T.Glyph);
+      $.CONSUME(T.Unequip);
+      $.OR([
+        { ALT: () => $.CONSUME(T.On) },
+        { ALT: () => $.CONSUME(T.Off) },
+        { ALT: () => $.CONSUME(T.Main) },
+        { ALT: () => $.CONSUME(T.Protected) },
+      ]);
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Glyph[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const isOn = Boolean(ctx.On);
+      const isOff = Boolean(ctx.Off);
+      const isMain = Boolean(ctx.Main);
+      const isProtected = Boolean(ctx.Protected);
+      return () => {
+        if (isOn || isOff) {
+          player.reality.respec = isOn;
+          AutomatorData.logCommandEvent(
+            `Unequip Glyphs on Reality set to ${isOn ? "ON" : "OFF"}`,
+            ctx.startLine
+          );
+        } else if (isMain || isProtected) {
+          player.options.respecIntoProtected = isProtected;
+          AutomatorData.logCommandEvent(
+            `Unequip destination set to ${isProtected ? "PROTECTED slots" : "MAIN inventory"}`,
+            ctx.startLine
+          );
+        }
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: ctx.On ? "ON" : (ctx.Off ? "OFF" : (ctx.Main ? "MAIN" : "PROTECTED")),
+      ...automatorBlocksMap["GLYPH UNEQUIP"]
+    })
+  },
+  {
+    id: "glyphCreate",
+    rule: $ => () => {
+      $.CONSUME(T.Glyph);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.CONSUME(T.Create);
+      $.OR([
+        { ALT: () => $.CONSUME(T.Cursed) },
+        { ALT: () => $.CONSUME(T.Reality) },
+      ]);
+    },
+    validate: (ctx, VVal) => {
+      ctx.startLine = ctx.Glyph[0].startLine;
+      if (ctx.Cursed && !V.isFlipped) {
+        VVal.addError(ctx.Cursed[0], "Cursed Glyphs are not unlocked yet",
+          "Unlock Hard V to create Cursed Glyphs");
+        return false;
+      }
+      return true;
+    },
+    compile: ctx => {
+      const nowait = ctx.Nowait !== undefined;
+      const isCursed = Boolean(ctx.Cursed);
+      const isReality = Boolean(ctx.Reality);
+      return () => {
+        if (isCursed) {
+          if (!V.isFlipped) {
+            if (nowait) {
+              AutomatorData.logCommandEvent(`Cursed Glyph creation skipped: Hard V is not unlocked (NOWAIT)`, ctx.startLine);
+              return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            }
+            return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+          }
+          const cursedCount = Glyphs.allGlyphs.filter(g => g && g.type === "cursed").length;
+          const maxCount = Math.max(Glyphs.activeSlotCount, 5);
+          if (cursedCount >= maxCount) {
+            AutomatorData.logCommandEvent(`Cursed Glyph creation skipped: already at cap (${maxCount})`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          if (GameCache.glyphInventorySpace.value === 0) {
+            if (nowait) {
+              AutomatorData.logCommandEvent(`Cursed Glyph creation skipped: inventory full (NOWAIT)`, ctx.startLine);
+              return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            }
+            return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+          }
+          Glyphs.giveCursedGlyph();
+          AutomatorData.logCommandEvent(`Created a Cursed Glyph`, ctx.startLine);
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        }
+
+        if (isReality) {
+          const res = AlchemyResources.createRealityGlyph();
+          if (res.success) {
+            AutomatorData.logCommandEvent(`Created a level ${formatInt(res.level)} Reality Glyph`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Reality Glyph creation skipped: ${res.message} (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: ctx.Cursed ? "CURSED" : "REALITY",
+      nowait: ctx.Nowait !== undefined,
+      ...automatorBlocksMap["GLYPH CREATE"]
+    })
+  },
+  {
+    id: "glyphEquip",
+    rule: $ => () => {
+      $.CONSUME(T.Glyph);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.CONSUME(T.Equip);
+      $.CONSUME(T.Cursed);
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Glyph[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        const targetSlot = Glyphs.active.indexOf(null);
+        if (targetSlot === -1 || targetSlot >= Glyphs.activeSlotCount) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Equip Cursed Glyph skipped: no empty active slot (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        const cursedGlyph = Glyphs.inventory.find(g => g && g.type === "cursed");
+        if (!cursedGlyph) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Equip Cursed Glyph skipped: no Cursed Glyph in inventory (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        Glyphs.equip(cursedGlyph, targetSlot);
+        AutomatorData.logCommandEvent(`Equipped a Cursed Glyph into slot ${targetSlot + 1}`, ctx.startLine);
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      nowait: ctx.Nowait !== undefined,
+      ...automatorBlocksMap["GLYPH EQUIP"]
+    })
+  },
+  {
+    id: "alchemyAction",
+    rule: $ => () => {
+      $.CONSUME(T.Alchemy);
+      $.OR([
+        {
+          ALT: () => {
+            $.OR1([
+              { ALT: () => $.CONSUME(T.On) },
+              { ALT: () => $.CONSUME(T.Off) },
+            ]);
+            $.OPTION(() => $.CONSUME(T.Nowait));
+          }
+        },
+        {
+          ALT: () => $.CONSUME(T.Reset)
+        }
+      ]);
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Alchemy[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const isOn = Boolean(ctx.On);
+      const isOff = Boolean(ctx.Off);
+      const isReset = Boolean(ctx.Reset);
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        if (isReset) {
+          AlchemyResources.reset();
+          AutomatorData.logCommandEvent(`Reset all Alchemy resources`, ctx.startLine);
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        }
+        const hasReactions = AlchemyResources.all.some(res => !res.isBaseResource && res.isUnlocked);
+        if (!hasReactions && !nowait) {
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        AlchemyResources.setAllReactions(isOn);
+        AutomatorData.logCommandEvent(`Turned all Alchemy reactions ${isOn ? "ON" : "OFF"}`, ctx.startLine);
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: ctx.Reset ? "RESET" : (ctx.On ? "ON" : "OFF"),
+      nowait: ctx.Nowait !== undefined,
+      ...automatorBlocksMap.ALCHEMY
+    })
+  },
+  {
+    id: "rift",
+    rule: $ => () => {
+      $.CONSUME(T.Rift);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.OR([
+        {
+          ALT: () => {
+            $.CONSUME(T.NumberLiteral);
+            $.OR1([
+              { ALT: () => $.CONSUME(T.On) },
+              { ALT: () => $.CONSUME(T.Off) },
+              { ALT: () => $.CONSUME(T.Sacrifice) },
+            ]);
+          }
+        },
+        {
+          ALT: () => $.CONSUME1(T.Sacrifice)
+        }
+      ]);
+      $.OPTION1(() => $.CONSUME1(T.Nowait));
+    },
+    validate: (ctx, V) => {
+      ctx.startLine = ctx.Rift[0].startLine;
+      const isSacrifice = ctx.Sacrifice !== undefined;
+      if (ctx.NumberLiteral) {
+        const riftId = parseInt(ctx.NumberLiteral[0].image, 10);
+        if (isNaN(riftId) || riftId < 1 || riftId > 5) {
+          V.addError(ctx.NumberLiteral[0], `Invalid Rift ID ${ctx.NumberLiteral[0].image}`,
+            "Rift ID must be an integer between 1 and 5");
+          return false;
+        }
+        ctx.$riftId = riftId;
+      } else if (!isSacrifice) {
+        V.addError(ctx.Rift[0], "Missing Rift number",
+          "Specify which Rift (1 - 5) is being referred to");
+        return false;
+      }
+      return true;
+    },
+    compile: ctx => {
+      const riftId = ctx.$riftId ?? null;
+      const isSacrifice = ctx.Sacrifice !== undefined;
+      const isOn = Boolean(ctx.On);
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        if (!Pelle.isUnlocked) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Rift command skipped: Pelle is not unlocked (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+
+        if (isSacrifice) {
+          if (!Pelle.hasGalaxyGenerator) {
+            if (nowait) {
+              AutomatorData.logCommandEvent(`Rift Sacrifice skipped: Galaxy Generator not unlocked (NOWAIT)`, ctx.startLine);
+              return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            }
+            return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+          }
+
+          if (riftId !== null) {
+            const currentCapRiftIndex = GalaxyGenerator.capRift ? (PelleRifts.all.indexOf(GalaxyGenerator.capRift) + 1) : 99;
+            if (currentCapRiftIndex > riftId) {
+              AutomatorData.logCommandEvent(`Rift ${riftId} already sacrificed, continuing`, ctx.startLine);
+              return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            }
+          }
+
+          if (GalaxyGenerator.sacrificeActive) {
+            AutomatorData.logCommandEvent(`Rift sacrifice currently in progress, continuing`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+
+          if (GalaxyGenerator.canSacrifice(riftId)) {
+            const targetName = GalaxyGenerator.capRift?.name || (riftId ? `Rift ${riftId}` : "Rift");
+            GalaxyGenerator.startSacrifice(riftId);
+            AutomatorData.logCommandEvent(`Started sacrifice of ${targetName} for Galaxy Generator cap`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Rift Sacrifice skipped: not at Galaxy Generator cap yet (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+
+        const rift = PelleRifts.all[riftId - 1];
+        if (!rift || !rift.canBeApplied) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Rift ${riftId} skipped: not unlocked yet (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        if (isOn) {
+          if (rift.isMaxed || Pelle.hasGalaxyGenerator) {
+            AutomatorData.logCommandEvent(`Rift ${riftId} is already maxed`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          if (rift.isActive) {
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          const success = rift.setActive(true);
+          if (success) {
+            AutomatorData.logCommandEvent(`Turned Rift ${riftId} (${rift.name}) ON`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Rift ${riftId} could not be activated: 2 Rifts already active (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        rift.setActive(false);
+        AutomatorData.logCommandEvent(`Turned Rift ${riftId} (${rift.name}) OFF`, ctx.startLine);
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleTextInput: ctx.$riftId || "",
+      singleSelectionInput: ctx.Sacrifice ? "SACRIFICE" : (ctx.On ? "ON" : "OFF"),
+      nowait: ctx.Nowait !== undefined,
+      ...(automatorBlocksMap?.RIFT || {})
+    })
+  },
+  {
+    id: "teresaPour",
+    rule: $ => () => {
+      $.CONSUME(T.Celestial);
+      $.CONSUME(T.Teresa);
+      $.CONSUME(T.Pour);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.OR([
+        { ALT: () => $.CONSUME(T.On) },
+        { ALT: () => $.CONSUME(T.Off) },
+      ]);
+      $.OPTION1(() => $.CONSUME1(T.Nowait));
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Celestial[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const isOn = Boolean(ctx.On);
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        if (!Teresa.isUnlocked) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Teresa Pour skipped: Teresa is not unlocked (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        if (isOn) {
+          if (Teresa.pouredAmount.gte(Teresa.pouredAmountCap)) {
+            AutomatorData.logCommandEvent(`Teresa Pour skipped: already capped`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          if (Currency.realityMachines.value.lte(0)) {
+            if (nowait) {
+              AutomatorData.logCommandEvent(`Teresa Pour skipped: no Reality Machines (NOWAIT)`, ctx.startLine);
+              return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            }
+            return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+          }
+          Teresa.setPour(true);
+          AutomatorData.logCommandEvent(`Teresa Pour started (ON)`, ctx.startLine);
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        }
+        Teresa.setPour(false);
+        AutomatorData.logCommandEvent(`Teresa Pour stopped (OFF)`, ctx.startLine);
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: ctx.On ? "ON" : "OFF",
+      nowait: ctx.Nowait !== undefined,
+      ...(automatorBlocksMap?.["TERESA POUR"] || {})
+    })
+  },
+  {
+    id: "autoPour",
+    rule: $ => () => {
+      $.CONSUME(T.Auto);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.CONSUME(T.Pour);
+      $.OR([
+        { ALT: () => $.CONSUME(T.On) },
+        { ALT: () => $.CONSUME(T.Off) },
+      ]);
+      $.OPTION1(() => $.CONSUME1(T.Nowait));
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Auto[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const isOn = Boolean(ctx.On);
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        const isUnlocked = ExpansionPack.teresaPack.isBought && !player.disablePostReality;
+        if (!isUnlocked) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Auto Pour skipped: not unlocked yet (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        player.celestials.teresa.autoPour = isOn;
+        AutomatorData.logCommandEvent(`Auto Pour turned ${isOn ? "ON" : "OFF"}`, ctx.startLine);
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: ctx.On ? "ON" : "OFF",
+      nowait: ctx.Nowait !== undefined,
+      ...(automatorBlocksMap?.["AUTO POUR"] || {})
+    })
+  },
+  {
+    id: "unlockGenerator",
+    rule: $ => () => {
+      $.CONSUME(T.Unlock);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.CONSUME(T.Generator);
+      $.OPTION1(() => $.CONSUME1(T.Nowait));
+    },
+    validate: ctx => {
+      ctx.startLine = ctx.Unlock[0].startLine;
+      return true;
+    },
+    compile: ctx => {
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        if (!Pelle.isUnlocked) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Galaxy Generator unlock skipped: Pelle not unlocked (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        if (Pelle.hasGalaxyGenerator || player.celestials.pelle.galaxyGenerator.unlocked) {
+          AutomatorData.logCommandEvent(`Galaxy Generator is already unlocked`, ctx.startLine);
+          return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+        }
+        if (!GalaxyGenerator.canUnlock) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Galaxy Generator unlock skipped: requirements not met (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+        GalaxyGenerator.unlock();
+        AutomatorData.logCommandEvent(`Unlocked the Galaxy Generator`, ctx.startLine);
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => ({
+      singleSelectionInput: "GENERATOR",
+      nowait: ctx.Nowait !== undefined,
+      ...automatorBlocksMap.UNLOCK
+    })
+  },
+  {
+    id: "tab",
+    rule: $ => () => {
+      $.CONSUME(T.Tab);
+      $.OPTION(() => $.CONSUME(T.Nowait));
+      $.OR([
+        { ALT: () => $.CONSUME(T.Identifier) },
+        { ALT: () => $.CONSUME(T.PrestigeEvent) },
+        { ALT: () => $.CONSUME(T.Celestial) },
+      ]);
+      $.OPTION1(() => $.OR1([
+        { ALT: () => $.CONSUME1(T.Identifier) },
+        { ALT: () => $.CONSUME(T.NumberLiteral) },
+        { ALT: () => $.CONSUME1(T.PrestigeEvent) },
+        { ALT: () => $.CONSUME1(T.Celestial) },
+        { ALT: () => $.CONSUME(T.Glyph) },
+        { ALT: () => $.CONSUME(T.Alchemy) },
+        { ALT: () => $.CONSUME(T.Dilation) },
+        { ALT: () => $.CONSUME(T.Teresa) },
+        { ALT: () => $.CONSUME(T.Effarig) },
+        { ALT: () => $.CONSUME(T.Enslaved) },
+        { ALT: () => $.CONSUME(T.V) },
+        { ALT: () => $.CONSUME(T.Ra) },
+        { ALT: () => $.CONSUME(T.Laitela) },
+        { ALT: () => $.CONSUME(T.Pelle) },
+        { ALT: () => $.CONSUME(T.StudyPath) },
+      ]));
+      $.OPTION2(() => $.CONSUME2(T.Nowait));
+    },
+    validate: (ctx, V) => {
+      ctx.startLine = ctx.Tab[0].startLine;
+      const res = parseTabTokens(ctx);
+      if (res.error) {
+        V.addError(res.errorToken || ctx.Tab[0], res.errorInfo, res.errorTip);
+        return false;
+      }
+      return true;
+    },
+    compile: ctx => {
+      const { tabKey, subtabKey } = parseTabTokens(ctx);
+      const nowait = ctx.Nowait !== undefined;
+      return () => {
+        const targetTab = Tab[tabKey];
+        if (!targetTab || !targetTab.isUnlocked) {
+          if (nowait) {
+            AutomatorData.logCommandEvent(`Tab switch to ${tabKey} skipped: tab not unlocked (NOWAIT)`, ctx.startLine);
+            return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+          }
+          return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+        }
+
+        if (subtabKey) {
+          const targetSubtab = targetTab[subtabKey];
+          if (!targetSubtab || !targetSubtab.isUnlocked || !targetSubtab.isAvailable) {
+            if (nowait) {
+              AutomatorData.logCommandEvent(`Subtab switch to ${tabKey}.${subtabKey} skipped: subtab not available (NOWAIT)`, ctx.startLine);
+              return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+            }
+            return AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION;
+          }
+          targetSubtab.show(true);
+          AutomatorData.logCommandEvent(`Switched tab to ${tabKey} -> ${subtabKey}`, ctx.startLine);
+        } else {
+          targetTab.show(true);
+          AutomatorData.logCommandEvent(`Switched tab to ${tabKey}`, ctx.startLine);
+        }
+        return AUTOMATOR_COMMAND_STATUS.NEXT_INSTRUCTION;
+      };
+    },
+    blockify: ctx => {
+      const { tabKey, subtabKey } = parseTabTokens(ctx);
+      return {
+        singleSelectionInput: (tabKey || "").toUpperCase(),
+        singleTextInput: subtabKey || "",
+        nowait: ctx.Nowait !== undefined,
+        ...(automatorBlocksMap?.TAB || {})
+      };
+    }
+  },
 ];

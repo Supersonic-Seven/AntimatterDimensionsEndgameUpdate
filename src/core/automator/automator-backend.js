@@ -759,10 +759,10 @@ export const AutomatorBackend = {
         case AUTOMATOR_COMMAND_STATUS.NEXT_TICK_SAME_INSTRUCTION:
           return false;
         case AUTOMATOR_COMMAND_STATUS.NEXT_TICK_NEXT_INSTRUCTION:
-          this.nextCommand();
+          if (this.stack.top) this.nextCommand();
           return false;
         case AUTOMATOR_COMMAND_STATUS.SKIP_INSTRUCTION:
-          this.nextCommand();
+          if (this.stack.top) this.nextCommand();
           break;
         case AUTOMATOR_COMMAND_STATUS.HALT:
           this.stop();
@@ -821,6 +821,7 @@ export const AutomatorBackend = {
 
   nextCommand() {
     const S = this.stack.top;
+    if (!S) return false;
     if (S.commandIndex >= S.commands.length - 1) {
       this.stack.pop();
       if (this.stack.isEmpty) {
@@ -934,6 +935,9 @@ export const AutomatorBackend = {
 
   toggleForceRestart() {
     this.state.forceRestart = !this.state.forceRestart;
+  },
+  toggleForceRestartEndgame() {
+    this.state.forceRestartEndgame = !(this.state.forceRestartEndgame ?? true);
   },
 
   toggleFollowExecution() {
